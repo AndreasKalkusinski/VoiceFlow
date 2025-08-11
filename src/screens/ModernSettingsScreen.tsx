@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   ScrollView,
   Alert,
   Switch,
   Animated,
-  Dimensions,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,7 +15,6 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
-import { ModelDropdown } from '../components/ModelDropdown';
 import { ProviderSettings } from '../components/ProviderSettings';
 import { StorageService } from '../services/storage';
 import { OpenAIService, Model } from '../services/openai';
@@ -29,7 +26,6 @@ import {
   wp,
   hp,
   spacing,
-  fontSize,
   fontSizes,
   componentHeights,
   adaptiveSpacing,
@@ -51,19 +47,19 @@ export const ModernSettingsScreen: React.FC = () => {
     },
     providerSettings: {},
   });
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isValidating, setIsValidating] = useState(false);
+  // const [isValidating, setIsValidating] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  const [apiKeyVisible, setApiKeyVisible] = useState(false);
-  const [whisperModels, setWhisperModels] = useState<Model[]>([]);
-  const [ttsModels, setTtsModels] = useState<Model[]>([]);
-  const [modelsLoading, setModelsLoading] = useState(false);
+  // const [apiKeyVisible, setApiKeyVisible] = useState(false);
+  // const [whisperModels, setWhisperModels] = useState<Model[]>([]);
+  // const [ttsModels, setTtsModels] = useState<Model[]>([]);
+  // const [modelsLoading, setModelsLoading] = useState(false);
   const [autoSave, setAutoSave] = useState(false);
   const modelRefreshInterval = useRef<NodeJS.Timeout | null>(null);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const { colors, theme, isDark, themeMode, setTheme } = useTheme();
+  const { colors, isDark, themeMode, setTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -251,13 +247,13 @@ export const ModernSettingsScreen: React.FC = () => {
     setTimeout(() => setStatusMessage(''), duration);
   };
 
-  const validateApiKey = async () => {
+  const _validateApiKey = async () => {
     if (!settings.openaiApiKey) {
       Alert.alert(t('alerts.apiKeyInvalidTitle'), t('alerts.enterApiKey'));
       return;
     }
 
-    setIsValidating(true);
+    // setIsValidating(true);
     showStatus(t('settings.status.validating'));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
@@ -278,7 +274,7 @@ export const ModernSettingsScreen: React.FC = () => {
       showStatus(t('settings.status.failed'));
       Alert.alert(t('common.error'), t('settings.status.failed'));
     } finally {
-      setIsValidating(false);
+      // setIsValidating(false);
     }
   };
 
@@ -562,33 +558,6 @@ const styles = StyleSheet.create({
   languageButton: {
     flex: 1,
     marginHorizontal: spacing.xs / 2,
-  },
-  inputGroup: {
-    marginBottom: spacing.md,
-  },
-  label: {
-    fontSize: fontSizes.small,
-    fontWeight: '600',
-    marginBottom: spacing.xs,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.2)',
-    borderRadius: spacing.sm,
-    padding: spacing.sm,
-    fontSize: fontSizes.medium,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-  },
-  apiKeyContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  eyeButton: {
-    marginLeft: spacing.xs,
-    width: wp(12),
-  },
-  validateButton: {
-    marginTop: spacing.sm,
   },
   saveButtonContainer: {
     marginBottom: spacing.md,

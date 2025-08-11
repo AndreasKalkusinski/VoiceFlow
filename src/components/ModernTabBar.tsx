@@ -7,11 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../hooks/useTheme';
 import { vw, vh } from '../utils/responsive-dimensions';
 
-interface TabBarProps {
-  state: any;
-  descriptors: any;
-  navigation: any;
-}
+import { TabBarProps } from '../types/navigation';
 
 export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, navigation }) => {
   const { isDark } = useTheme();

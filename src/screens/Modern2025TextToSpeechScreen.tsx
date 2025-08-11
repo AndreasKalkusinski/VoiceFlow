@@ -213,7 +213,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
     }
   };
 
-  const stopPlayback = async () => {
+  const _stopPlayback = async () => {
     if (sound) {
       await sound.stopAsync();
       setIsPlaying(false);
@@ -520,7 +520,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                   onPress={(e) => {
                     if (!audioUri) return;
                     const { locationX } = e.nativeEvent;
-                    const containerWidth = e.currentTarget.measure?.((x, y, width) => {
+                    e.currentTarget.measure?.((x, y, width) => {
                       const progress = Math.max(0, Math.min(1, locationX / width));
                       seekToPosition(progress);
                     });
@@ -696,9 +696,6 @@ const styles = StyleSheet.create({
     fontSize: responsiveDimensions.fontSize.title,
     fontWeight: '700',
     marginBottom: responsiveDimensions.padding.small,
-  },
-  subtitle: {
-    fontSize: responsiveDimensions.fontSize.medium,
   },
   statusArea: {
     minHeight: vh(3.5),

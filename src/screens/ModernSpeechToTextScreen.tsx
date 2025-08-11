@@ -9,14 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Audio } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 import { FloatingActionButton } from '../components/FloatingActionButton';
@@ -29,7 +27,6 @@ import {
   wp,
   hp,
   spacing,
-  fontSize,
   fontSizes,
   componentHeights,
   adaptiveSpacing,
@@ -44,7 +41,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
-  const { colors, theme, isDark } = useTheme();
+  const { colors, isDark } = useTheme();
   const { t } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;

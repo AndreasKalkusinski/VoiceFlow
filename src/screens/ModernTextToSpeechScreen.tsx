@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
-  Dimensions,
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -30,7 +29,6 @@ import {
   wp,
   hp,
   spacing,
-  fontSize,
   fontSizes,
   componentHeights,
   adaptiveSpacing,
@@ -48,11 +46,11 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   const [playbackDuration, setPlaybackDuration] = useState(0);
   const [audioUri, setAudioUri] = useState<string | null>(null);
 
-  const { colors, theme, isDark } = useTheme();
+  const { colors, isDark } = useTheme();
   const { t } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
-  const progressAnim = useRef(new Animated.Value(0)).current;
+  // const progressAnim = useRef(new Animated.Value(0)).current;
   const waveformAnims = useRef([...Array(15)].map(() => new Animated.Value(0.3))).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 

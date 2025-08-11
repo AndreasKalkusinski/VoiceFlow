@@ -521,10 +521,6 @@ const styles = StyleSheet.create({
   segmentActive: {
     ...designTokens.elevation.sm,
   },
-  segmentIcon: {
-    fontSize: 16,
-    marginRight: designTokens.spacing.xs,
-  },
   segmentText: {
     ...designTokens.typography.labelMedium,
     fontWeight: '600',

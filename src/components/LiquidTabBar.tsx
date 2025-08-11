@@ -9,14 +9,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
 import { vw, vh } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
+import { TabBarProps } from '../types/navigation';
 
 const { width } = Dimensions.get('window');
-
-interface TabBarProps {
-  state: any;
-  descriptors: any;
-  navigation: any;
-}
 
 export const LiquidTabBar: React.FC<TabBarProps> = ({ state, navigation }) => {
   const { isDark, colors } = useTheme();
