@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -39,6 +39,14 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to error reporting service
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Show alert in release builds for debugging
+    if (!__DEV__) {
+      Alert.alert(
+        'Error Caught',
+        `${error.toString()}\n\nStack: ${errorInfo.componentStack?.slice(0, 200)}`,
+      );
+    }
 
     this.setState({
       error,

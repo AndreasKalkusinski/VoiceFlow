@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +21,12 @@ function ThemedApp() {
   const { isDark } = useTheme();
   const { t, i18n, ready } = useTranslation();
 
+  React.useEffect(() => {
+    if (!__DEV__) {
+      Alert.alert('Debug', `ThemedApp mounted, i18n ready: ${ready}`);
+    }
+  }, [ready]);
+
   // Force re-render when language changes
   React.useEffect(() => {
     const handleLanguageChange = () => {
@@ -36,6 +42,9 @@ function ThemedApp() {
 
   // Wait for i18n to be ready
   if (!ready) {
+    if (!__DEV__) {
+      Alert.alert('Debug', 'Waiting for i18n...');
+    }
     return <LoadingFallback />;
   }
 
@@ -85,7 +94,13 @@ function LoadingFallback() {
 
 export default function App() {
   React.useEffect(() => {
-    // Remove console.log for release builds
+    // Debug alerts for release build
+
+    // Show debug info in release
+    if (!__DEV__) {
+      Alert.alert('Debug', 'App mounted, starting initialization');
+    }
+
     if (__DEV__) {
       console.log('App mounted successfully');
     }
