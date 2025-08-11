@@ -123,7 +123,7 @@ export class ElevenLabsTTSProvider extends BaseTTSProvider {
         },
       });
       return response.status === 200;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

@@ -18,7 +18,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  const { colors, theme } = useTheme();
+  const { colors } = useTheme();
 
   useEffect(() => {
     if (isActive) {

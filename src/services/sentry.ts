@@ -107,7 +107,7 @@ export const addBreadcrumb = (breadcrumb: {
 /**
  * Start a new Sentry span for performance monitoring
  */
-export const startSpan = (name: string, op: string) => {
+export const startSpan = (_name: string, _op: string) => {
   if (!config.app.isProduction || !config.features.crashReporting) {
     return null;
   }

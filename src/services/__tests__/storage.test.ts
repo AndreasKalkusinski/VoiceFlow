@@ -10,7 +10,12 @@ describe('StorageService', () => {
 
   describe('getApiKey', () => {
     it('should return stored API key', async () => {
-      const mockSettings = { openaiApiKey: 'test-api-key-123', sttModel: 'whisper-1', ttsModel: 'tts-1', ttsVoice: 'alloy' };
+      const mockSettings = {
+        openaiApiKey: 'test-api-key-123',
+        sttModel: 'whisper-1',
+        ttsModel: 'tts-1',
+        ttsVoice: 'alloy',
+      };
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockSettings));
 
       const result = await StorageService.getApiKey();
@@ -42,14 +47,22 @@ describe('StorageService', () => {
   describe('setApiKey', () => {
     it('should store API key', async () => {
       const apiKey = 'new-api-key-456';
-      const mockSettings = { openaiApiKey: '', sttModel: 'whisper-1', ttsModel: 'tts-1', ttsVoice: 'alloy' };
+      const mockSettings = {
+        openaiApiKey: '',
+        sttModel: 'whisper-1',
+        ttsModel: 'tts-1',
+        ttsVoice: 'alloy',
+      };
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockSettings));
       (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
 
       await StorageService.setApiKey(apiKey);
 
       const expectedSettings = { ...mockSettings, openaiApiKey: apiKey };
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@voiceflow_settings', JSON.stringify(expectedSettings));
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        '@voiceflow_settings',
+        JSON.stringify(expectedSettings),
+      );
     });
 
     it('should handle storage errors', async () => {
@@ -66,7 +79,12 @@ describe('StorageService', () => {
 
   describe('getSelectedModel', () => {
     it('should return stored model', async () => {
-      const mockSettings = { openaiApiKey: '', sttModel: 'gpt-4', ttsModel: 'tts-1', ttsVoice: 'alloy' };
+      const mockSettings = {
+        openaiApiKey: '',
+        sttModel: 'gpt-4',
+        ttsModel: 'tts-1',
+        ttsVoice: 'alloy',
+      };
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockSettings));
 
       const result = await StorageService.getSelectedModel();
@@ -94,13 +112,21 @@ describe('StorageService', () => {
       await StorageService.setSelectedModel(model);
 
       const expectedSettings = { ...mockSettings, sttModel: model };
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@voiceflow_settings', JSON.stringify(expectedSettings));
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        '@voiceflow_settings',
+        JSON.stringify(expectedSettings),
+      );
     });
   });
 
   describe('getSelectedVoice', () => {
     it('should return stored voice', async () => {
-      const mockSettings = { openaiApiKey: '', sttModel: 'whisper-1', ttsModel: 'tts-1', ttsVoice: 'nova' };
+      const mockSettings = {
+        openaiApiKey: '',
+        sttModel: 'whisper-1',
+        ttsModel: 'tts-1',
+        ttsVoice: 'nova',
+      };
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockSettings));
 
       const result = await StorageService.getSelectedVoice();
@@ -121,20 +147,33 @@ describe('StorageService', () => {
   describe('setSelectedVoice', () => {
     it('should store selected voice', async () => {
       const voice = 'echo';
-      const mockSettings = { openaiApiKey: '', sttModel: 'whisper-1', ttsModel: 'tts-1', ttsVoice: '' };
+      const mockSettings = {
+        openaiApiKey: '',
+        sttModel: 'whisper-1',
+        ttsModel: 'tts-1',
+        ttsVoice: '',
+      };
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockSettings));
       (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
 
       await StorageService.setSelectedVoice(voice);
 
       const expectedSettings = { ...mockSettings, ttsVoice: voice };
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@voiceflow_settings', JSON.stringify(expectedSettings));
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        '@voiceflow_settings',
+        JSON.stringify(expectedSettings),
+      );
     });
   });
 
   describe('getTTSModel', () => {
     it('should return stored TTS model', async () => {
-      const mockSettings = { openaiApiKey: '', sttModel: 'whisper-1', ttsModel: 'tts-1-hd', ttsVoice: 'alloy' };
+      const mockSettings = {
+        openaiApiKey: '',
+        sttModel: 'whisper-1',
+        ttsModel: 'tts-1-hd',
+        ttsVoice: 'alloy',
+      };
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockSettings));
 
       const result = await StorageService.getTTSModel();
@@ -155,14 +194,22 @@ describe('StorageService', () => {
   describe('setTTSModel', () => {
     it('should store TTS model', async () => {
       const model = 'tts-1-hd';
-      const mockSettings = { openaiApiKey: '', sttModel: 'whisper-1', ttsModel: '', ttsVoice: 'alloy' };
+      const mockSettings = {
+        openaiApiKey: '',
+        sttModel: 'whisper-1',
+        ttsModel: '',
+        ttsVoice: 'alloy',
+      };
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockSettings));
       (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
 
       await StorageService.setTTSModel(model);
 
       const expectedSettings = { ...mockSettings, ttsModel: model };
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@voiceflow_settings', JSON.stringify(expectedSettings));
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        '@voiceflow_settings',
+        JSON.stringify(expectedSettings),
+      );
     });
   });
 });

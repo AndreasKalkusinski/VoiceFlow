@@ -85,7 +85,7 @@ export class OpenAISTTProvider extends BaseSTTProvider {
         },
       });
       return response.status === 200;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

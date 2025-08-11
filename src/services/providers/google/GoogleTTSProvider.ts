@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
-import { Buffer } from 'buffer';
+// Buffer import removed - not used
 import { BaseTTSProvider } from '../BaseProvider';
 import { TTSOptions, TTSModel, TTSVoice } from '../types';
 
@@ -222,7 +222,7 @@ export class GoogleTTSProvider extends BaseTTSProvider {
         },
       });
       return response.status === 200;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

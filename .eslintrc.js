@@ -57,5 +57,6 @@ module.exports = {
     'web-build/',
     '*.config.js',
     'babel.config.js',
+    'jest-setup.js',
   ],
 };
