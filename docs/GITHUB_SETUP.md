@@ -30,6 +30,7 @@ Gehe zu: Settings → Secrets and variables → Actions
 ### Erforderliche Secrets:
 
 1. **EXPO_TOKEN**
+
    ```bash
    # Generieren auf: https://expo.dev/accounts/[username]/settings/access-tokens
    eas login
@@ -37,6 +38,7 @@ Gehe zu: Settings → Secrets and variables → Actions
    ```
 
 2. **SENTRY_AUTH_TOKEN** (optional)
+
    ```bash
    # Generieren auf: https://sentry.io/settings/auth-tokens/
    ```
@@ -66,32 +68,39 @@ eas build --platform android --profile preview
 ## 🚀 Deployment Workflow
 
 ### 1. Feature Branch erstellen
+
 ```bash
 git checkout -b feature/neue-funktion
 ```
 
 ### 2. Änderungen committen
+
 ```bash
 git add .
 git commit -m "feat: neue funktion hinzugefügt"
 ```
 
 ### 3. Push und Pull Request
+
 ```bash
 git push origin feature/neue-funktion
 ```
+
 → Erstelle Pull Request auf GitHub
 
 ### 4. Automatische Checks
+
 - ✅ Linting
-- ✅ Type Checking  
+- ✅ Type Checking
 - ✅ Tests
 - ✅ Preview Build (optional)
 
 ### 5. Merge zu main
+
 Nach erfolgreichen Checks → Merge
 
 ### 6. Automatisches Deployment
+
 - Build wird erstellt
 - Upload zu TestFlight/Play Console
 
@@ -117,15 +126,18 @@ Erstelle `.github/pull_request_template.md`:
 
 ```markdown
 ## Beschreibung
+
 Kurze Beschreibung der Änderungen
 
 ## Art der Änderung
+
 - [ ] Bug fix
 - [ ] Neue Funktion
 - [ ] Breaking change
 - [ ] Dokumentation
 
 ## Checkliste
+
 - [ ] Code folgt den Style Guidelines
 - [ ] Selbst-Review durchgeführt
 - [ ] Tests hinzugefügt/aktualisiert

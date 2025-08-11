@@ -3,6 +3,7 @@
 ## Empfohlene Strategie: GitHub Flow (Schlank & CI/CD-freundlich)
 
 ### Branches:
+
 ```
 main (production-ready)
   └── feature/* oder fix/* (kurzlebige Branches)
@@ -54,7 +55,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
-      
+
   build-ios:
     if: github.ref == 'refs/heads/main'
     runs-on: macos-latest
@@ -62,7 +63,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: expo/expo-github-action@v8
       - run: eas build --platform ios --non-interactive
-      
+
   deploy:
     needs: [test, build-ios]
     if: github.ref == 'refs/heads/main'
@@ -93,9 +94,9 @@ if (FEATURES.NEW_VOICE_ENGINE) {
 
 ```json
 {
-  "version": "1.2.3",
+  "version": "1.2.3"
   // 1 = Major (Breaking Changes)
-  // 2 = Minor (Neue Features)  
+  // 2 = Minor (Neue Features)
   // 3 = Patch (Bugfixes)
 }
 ```
@@ -103,6 +104,7 @@ if (FEATURES.NEW_VOICE_ENGINE) {
 ## Deployment Strategie:
 
 ### 1. Automatisch (Empfohlen)
+
 - Main → Staging (automatisch)
 - Tag → Production (automatisch)
 
@@ -113,12 +115,14 @@ git push origin v1.2.3
 ```
 
 ### 2. Progressive Rollout
+
 - 10% der User → 50% → 100%
 - Via TestFlight oder Play Console
 
 ## Testing Strategie:
 
 ### Pre-Merge (Pull Request):
+
 - ✅ Unit Tests
 - ✅ Integration Tests
 - ✅ Linting
@@ -126,6 +130,7 @@ git push origin v1.2.3
 - ✅ Bundle Size Check
 
 ### Post-Merge (main):
+
 - ✅ E2E Tests
 - ✅ Performance Tests
 - ✅ Build für alle Plattformen
@@ -182,6 +187,7 @@ chore: Wartungsarbeiten
 **KISS - Keep It Simple, Stupid!**
 
 Ein develop Branch macht nur Sinn wenn:
+
 - Du ein großes Team hast (5+ Entwickler)
 - Du scheduled Releases machst (z.B. monatlich)
 - Du eine komplexe QA-Phase brauchst

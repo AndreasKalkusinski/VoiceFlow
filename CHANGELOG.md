@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Professional project structure with ESLint and Prettier configuration
 - Comprehensive testing setup with Jest and React Native Testing Library
 - Error Boundary component for graceful error handling
@@ -23,11 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Provider settings management
 
 ### Changed
+
 - Improved error handling in OpenAI service
 - Enhanced TypeScript configuration with strict mode
 - Updated project documentation
 
 ### Security
+
 - API keys stored securely in AsyncStorage
 - Environment variables for sensitive configuration
 - Input validation for all API calls
@@ -35,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2024-01-10
 
 ### Added
+
 - Initial release of VoiceFlow
 - Speech-to-Text functionality using OpenAI Whisper API
 - Text-to-Speech functionality using OpenAI TTS API
@@ -49,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-language support (English, German, Spanish)
 
 ### Features
+
 - Record audio and transcribe to text
 - Convert text to natural-sounding speech
 - Copy transcribed text to clipboard
@@ -59,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modern, responsive UI design
 
 ### Technical
+
 - Built with React Native and Expo
 - TypeScript for type safety
 - Modular architecture
@@ -69,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2024-01-01
 
 ### Added
+
 - Initial project setup with Expo
 - Basic navigation structure
 - Core dependencies installation

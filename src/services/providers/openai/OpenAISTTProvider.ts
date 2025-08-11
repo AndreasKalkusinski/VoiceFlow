@@ -8,7 +8,7 @@ export class OpenAISTTProvider extends BaseSTTProvider {
   name = 'OpenAI Whisper';
   description = 'Fast and accurate speech recognition by OpenAI';
   requiresApiKey = true;
-  
+
   models: STTModel[] = [
     {
       id: 'whisper-1',
@@ -19,8 +19,26 @@ export class OpenAISTTProvider extends BaseSTTProvider {
   ];
 
   supportedLanguages = [
-    'en', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'zh', 'ja', 'ko',
-    'nl', 'tr', 'pl', 'sv', 'no', 'fi', 'da', 'cs', 'ar', 'he',
+    'en',
+    'de',
+    'es',
+    'fr',
+    'it',
+    'pt',
+    'ru',
+    'zh',
+    'ja',
+    'ko',
+    'nl',
+    'tr',
+    'pl',
+    'sv',
+    'no',
+    'fi',
+    'da',
+    'cs',
+    'ar',
+    'he',
   ];
 
   private baseURL = 'https://api.openai.com/v1';
@@ -38,21 +56,17 @@ export class OpenAISTTProvider extends BaseSTTProvider {
         name: 'audio.m4a',
       } as any);
       formData.append('model', options.model || 'whisper-1');
-      
+
       if (options.language) {
         formData.append('language', options.language);
       }
 
-      const response = await axios.post(
-        `${this.baseURL}/audio/transcriptions`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${options.apiKey}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const response = await axios.post(`${this.baseURL}/audio/transcriptions`, formData, {
+        headers: {
+          Authorization: `Bearer ${options.apiKey}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       return response.data.text;
     } catch (error: any) {
@@ -63,11 +77,11 @@ export class OpenAISTTProvider extends BaseSTTProvider {
 
   async validateConfig(config: any): Promise<boolean> {
     if (!config.apiKey) return false;
-    
+
     try {
       const response = await axios.get(`${this.baseURL}/models`, {
         headers: {
-          'Authorization': `Bearer ${config.apiKey}`,
+          Authorization: `Bearer ${config.apiKey}`,
         },
       });
       return response.status === 200;

@@ -1,11 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
 import { LogMessage } from '../types';
 
 interface LogViewProps {
@@ -63,10 +57,7 @@ export const LogView: React.FC<LogViewProps> = ({ messages }) => {
         {messages.map((message) => (
           <View
             key={message.id}
-            style={[
-              styles.messageContainer,
-              { borderLeftColor: getMessageColor(message.type) },
-            ]}
+            style={[styles.messageContainer, { borderLeftColor: getMessageColor(message.type) }]}
           >
             <Text style={styles.messageText}>{message.message}</Text>
           </View>

@@ -1,17 +1,11 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  View,
-  Text,
-} from 'react-native';
+import { TouchableOpacity, StyleSheet, Animated, View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../hooks/useTheme';
 import { designTokens } from '../utils/design-system';
-import { vw, vh, contentVH, responsiveDimensions } from '../utils/responsive-dimensions';
+import { vh, responsiveDimensions } from '../utils/responsive-dimensions';
 
 interface ModernFABProps {
   onPress: () => void;
@@ -34,7 +28,7 @@ export const ModernFAB: React.FC<ModernFABProps> = ({
 }) => {
   const { isDark } = useTheme();
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
-  
+
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -62,7 +56,7 @@ export const ModernFAB: React.FC<ModernFABProps> = ({
             duration: 1000,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       ).start();
     } else {
       pulseAnim.setValue(1);
@@ -122,11 +116,8 @@ export const ModernFAB: React.FC<ModernFABProps> = ({
     outputRange: ['0deg', '90deg'],
   });
 
-  const transforms = [
-    { scale: scaleAnim },
-    { rotate: rotation },
-  ];
-  
+  const transforms = [{ scale: scaleAnim }, { rotate: rotation }];
+
   if (isActive) {
     transforms.push({ scale: pulseAnim });
   }
@@ -147,11 +138,7 @@ export const ModernFAB: React.FC<ModernFABProps> = ({
         onPressOut={handlePressOut}
         disabled={disabled}
         activeOpacity={0.9}
-        style={[
-          styles.fab,
-          variant === 'extended' && styles.extended,
-          disabled && styles.disabled,
-        ]}
+        style={[styles.fab, variant === 'extended' && styles.extended, disabled && styles.disabled]}
       >
         {variant === 'surface' || variant === 'glass' ? (
           <>
@@ -163,7 +150,7 @@ export const ModernFAB: React.FC<ModernFABProps> = ({
             {variant === 'glass' && (
               <LinearGradient
                 colors={
-                  isDark 
+                  isDark
                     ? ['rgba(255,255,255,0.12)', 'rgba(255,255,255,0.05)']
                     : ['rgba(255,255,255,0.7)', 'rgba(255,255,255,0.4)']
                 }
@@ -173,28 +160,26 @@ export const ModernFAB: React.FC<ModernFABProps> = ({
           </>
         ) : (
           <LinearGradient
-            colors={isActive ? (colors.accentGradient as [string, string]) : [colors.primary, colors.primaryDark] as [string, string]}
+            colors={
+              isActive
+                ? (colors.accentGradient as [string, string])
+                : ([colors.primary, colors.primaryDark] as [string, string])
+            }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={StyleSheet.absoluteFillObject}
           />
         )}
-        
+
         <View style={styles.content}>
-          <View style={styles.iconContainer}>
-            {icon}
-          </View>
+          <View style={styles.iconContainer}>{icon}</View>
           {label && variant === 'extended' && (
-            <Text style={[styles.label, { color: colors.textOnPrimary }]}>
-              {label}
-            </Text>
+            <Text style={[styles.label, { color: colors.textOnPrimary }]}>{label}</Text>
           )}
         </View>
 
         {/* Ripple effect indicator */}
-        {isActive && (
-          <View style={[styles.ripple, { borderColor: colors.primary }]} />
-        )}
+        {isActive && <View style={[styles.ripple, { borderColor: colors.primary }]} />}
       </TouchableOpacity>
     </Animated.View>
   );
@@ -217,7 +202,10 @@ const styles = StyleSheet.create({
   center: {
     top: '50%',
     left: '50%',
-    transform: [{ translateX: -(responsiveDimensions.fab.size / 2) }, { translateY: -(responsiveDimensions.fab.size / 2) }],
+    transform: [
+      { translateX: -(responsiveDimensions.fab.size / 2) },
+      { translateY: -(responsiveDimensions.fab.size / 2) },
+    ],
   },
   fab: {
     width: responsiveDimensions.fab.size,

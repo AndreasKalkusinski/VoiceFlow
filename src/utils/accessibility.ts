@@ -82,12 +82,7 @@ export const a11y = {
 /**
  * Helper function to create accessibility props
  */
-export const createA11yProps = (
-  label: string,
-  hint?: string,
-  role?: string,
-  state?: object
-) => {
+export const createA11yProps = (label: string, hint?: string, role?: string, state?: object) => {
   const props: any = {
     accessible: true,
     accessibilityLabel: label,
@@ -116,12 +111,7 @@ export const createA11yProps = (
 /**
  * Helper to create button accessibility props
  */
-export const buttonA11y = (
-  label: string,
-  hint?: string,
-  disabled = false,
-  loading = false
-) => {
+export const buttonA11y = (label: string, hint?: string, disabled = false, loading = false) => {
   const state: any = { disabled };
   if (loading) {
     state.busy = true;
@@ -131,19 +121,14 @@ export const buttonA11y = (
     loading ? `${label}, ${a11y.states.loading}` : label,
     hint,
     'button',
-    state
+    state,
   );
 };
 
 /**
  * Helper to create text input accessibility props
  */
-export const inputA11y = (
-  label: string,
-  value: string,
-  required = false,
-  error?: string
-) => {
+export const inputA11y = (label: string, value: string, required = false, error?: string) => {
   let fullLabel = label;
   if (required) {
     fullLabel += `, ${a11y.form.required}`;
@@ -152,14 +137,9 @@ export const inputA11y = (
     fullLabel += `, ${error}`;
   }
 
-  return createA11yProps(
-    fullLabel,
-    undefined,
-    'text',
-    {
-      invalid: !!error,
-    }
-  );
+  return createA11yProps(fullLabel, undefined, 'text', {
+    invalid: !!error,
+  });
 };
 
 /**
@@ -213,7 +193,7 @@ export const switchA11y = (label: string, checked: boolean) => {
     label,
     `${checked ? 'Enabled' : 'Disabled'}. Double tap to toggle.`,
     'switch',
-    { checked }
+    { checked },
   );
 };
 
@@ -225,7 +205,7 @@ export const tabA11y = (label: string, selected: boolean, index: number, total: 
     `${label}, tab ${index + 1} of ${total}`,
     selected ? 'Currently selected' : 'Double tap to select',
     'tab',
-    { selected }
+    { selected },
   );
 };
 
@@ -243,16 +223,11 @@ export const modalA11y = (title: string, visible: boolean) => {
 /**
  * Helper for list items
  */
-export const listItemA11y = (
-  label: string,
-  position: number,
-  total: number,
-  selected = false
-) => {
+export const listItemA11y = (label: string, position: number, total: number, selected = false) => {
   return createA11yProps(
     `${label}, ${position} of ${total}`,
     selected ? 'Selected' : 'Double tap to select',
     'button',
-    { selected }
+    { selected },
   );
 };

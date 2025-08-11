@@ -27,17 +27,20 @@ A modern, open-source React Native app for Speech-to-Text and Text-to-Speech usi
 ### Features
 
 ### 🎤 Speech-to-Text
+
 - Sprachaufnahme mit visueller Animation
 - Transkription über OpenAI Whisper
 - Text bearbeiten und ergänzen
 - Text in Zwischenablage kopieren
 
-### 🔊 Text-to-Speech  
+### 🔊 Text-to-Speech
+
 - Text eingeben oder aus Zwischenablage einfügen
 - Sprachausgabe mit verschiedenen Stimmen
 - Wiedergabe-Kontrollen (Play/Pause/Stop)
 
 ### ⚙️ Settings
+
 - OpenAI API Key Konfiguration
 - API Key Validierung
 - Modell-Auswahl für STT und TTS
@@ -46,16 +49,19 @@ A modern, open-source React Native app for Speech-to-Text and Text-to-Speech usi
 ## Installation
 
 1. **Abhängigkeiten installieren:**
+
 ```bash
 npm install
 ```
 
 2. **App starten:**
+
 ```bash
 npx expo start
 ```
 
 3. **App auf Gerät/Simulator ausführen:**
+
 - iOS: Drücke `i` im Terminal
 - Android: Drücke `a` im Terminal
 - Expo Go App: Scanne den QR-Code
@@ -134,14 +140,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### Entwicklung
 
 Die App ist modular aufgebaut:
+
 - `/src/screens/` - Die drei Hauptbildschirme
-- `/src/components/` - Wiederverwendbare Komponenten  
+- `/src/components/` - Wiederverwendbare Komponenten
 - `/src/services/` - API und Storage Services
 - `/src/types/` - TypeScript Type Definitionen
 
 ## ⭐ Support the Project
 
 If you like VoiceFlow, please:
+
 - ⭐ Star this repository
 - 🐛 Report bugs
 - 💡 Suggest new features

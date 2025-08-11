@@ -1,10 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  View,
-} from 'react-native';
+import { TouchableOpacity, StyleSheet, Animated, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../hooks/useTheme';
@@ -39,7 +34,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
             duration: 1000,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       ).start();
 
       Animated.loop(
@@ -47,7 +42,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           toValue: 1,
           duration: 4000,
           useNativeDriver: true,
-        })
+        }),
       ).start();
     } else {
       pulseAnim.stopAnimation();
@@ -89,10 +84,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       style={[
         styles.container,
         {
-          transform: [
-            { scale: Animated.multiply(scaleAnim, pulseAnim) },
-            { rotate: spin },
-          ],
+          transform: [{ scale: Animated.multiply(scaleAnim, pulseAnim) }, { rotate: spin }],
         },
       ]}
     >
@@ -118,14 +110,16 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         style={styles.touchable}
       >
         <LinearGradient
-          colors={isActive ? (colors.secondaryGradient as [string, string]) : (colors.primaryGradient as [string, string])}
+          colors={
+            isActive
+              ? (colors.secondaryGradient as [string, string])
+              : (colors.primaryGradient as [string, string])
+          }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradient}
         >
-          <View style={styles.iconContainer}>
-            {icon}
-          </View>
+          <View style={styles.iconContainer}>{icon}</View>
         </LinearGradient>
       </TouchableOpacity>
     </Animated.View>

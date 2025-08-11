@@ -57,7 +57,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     }).start();
   };
 
-  const handlePress = (e: GestureResponderEvent) => {
+  const handlePress = (_e: GestureResponderEvent) => {
     if (haptic) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
@@ -75,7 +75,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       case 'danger':
         return [colors.error, colors.error];
       case 'glass':
-        return isDark 
+        return isDark
           ? ['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']
           : ['rgba(0, 0, 0, 0.05)', 'rgba(0, 0, 0, 0.02)'];
       default:

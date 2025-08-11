@@ -5,10 +5,7 @@ module.exports = {
     'node_modules/(?!(react-native|@react-native|@react-navigation|@react-native-community|expo-.*|@expo|react-native-.*|@shopify/react-native-skia|lottie-react-native)/)',
   ],
   setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
-  testMatch: [
-    '**/__tests__/**/*.{ts,tsx,js,jsx}',
-    '**/*.{spec,test}.{ts,tsx,js,jsx}',
-  ],
+  testMatch: ['**/__tests__/**/*.{ts,tsx,js,jsx}', '**/*.{spec,test}.{ts,tsx,js,jsx}'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',

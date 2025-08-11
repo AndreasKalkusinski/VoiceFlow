@@ -40,7 +40,7 @@ export const CleanSettingsScreen: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [autoSave, setAutoSave] = useState(false);
   const saveTimeout = React.useRef<NodeJS.Timeout | null>(null);
-  
+
   const { colors, isDark, themeMode, setTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
@@ -147,21 +147,16 @@ export const CleanSettingsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <Text style={[styles.screenTitle, { color: colors.text }]}>
-            {t('settings.title')}
-          </Text>
+          <Text style={[styles.screenTitle, { color: colors.text }]}>{t('settings.title')}</Text>
 
           {/* Appearance Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               {t('settings.appearance')}
             </Text>
-            
+
             <MinimalCard variant="outlined" style={styles.card}>
               <Text style={[styles.label, { color: colors.textSecondary }]}>
                 {t('settings.theme.title')}
@@ -181,10 +176,12 @@ export const CleanSettingsScreen: React.FC = () => {
                     ]}
                     onPress={() => setTheme(option.id as ThemeMode)}
                   >
-                    <Text style={[
-                      styles.optionText,
-                      { color: themeMode === option.id ? colors.primary : colors.text }
-                    ]}>
+                    <Text
+                      style={[
+                        styles.optionText,
+                        { color: themeMode === option.id ? colors.primary : colors.text },
+                      ]}
+                    >
                       {option.name}
                     </Text>
                   </TouchableOpacity>
@@ -203,14 +200,19 @@ export const CleanSettingsScreen: React.FC = () => {
                     style={[
                       styles.option,
                       selectedLanguage === lang.code && styles.optionSelected,
-                      { borderColor: selectedLanguage === lang.code ? colors.primary : colors.border },
+                      {
+                        borderColor:
+                          selectedLanguage === lang.code ? colors.primary : colors.border,
+                      },
                     ]}
                     onPress={() => handleLanguageChange(lang.code)}
                   >
-                    <Text style={[
-                      styles.optionText,
-                      { color: selectedLanguage === lang.code ? colors.primary : colors.text }
-                    ]}>
+                    <Text
+                      style={[
+                        styles.optionText,
+                        { color: selectedLanguage === lang.code ? colors.primary : colors.text },
+                      ]}
+                    >
                       {lang.flag} {lang.name}
                     </Text>
                   </TouchableOpacity>
@@ -224,28 +226,34 @@ export const CleanSettingsScreen: React.FC = () => {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               {t('settings.providers')}
             </Text>
-            
+
             <ProviderSettings
               type="stt"
               selectedProvider={settings.sttProvider || 'openai-stt'}
               apiKeys={settings.apiKeys || {}}
               providerSettings={settings.providerSettings || {}}
-              onProviderChange={(providerId) => setSettings({ ...settings, sttProvider: providerId })}
-              onApiKeyChange={(provider, key) => setSettings({
-                ...settings,
-                apiKeys: { ...settings.apiKeys, [provider]: key },
-                openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
-              })}
-              onSettingChange={(providerId, setting, value) => setSettings({
-                ...settings,
-                providerSettings: {
-                  ...settings.providerSettings,
-                  [providerId]: {
-                    ...settings.providerSettings?.[providerId],
-                    [setting]: value,
+              onProviderChange={(providerId) =>
+                setSettings({ ...settings, sttProvider: providerId })
+              }
+              onApiKeyChange={(provider, key) =>
+                setSettings({
+                  ...settings,
+                  apiKeys: { ...settings.apiKeys, [provider]: key },
+                  openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
+                })
+              }
+              onSettingChange={(providerId, setting, value) =>
+                setSettings({
+                  ...settings,
+                  providerSettings: {
+                    ...settings.providerSettings,
+                    [providerId]: {
+                      ...settings.providerSettings?.[providerId],
+                      [setting]: value,
+                    },
                   },
-                },
-              })}
+                })
+              }
             />
 
             <View style={styles.spacer} />
@@ -255,22 +263,28 @@ export const CleanSettingsScreen: React.FC = () => {
               selectedProvider={settings.ttsProvider || 'openai-tts'}
               apiKeys={settings.apiKeys || {}}
               providerSettings={settings.providerSettings || {}}
-              onProviderChange={(providerId) => setSettings({ ...settings, ttsProvider: providerId })}
-              onApiKeyChange={(provider, key) => setSettings({
-                ...settings,
-                apiKeys: { ...settings.apiKeys, [provider]: key },
-                openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
-              })}
-              onSettingChange={(providerId, setting, value) => setSettings({
-                ...settings,
-                providerSettings: {
-                  ...settings.providerSettings,
-                  [providerId]: {
-                    ...settings.providerSettings?.[providerId],
-                    [setting]: value,
+              onProviderChange={(providerId) =>
+                setSettings({ ...settings, ttsProvider: providerId })
+              }
+              onApiKeyChange={(provider, key) =>
+                setSettings({
+                  ...settings,
+                  apiKeys: { ...settings.apiKeys, [provider]: key },
+                  openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
+                })
+              }
+              onSettingChange={(providerId, setting, value) =>
+                setSettings({
+                  ...settings,
+                  providerSettings: {
+                    ...settings.providerSettings,
+                    [providerId]: {
+                      ...settings.providerSettings?.[providerId],
+                      [setting]: value,
+                    },
                   },
-                },
-              })}
+                })
+              }
             />
           </View>
 
@@ -279,7 +293,7 @@ export const CleanSettingsScreen: React.FC = () => {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               {t('settings.voiceSelection')}
             </Text>
-            
+
             <MinimalCard variant="outlined" style={styles.card}>
               <View style={styles.voiceGrid}>
                 {voices.map((voice) => (
@@ -288,14 +302,19 @@ export const CleanSettingsScreen: React.FC = () => {
                     style={[
                       styles.voiceOption,
                       settings.ttsVoice === voice.id && styles.voiceSelected,
-                      { borderColor: settings.ttsVoice === voice.id ? colors.primary : colors.border },
+                      {
+                        borderColor:
+                          settings.ttsVoice === voice.id ? colors.primary : colors.border,
+                      },
                     ]}
                     onPress={() => setSettings({ ...settings, ttsVoice: voice.id })}
                   >
-                    <Text style={[
-                      styles.voiceText,
-                      { color: settings.ttsVoice === voice.id ? colors.primary : colors.text }
-                    ]}>
+                    <Text
+                      style={[
+                        styles.voiceText,
+                        { color: settings.ttsVoice === voice.id ? colors.primary : colors.text },
+                      ]}
+                    >
                       {voice.name}
                     </Text>
                   </TouchableOpacity>

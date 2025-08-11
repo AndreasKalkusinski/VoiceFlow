@@ -53,7 +53,7 @@ export const SettingsScreen: React.FC = () => {
       type,
       timestamp: new Date(),
     };
-    setLogs(prev => [...prev, newLog]);
+    setLogs((prev) => [...prev, newLog]);
   };
 
   const validateApiKey = async () => {
@@ -65,11 +65,11 @@ export const SettingsScreen: React.FC = () => {
     setIsValidating(true);
     setLogs([]);
     addLog('Validating API key...', 'info');
-    
+
     try {
       const openaiService = new OpenAIService(settings.openaiApiKey);
       const isValid = await openaiService.validateApiKey();
-      
+
       if (isValid) {
         addLog('API key is valid', 'success');
         Alert.alert('Success', 'API key is valid!');
@@ -90,7 +90,7 @@ export const SettingsScreen: React.FC = () => {
     setIsSaving(true);
     setLogs([]);
     addLog('Saving settings...', 'info');
-    
+
     try {
       await StorageService.saveSettings(settings);
       addLog('Settings saved successfully', 'success');
@@ -117,10 +117,10 @@ export const SettingsScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <LogView messages={logs} />
-      
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>OpenAI Configuration</Text>
-        
+
         <View style={styles.inputGroup}>
           <Text style={styles.label}>API Key</Text>
           <TextInput
@@ -166,7 +166,11 @@ export const SettingsScreen: React.FC = () => {
 
         <View style={styles.inputGroup}>
           <Text style={styles.label}>TTS Voice</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.voiceSelector}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.voiceSelector}
+          >
             {voices.map((voice) => (
               <TouchableOpacity
                 key={voice}

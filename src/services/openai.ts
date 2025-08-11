@@ -22,7 +22,7 @@ export class OpenAIService {
     try {
       const response = await axios.get(`${this.baseURL}/models`, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
         },
       });
       return response.status === 200;
@@ -37,7 +37,7 @@ export class OpenAIService {
     try {
       const response = await axios.get(`${this.baseURL}/models`, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
         },
       });
       return response.data.data || [];
@@ -50,18 +50,13 @@ export class OpenAIService {
 
   async getWhisperModels(): Promise<Model[]> {
     const models = await this.getAvailableModels();
-    return models.filter(model => 
-      model.id.includes('whisper') || 
-      model.id === 'whisper-1'
-    );
+    return models.filter((model) => model.id.includes('whisper') || model.id === 'whisper-1');
   }
 
   async getTTSModels(): Promise<Model[]> {
     const models = await this.getAvailableModels();
-    return models.filter(model => 
-      model.id.includes('tts') || 
-      model.id === 'tts-1' || 
-      model.id === 'tts-1-hd'
+    return models.filter(
+      (model) => model.id.includes('tts') || model.id === 'tts-1' || model.id === 'tts-1-hd',
     );
   }
 
@@ -74,7 +69,7 @@ export class OpenAIService {
           ErrorType.VALIDATION,
           'Audio file does not exist',
           'FILE_NOT_FOUND',
-          { audioUri }
+          { audioUri },
         );
       }
 
@@ -90,16 +85,12 @@ export class OpenAIService {
       } as any);
       formData.append('model', model);
 
-      const response = await axios.post(
-        `${this.baseURL}/audio/transcriptions`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const response = await axios.post(`${this.baseURL}/audio/transcriptions`, formData, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       return response.data.text;
     } catch (error) {
@@ -112,15 +103,15 @@ export class OpenAIService {
     }
   }
 
-  async textToSpeech(text: string, model: string = 'tts-1', voice: string = 'alloy'): Promise<string> {
+  async textToSpeech(
+    text: string,
+    model: string = 'tts-1',
+    voice: string = 'alloy',
+  ): Promise<string> {
     try {
       // Validate input
       if (!text || text.trim().length === 0) {
-        throw new ApplicationError(
-          ErrorType.VALIDATION,
-          'Text cannot be empty',
-          'EMPTY_TEXT'
-        );
+        throw new ApplicationError(ErrorType.VALIDATION, 'Text cannot be empty', 'EMPTY_TEXT');
       }
 
       if (text.length > 4096) {
@@ -128,10 +119,10 @@ export class OpenAIService {
           ErrorType.VALIDATION,
           'Text is too long (max 4096 characters)',
           'TEXT_TOO_LONG',
-          { length: text.length }
+          { length: text.length },
         );
       }
-      
+
       const response = await axios.post(
         `${this.baseURL}/audio/speech`,
         {
@@ -142,26 +133,22 @@ export class OpenAIService {
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
+            Authorization: `Bearer ${this.apiKey}`,
             'Content-Type': 'application/json',
           },
           responseType: 'arraybuffer',
-        }
+        },
       );
 
       // Convert arraybuffer to base64 using Buffer polyfill
       const base64Audio = Buffer.from(response.data).toString('base64');
-      
+
       // Use timestamp to avoid caching issues
       const audioUri = FileSystem.documentDirectory + `speech_${Date.now()}.mp3`;
-      
-      await FileSystem.writeAsStringAsync(
-        audioUri,
-        base64Audio,
-        {
-          encoding: FileSystem.EncodingType.Base64,
-        }
-      );
+
+      await FileSystem.writeAsStringAsync(audioUri, base64Audio, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
       // Verify file was written
       const fileInfo = await FileSystem.getInfoAsync(audioUri);
@@ -169,7 +156,7 @@ export class OpenAIService {
         throw new ApplicationError(
           ErrorType.STORAGE,
           'Failed to save audio file',
-          'FILE_SAVE_ERROR'
+          'FILE_SAVE_ERROR',
         );
       }
 

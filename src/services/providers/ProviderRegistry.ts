@@ -9,11 +9,11 @@ export class ProviderRegistry {
   private static sttProviders = new Map<string, STTProvider>();
   private static ttsProviders = new Map<string, TTSProvider>();
   private static initialized = false;
-  
+
   private static initialize() {
     if (this.initialized) return;
     this.initialized = true; // Set flag BEFORE registering to prevent recursion
-    
+
     // Register default providers
     this.sttProviders.set('openai-stt', new OpenAISTTProvider());
     this.sttProviders.set('google-stt', new GoogleSTTProvider());
@@ -52,7 +52,7 @@ export class ProviderRegistry {
 
   static getSTTProviderInfo() {
     this.initialize();
-    return this.getAllSTTProviders().map(p => ({
+    return this.getAllSTTProviders().map((p) => ({
       id: p.id,
       name: p.name,
       description: p.description,
@@ -63,7 +63,7 @@ export class ProviderRegistry {
 
   static getTTSProviderInfo() {
     this.initialize();
-    return this.getAllTTSProviders().map(p => ({
+    return this.getAllTTSProviders().map((p) => ({
       id: p.id,
       name: p.name,
       description: p.description,

@@ -1,12 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView, Alert } from 'react-native';
 import { GlassCard } from './GlassCard';
 import { AnimatedButton } from './AnimatedButton';
 import { ProviderCard } from './ProviderCard';
@@ -14,7 +7,7 @@ import { ModelDropdown } from './ModelDropdown';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { ProviderRegistry } from '../services/providers/ProviderRegistry';
-import { wp, hp, spacing, fontSize, fontSizes } from '../utils/responsive';
+import { wp, spacing, fontSizes } from '../utils/responsive';
 import * as Haptics from 'expo-haptics';
 
 interface ProviderSettingsProps {
@@ -39,13 +32,12 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({
   const { colors } = useTheme();
   const { t } = useTranslation();
   const [apiKeyVisible, setApiKeyVisible] = useState<Record<string, boolean>>({});
-  
-  const providers = type === 'stt' 
-    ? ProviderRegistry.getAllSTTProviders()
-    : ProviderRegistry.getAllTTSProviders();
 
-  const currentProvider = providers.find(p => p.id === selectedProvider);
-  
+  const providers =
+    type === 'stt' ? ProviderRegistry.getAllSTTProviders() : ProviderRegistry.getAllTTSProviders();
+
+  const currentProvider = providers.find((p) => p.id === selectedProvider);
+
   const getApiKeyForProvider = (providerId: string): string => {
     // Map provider ID to API key field
     if (providerId.startsWith('openai')) return apiKeys.openai || '';
@@ -59,14 +51,14 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({
     if (providerId.startsWith('openai')) keyName = 'openai';
     else if (providerId.startsWith('google')) keyName = 'google';
     else if (providerId.startsWith('elevenlabs')) keyName = 'elevenlabs';
-    
+
     if (keyName) {
       onApiKeyChange(keyName, value);
     }
   };
 
   const toggleApiKeyVisibility = (providerId: string) => {
-    setApiKeyVisible(prev => ({
+    setApiKeyVisible((prev) => ({
       ...prev,
       [providerId]: !prev[providerId],
     }));
@@ -101,7 +93,7 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({
 
       {/* Provider Selection */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.providerList}>
-        {providers.map(provider => (
+        {providers.map((provider) => (
           <View key={provider.id} style={styles.providerCardWrapper}>
             <ProviderCard
               id={provider.id}
@@ -163,7 +155,7 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({
             <ModelDropdown
               label={t('settings.model')}
               value={providerSettings[currentProvider.id]?.model || currentProvider.models[0].id}
-              options={currentProvider.models.map(m => ({
+              options={currentProvider.models.map((m) => ({
                 id: m.id,
                 name: m.name,
                 description: m.description,
@@ -173,18 +165,21 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({
           )}
 
           {/* Voice Selection for TTS */}
-          {type === 'tts' && 'voices' in currentProvider && currentProvider.voices && currentProvider.voices.length > 0 && (
-            <ModelDropdown
-              label={t('settings.voice')}
-              value={providerSettings[currentProvider.id]?.voice || currentProvider.voices[0]?.id}
-              options={currentProvider.voices.map((v: any) => ({
-                id: v.id,
-                name: v.name,
-                description: `${v.gender || ''} ${v.description || ''}`.trim(),
-              }))}
-              onValueChange={(value) => onSettingChange(currentProvider.id, 'voice', value)}
-            />
-          )}
+          {type === 'tts' &&
+            'voices' in currentProvider &&
+            currentProvider.voices &&
+            currentProvider.voices.length > 0 && (
+              <ModelDropdown
+                label={t('settings.voice')}
+                value={providerSettings[currentProvider.id]?.voice || currentProvider.voices[0]?.id}
+                options={currentProvider.voices.map((v: any) => ({
+                  id: v.id,
+                  name: v.name,
+                  description: `${v.gender || ''} ${v.description || ''}`.trim(),
+                }))}
+                onValueChange={(value) => onSettingChange(currentProvider.id, 'voice', value)}
+              />
+            )}
         </GlassCard>
       )}
     </View>

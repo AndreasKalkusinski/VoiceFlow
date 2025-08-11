@@ -62,28 +62,28 @@ export function handleApiError(error: any): ApplicationError {
         ErrorType.API,
         'Authentication failed. Please check your API key.',
         'AUTH_ERROR',
-        data
+        data,
       );
     } else if (status === 429) {
       return new ApplicationError(
         ErrorType.API,
         'Rate limit exceeded. Please try again later.',
         'RATE_LIMIT',
-        data
+        data,
       );
     } else if (status === 400) {
       return new ApplicationError(
         ErrorType.API,
         data?.error?.message || 'Invalid request. Please check your input.',
         'BAD_REQUEST',
-        data
+        data,
       );
     } else if (status >= 500) {
       return new ApplicationError(
         ErrorType.API,
         'Server error. Please try again later.',
         'SERVER_ERROR',
-        data
+        data,
       );
     }
 
@@ -91,7 +91,7 @@ export function handleApiError(error: any): ApplicationError {
       ErrorType.API,
       data?.error?.message || `Request failed with status ${status}`,
       `HTTP_${status}`,
-      data
+      data,
     );
   } else if (error.request) {
     // Request made but no response received
@@ -99,7 +99,7 @@ export function handleApiError(error: any): ApplicationError {
       ErrorType.NETWORK,
       'Network error. Please check your internet connection.',
       'NETWORK_ERROR',
-      error.request
+      error.request,
     );
   } else {
     // Something else happened
@@ -107,7 +107,7 @@ export function handleApiError(error: any): ApplicationError {
       ErrorType.UNKNOWN,
       error.message || 'An unexpected error occurred.',
       'UNKNOWN_ERROR',
-      error
+      error,
     );
   }
 }
@@ -120,7 +120,7 @@ export function handleStorageError(error: any): ApplicationError {
     ErrorType.STORAGE,
     'Failed to access local storage. Please try again.',
     'STORAGE_ERROR',
-    error
+    error,
   );
 }
 
@@ -132,7 +132,7 @@ export function handlePermissionError(permission: string): ApplicationError {
     ErrorType.PERMISSION,
     `Permission denied: ${permission}. Please enable this permission in your device settings.`,
     'PERMISSION_DENIED',
-    { permission }
+    { permission },
   );
 }
 
@@ -152,7 +152,7 @@ export function handleError(error: any): ApplicationError {
     ErrorType.UNKNOWN,
     error.message || 'An unexpected error occurred.',
     'UNKNOWN_ERROR',
-    error
+    error,
   );
 }
 

@@ -17,49 +17,53 @@ const ScreenLoader = () => (
  */
 
 // Modern screens
-export const LazyModernSpeechToTextScreen = lazy(
-  () => import('./ModernSpeechToTextScreen').then(m => ({ default: m.ModernSpeechToTextScreen }))
+export const LazyModernSpeechToTextScreen = lazy(() =>
+  import('./ModernSpeechToTextScreen').then((m) => ({ default: m.ModernSpeechToTextScreen })),
 );
 
-export const LazyModernTextToSpeechScreen = lazy(
-  () => import('./ModernTextToSpeechScreen').then(m => ({ default: m.ModernTextToSpeechScreen }))
+export const LazyModernTextToSpeechScreen = lazy(() =>
+  import('./ModernTextToSpeechScreen').then((m) => ({ default: m.ModernTextToSpeechScreen })),
 );
 
-export const LazyModernSettingsScreen = lazy(
-  () => import('./ModernSettingsScreen').then(m => ({ default: m.ModernSettingsScreen }))
+export const LazyModernSettingsScreen = lazy(() =>
+  import('./ModernSettingsScreen').then((m) => ({ default: m.ModernSettingsScreen })),
 );
 
 // Clean screens
-export const LazyCleanSpeechToTextScreen = lazy(
-  () => import('./CleanSpeechToTextScreen').then(m => ({ default: m.CleanSpeechToTextScreen }))
+export const LazyCleanSpeechToTextScreen = lazy(() =>
+  import('./CleanSpeechToTextScreen').then((m) => ({ default: m.CleanSpeechToTextScreen })),
 );
 
-export const LazyCleanTextToSpeechScreen = lazy(
-  () => import('./CleanTextToSpeechScreen').then(m => ({ default: m.CleanTextToSpeechScreen }))
+export const LazyCleanTextToSpeechScreen = lazy(() =>
+  import('./CleanTextToSpeechScreen').then((m) => ({ default: m.CleanTextToSpeechScreen })),
 );
 
-export const LazyCleanSettingsScreen = lazy(
-  () => import('./CleanSettingsScreen').then(m => ({ default: m.CleanSettingsScreen }))
+export const LazyCleanSettingsScreen = lazy(() =>
+  import('./CleanSettingsScreen').then((m) => ({ default: m.CleanSettingsScreen })),
 );
 
 // Modern2025 screens
-export const LazyModern2025SpeechToTextScreen = lazy(
-  () => import('./Modern2025SpeechToTextScreen').then(m => ({ default: m.Modern2025SpeechToTextScreen }))
+export const LazyModern2025SpeechToTextScreen = lazy(() =>
+  import('./Modern2025SpeechToTextScreen').then((m) => ({
+    default: m.Modern2025SpeechToTextScreen,
+  })),
 );
 
-export const LazyModern2025TextToSpeechScreen = lazy(
-  () => import('./Modern2025TextToSpeechScreen').then(m => ({ default: m.Modern2025TextToSpeechScreen }))
+export const LazyModern2025TextToSpeechScreen = lazy(() =>
+  import('./Modern2025TextToSpeechScreen').then((m) => ({
+    default: m.Modern2025TextToSpeechScreen,
+  })),
 );
 
-export const LazyModern2025SettingsScreen = lazy(
-  () => import('./Modern2025SettingsScreen').then(m => ({ default: m.Modern2025SettingsScreen }))
+export const LazyModern2025SettingsScreen = lazy(() =>
+  import('./Modern2025SettingsScreen').then((m) => ({ default: m.Modern2025SettingsScreen })),
 );
 
 /**
  * HOC to wrap lazy loaded components with Suspense
  */
 export function withSuspense<P extends object>(
-  LazyComponent: React.LazyExoticComponent<React.ComponentType<P>>
+  LazyComponent: React.LazyExoticComponent<React.ComponentType<P>>,
 ) {
   return (props: P) => (
     <Suspense fallback={<ScreenLoader />}>

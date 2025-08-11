@@ -32,8 +32,51 @@ jest.mock('expo-haptics', () => ({
   },
 }));
 
+jest.mock('expo-linear-gradient', () => {
+  const { View } = require('react-native');
+  return {
+    LinearGradient: View,
+  };
+});
+
+jest.mock('expo-blur', () => {
+  const { View } = require('react-native');
+  return {
+    BlurView: View,
+  };
+});
+
+jest.mock('react-native-safe-area-context', () => {
+  const React = require('react');
+  return {
+    SafeAreaProvider: ({ children }) => children,
+    SafeAreaView: ({ children }) => children,
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  };
+});
+
+jest.mock('react-native-svg', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    default: View,
+    Svg: View,
+    Path: View,
+    Circle: View,
+    G: View,
+    Line: View,
+  };
+});
+
+jest.mock('@expo/vector-icons', () => {
+  const { Text } = require('react-native');
+  return {
+    Ionicons: Text,
+  };
+});
+
 jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 // Mock react-native-reanimated
@@ -49,3 +92,6 @@ global.console = {
   warn: jest.fn(),
   error: jest.fn(),
 };
+
+// Mock global __DEV__
+global.__DEV__ = true;

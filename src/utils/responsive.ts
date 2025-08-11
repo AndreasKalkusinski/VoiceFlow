@@ -71,7 +71,7 @@ export const componentHeights = {
   buttonArea: screenHeight < 700 ? 120 : screenHeight < 900 ? 140 : 160,
   statusBar: screenHeight < 700 ? 60 : 80,
   tabBar: Platform.OS === 'android' ? 60 : 65,
-  header: Platform.OS === 'android' ? (screenHeight < 700 ? 50 : 60) : (screenHeight < 700 ? 44 : 56),
+  header: Platform.OS === 'android' ? (screenHeight < 700 ? 50 : 60) : screenHeight < 700 ? 44 : 56,
 };
 
 // Adaptive margins and paddings

@@ -29,7 +29,7 @@ export const initSentry = () => {
 export const captureException = (
   error: Error,
   context?: Record<string, any>,
-  level: 'error' | 'warning' | 'info' | 'debug' = 'error'
+  level: 'error' | 'warning' | 'info' | 'debug' = 'error',
 ) => {
   if (!config.app.isProduction || !config.features.crashReporting) {
     // In development, just log to console
@@ -52,7 +52,7 @@ export const captureException = (
 export const captureMessage = (
   message: string,
   level: 'error' | 'warning' | 'info' | 'debug' = 'info',
-  context?: Record<string, any>
+  context?: Record<string, any>,
 ) => {
   if (!config.app.isProduction || !config.features.crashReporting) {
     console.log(`[${level}] ${message}`, context);
@@ -71,11 +71,13 @@ export const captureMessage = (
 /**
  * Set user context for better error tracking
  */
-export const setUserContext = (user: {
-  id?: string;
-  email?: string;
-  username?: string;
-} | null) => {
+export const setUserContext = (
+  user: {
+    id?: string;
+    email?: string;
+    username?: string;
+  } | null,
+) => {
   if (!config.app.isProduction || !config.features.crashReporting) {
     return;
   }
@@ -120,17 +122,13 @@ export const startSpan = (name: string, op: string) => {
  */
 export const wrapAsync = <T extends (...args: any[]) => Promise<any>>(
   fn: T,
-  context?: string
+  context?: string,
 ): T => {
   return (async (...args) => {
     try {
       return await fn(...args);
     } catch (error) {
-      captureException(
-        error as Error,
-        { function: fn.name, context, args },
-        'error'
-      );
+      captureException(error as Error, { function: fn.name, context, args }, 'error');
       throw error;
     }
   }) as T;

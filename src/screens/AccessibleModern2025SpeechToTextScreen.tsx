@@ -9,12 +9,12 @@ import {
   AccessibilityInfo,
 } from 'react-native';
 import { Modern2025SpeechToTextScreen } from './Modern2025SpeechToTextScreen';
-import { 
-  buttonA11y, 
-  inputA11y, 
+import {
+  buttonA11y,
+  inputA11y,
   loadingA11y,
   announce,
-  createA11yProps 
+  createA11yProps,
 } from '../utils/accessibility';
 
 /**
@@ -38,24 +38,19 @@ export const useSpeechToTextA11y = (isRecording: boolean, isProcessing: boolean)
         'Stop Recording',
         'Double tap to stop recording and transcribe audio',
         false,
-        false
+        false,
       );
     }
     return buttonA11y(
       'Start Recording',
       'Double tap to start recording audio for transcription',
       false,
-      isProcessing
+      isProcessing,
     );
   }, [isRecording, isProcessing]);
 
   const textInputA11y = React.useMemo(() => {
-    return inputA11y(
-      'Transcribed text',
-      '',
-      false,
-      undefined
-    );
+    return inputA11y('Transcribed text', '', false, undefined);
   }, []);
 
   const copyButtonA11y = React.useMemo(() => {
@@ -63,26 +58,16 @@ export const useSpeechToTextA11y = (isRecording: boolean, isProcessing: boolean)
       'Copy to Clipboard',
       'Double tap to copy transcribed text to clipboard',
       false,
-      false
+      false,
     );
   }, []);
 
   const clearButtonA11y = React.useMemo(() => {
-    return buttonA11y(
-      'Clear Text',
-      'Double tap to clear all transcribed text',
-      false,
-      false
-    );
+    return buttonA11y('Clear Text', 'Double tap to clear all transcribed text', false, false);
   }, []);
 
   const shareButtonA11y = React.useMemo(() => {
-    return buttonA11y(
-      'Share Text',
-      'Double tap to share transcribed text',
-      false,
-      false
-    );
+    return buttonA11y('Share Text', 'Double tap to share transcribed text', false, false);
   }, []);
 
   return {

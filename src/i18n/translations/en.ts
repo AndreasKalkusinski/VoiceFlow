@@ -15,13 +15,13 @@ export default {
     current: 'Current',
     duration: 'Duration',
   },
-  
+
   navigation: {
     speechToText: 'Speech',
     textToSpeech: 'Voice',
     settings: 'Settings',
   },
-  
+
   speechToText: {
     title: 'Voice to Text',
     subtitle: 'Convert your voice into text',
@@ -42,7 +42,7 @@ export default {
       title: 'Tip',
       description: 'Tap the record button and speak clearly for best results.',
     },
-    
+
     status: {
       starting: 'Getting ready for you...',
       ready: 'Ready when you are!',
@@ -54,11 +54,11 @@ export default {
       microphoneDenied: 'We need your microphone permission',
     },
   },
-  
+
   textToSpeech: {
     title: 'Text to Speech',
     subtitle: 'Input Text',
-    placeholder: 'Type or paste your text here and we\'ll bring it to life with speech...',
+    placeholder: "Type or paste your text here and we'll bring it to life with speech...",
     generateSpeech: 'Create Speech',
     generating: 'Creating...',
     play: 'Play',
@@ -77,7 +77,7 @@ export default {
     textPasted: 'Text pasted',
     textCleared: 'Text cleared',
     refreshed: 'Refreshed',
-    
+
     tapToPlay: 'Tap to generate speech',
     status: {
       generating: 'Creating your speech with AI...',
@@ -87,7 +87,7 @@ export default {
       paused: 'Taking a break',
       stopped: 'All quiet now',
       completed: 'That was awesome!',
-      failed: 'Hmm, something didn\'t work',
+      failed: "Hmm, something didn't work",
       pasted: 'Text added! 📝',
       cleared: 'Fresh start!',
       downloaded: 'Audio saved 💾',
@@ -98,7 +98,7 @@ export default {
       pasteFailed: 'Paste failed',
     },
   },
-  
+
   settings: {
     title: 'Settings',
     subtitle: 'Personalize your app',
@@ -107,13 +107,13 @@ export default {
     configuration: 'OpenAI Configuration',
     voiceSelection: 'Voice Selection',
     providers: 'Providers',
-    
+
     theme: {
       auto: 'Auto',
       light: 'Light',
       dark: 'Dark',
     },
-    
+
     apiKey: 'API Key',
     apiKeyPlaceholder: 'sk-...',
     validateApiKey: 'Validate API Key',
@@ -123,12 +123,12 @@ export default {
     textToSpeechProvider: 'Text-to-Speech Provider',
     model: 'Model',
     voice: 'Voice',
-    
+
     models: {
       speechToText: 'Speech-to-Text Model',
       textToSpeech: 'Text-to-Speech Model',
     },
-    
+
     voices: {
       alloy: 'Alloy',
       echo: 'Echo',
@@ -136,7 +136,7 @@ export default {
       onyx: 'Onyx',
       nova: 'Nova',
       shimmer: 'Shimmer',
-      
+
       descriptions: {
         alloy: 'Neutral and balanced',
         echo: 'British accent',
@@ -146,9 +146,9 @@ export default {
         shimmer: 'Soft and gentle',
       },
     },
-    
+
     saveSettings: 'Save Settings',
-    
+
     status: {
       loading: 'Loading settings...',
       loaded: 'Settings loaded',
@@ -165,7 +165,7 @@ export default {
     autoSaveEnabled: 'Auto-save enabled',
     autoSaveDisabled: 'Auto-save disabled',
   },
-  
+
   errors: {
     noApiKey: 'Please configure your OpenAI API key in Settings',
     noText: 'Please enter some text',
@@ -173,7 +173,7 @@ export default {
     clipboardEmpty: 'No text found in clipboard',
     microphoneRequired: 'This app needs microphone access for speech to text functionality',
   },
-  
+
   alerts: {
     configRequired: 'Configuration Required',
     enterApiKey: 'Please enter an API key',

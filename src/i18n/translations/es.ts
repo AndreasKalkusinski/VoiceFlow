@@ -15,13 +15,13 @@ export default {
     current: 'Actual',
     duration: 'Duración',
   },
-  
+
   navigation: {
     speechToText: 'Voz',
     textToSpeech: 'Habla',
     settings: 'Ajustes',
   },
-  
+
   speechToText: {
     title: 'Voz a Texto',
     subtitle: 'Tu Transcripción',
@@ -34,7 +34,7 @@ export default {
     clearText: 'Limpiar',
     copiedToClipboard: '¡Copiado! 📋',
     textCleared: '¡Todo limpio!',
-    
+
     status: {
       starting: 'Preparándome para ti...',
       ready: '¡Listo cuando tú lo estés!',
@@ -46,7 +46,7 @@ export default {
       microphoneDenied: 'Necesitamos permiso del micrófono',
     },
   },
-  
+
   textToSpeech: {
     title: 'Texto a Voz',
     subtitle: 'Escribe tu Texto',
@@ -62,7 +62,7 @@ export default {
     pasteText: 'Pegar',
     audioPlayer: 'Reproductor',
     voice: 'Voz',
-    
+
     status: {
       generating: 'Creando tu voz con IA...',
       loading: 'Casi listo...',
@@ -82,20 +82,20 @@ export default {
       pasteFailed: 'Error al pegar',
     },
   },
-  
+
   settings: {
     title: 'Ajustes',
     appearance: 'Apariencia',
     language: 'Idioma',
     configuration: 'Configuración OpenAI',
     voiceSelection: 'Selección de Voz',
-    
+
     theme: {
       auto: 'Auto',
       light: 'Claro',
       dark: 'Oscuro',
     },
-    
+
     apiKey: 'Clave API',
     apiKeyPlaceholder: 'sk-...',
     validateApiKey: 'Validar Clave API',
@@ -105,12 +105,12 @@ export default {
     textToSpeechProvider: 'Proveedor de Texto a Voz',
     model: 'Modelo',
     voice: 'Voz',
-    
+
     models: {
       speechToText: 'Modelo Voz-a-Texto',
       textToSpeech: 'Modelo Texto-a-Voz',
     },
-    
+
     voices: {
       alloy: 'Alloy',
       echo: 'Echo',
@@ -118,7 +118,7 @@ export default {
       onyx: 'Onyx',
       nova: 'Nova',
       shimmer: 'Shimmer',
-      
+
       descriptions: {
         alloy: 'Neutral y equilibrado',
         echo: 'Acento británico',
@@ -128,9 +128,9 @@ export default {
         shimmer: 'Suave y delicado',
       },
     },
-    
+
     saveSettings: 'Guardar Ajustes',
-    
+
     status: {
       loading: 'Cargando ajustes...',
       loaded: 'Ajustes cargados',
@@ -147,15 +147,16 @@ export default {
     autoSaveEnabled: 'Guardado automático activado',
     autoSaveDisabled: 'Guardado automático desactivado',
   },
-  
+
   errors: {
     noApiKey: 'Por favor configura tu clave API de OpenAI en Ajustes',
     noText: 'Por favor introduce algún texto',
     noAudio: 'Por favor genera voz primero',
     clipboardEmpty: 'No se encontró texto en el portapapeles',
-    microphoneRequired: 'Esta aplicación necesita acceso al micrófono para la función de voz a texto',
+    microphoneRequired:
+      'Esta aplicación necesita acceso al micrófono para la función de voz a texto',
   },
-  
+
   alerts: {
     configRequired: 'Configuración Requerida',
     enterApiKey: 'Por favor introduce una clave API',

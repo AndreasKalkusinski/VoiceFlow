@@ -26,7 +26,15 @@ import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
-import { wp, hp, spacing, fontSize, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
+import {
+  wp,
+  hp,
+  spacing,
+  fontSize,
+  fontSizes,
+  componentHeights,
+  adaptiveSpacing,
+} from '../utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
 
 export const ModernTextToSpeechScreen: React.FC = () => {
@@ -39,15 +47,13 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   const [playbackPosition, setPlaybackPosition] = useState(0);
   const [playbackDuration, setPlaybackDuration] = useState(0);
   const [audioUri, setAudioUri] = useState<string | null>(null);
-  
+
   const { colors, theme, isDark } = useTheme();
   const { t } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
-  const waveformAnims = useRef(
-    [...Array(15)].map(() => new Animated.Value(0.3))
-  ).current;
+  const waveformAnims = useRef([...Array(15)].map(() => new Animated.Value(0.3))).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -88,7 +94,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
-    }, [])
+    }, []),
   );
 
   const animateEntry = () => {
@@ -122,13 +128,13 @@ export const ModernTextToSpeechScreen: React.FC = () => {
             duration: 300 + Math.random() * 200,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       ).start();
     });
   };
 
   const stopWaveformAnimation = () => {
-    waveformAnims.forEach(anim => {
+    waveformAnims.forEach((anim) => {
       anim.stopAnimation();
       Animated.timing(anim, {
         toValue: 0.3,
@@ -151,7 +157,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
           duration: 1000,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
   };
 
@@ -168,7 +174,10 @@ export const ModernTextToSpeechScreen: React.FC = () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-      console.log('TTS Settings loaded:', loadedSettings?.openaiApiKey ? 'API key present' : 'No API key');
+      console.log(
+        'TTS Settings loaded:',
+        loadedSettings?.openaiApiKey ? 'API key present' : 'No API key',
+      );
     } catch (error) {
       console.error('Error loading settings:', error);
     }
@@ -198,7 +207,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
     // Reload settings to ensure we have the latest
     const currentSettings = await StorageService.getSettings();
     setSettings(currentSettings);
-    
+
     if (!currentSettings?.openaiApiKey) {
       Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
       return;
@@ -218,7 +227,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
       const audioUri = await openaiService.textToSpeech(
         inputText,
         currentSettings.ttsModel,
-        currentSettings.ttsVoice
+        currentSettings.ttsVoice,
       );
 
       showStatus(t('textToSpeech.status.loading'));
@@ -238,13 +247,13 @@ export const ModernTextToSpeechScreen: React.FC = () => {
 
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: audioUri },
-        { 
+        {
           shouldPlay: false,
           volume: 1.0,
           isMuted: false,
           isLooping: false,
         },
-        onPlaybackStatusUpdate
+        onPlaybackStatusUpdate,
       );
 
       setSound(newSound);
@@ -264,13 +273,13 @@ export const ModernTextToSpeechScreen: React.FC = () => {
     if (status.isLoaded) {
       setPlaybackPosition(status.positionMillis || 0);
       setPlaybackDuration(status.durationMillis || 0);
-      
+
       if (status.isPlaying) {
         setIsPlaying(true);
       } else {
         setIsPlaying(false);
       }
-      
+
       if (status.didJustFinish) {
         setIsPlaying(false);
         setPlaybackPosition(0);
@@ -287,7 +296,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
 
     try {
       const status = await sound.getStatusAsync();
-      
+
       if (status.isLoaded) {
         if (isPlaying) {
           await sound.pauseAsync();
@@ -302,7 +311,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
             shouldDuckAndroid: true,
             playThroughEarpieceAndroid: false,
           });
-          
+
           await sound.setVolumeAsync(1.0);
           await sound.playAsync();
           showStatus(t('textToSpeech.status.playing'));
@@ -349,10 +358,10 @@ export const ModernTextToSpeechScreen: React.FC = () => {
 
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      
+
       // Check if sharing is available
       const isAvailable = await Sharing.isAvailableAsync();
-      
+
       if (!isAvailable) {
         Alert.alert(t('alerts.error'), t('textToSpeech.downloadNotAvailable'));
         return;
@@ -362,20 +371,20 @@ export const ModernTextToSpeechScreen: React.FC = () => {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
       const fileName = `VoiceFlow_TTS_${timestamp}.mp3`;
       const permanentUri = FileSystem.documentDirectory + fileName;
-      
+
       // Copy the file to a permanent location with a proper name
       await FileSystem.copyAsync({
         from: audioUri,
         to: permanentUri,
       });
-      
+
       // Share the file (this will show save options on iOS)
       await Sharing.shareAsync(permanentUri, {
         mimeType: 'audio/mpeg',
         dialogTitle: t('textToSpeech.saveAudio'),
         UTI: 'public.mp3',
       });
-      
+
       showStatus(t('textToSpeech.status.downloaded'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
@@ -395,296 +404,297 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <LinearGradient
-        colors={isDark 
-          ? ['#0F0F23', '#1A1A3E', '#0F0F23']
-          : ['#F0F4FF', '#FFFFFF', '#F0F4FF']
-        }
+        colors={isDark ? ['#0F0F23', '#1A1A3E', '#0F0F23'] : ['#F0F4FF', '#FFFFFF', '#F0F4FF']}
         style={styles.container}
       >
         <KeyboardAvoidingView
           style={styles.keyboardAvoid}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-        <ScrollView 
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <Animated.View
-            style={[
-              styles.content,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
           >
-            {/* Status Message */}
-            {statusMessage !== '' && (
-              <Animated.View style={styles.statusContainer}>
-                <GlassCard style={styles.statusCard}>
-                  <Text style={[styles.statusText, { color: colors.text }]}>
-                    {statusMessage}
+            <Animated.View
+              style={[
+                styles.content,
+                {
+                  opacity: fadeAnim,
+                  transform: [{ translateY: slideAnim }],
+                },
+              ]}
+            >
+              {/* Status Message */}
+              {statusMessage !== '' && (
+                <Animated.View style={styles.statusContainer}>
+                  <GlassCard style={styles.statusCard}>
+                    <Text style={[styles.statusText, { color: colors.text }]}>{statusMessage}</Text>
+                  </GlassCard>
+                </Animated.View>
+              )}
+
+              {/* Text Input Area */}
+              <GlassCard style={styles.textCard} gradient>
+                <View style={styles.textHeader}>
+                  <Text style={[styles.label, { color: colors.text }]}>
+                    {t('textToSpeech.title')}
                   </Text>
-                </GlassCard>
-              </Animated.View>
-            )}
+                  <AnimatedButton
+                    title={t('textToSpeech.pasteText')}
+                    onPress={pasteFromClipboard}
+                    variant="glass"
+                    size="small"
+                    icon={<Text>📋</Text>}
+                  />
+                </View>
 
-            {/* Text Input Area */}
-            <GlassCard style={styles.textCard} gradient>
-              <View style={styles.textHeader}>
-                <Text style={[styles.label, { color: colors.text }]}>
-                  {t('textToSpeech.title')}
-                </Text>
-                <AnimatedButton
-                  title={t('textToSpeech.pasteText')}
-                  onPress={pasteFromClipboard}
-                  variant="glass"
-                  size="small"
-                  icon={<Text>📋</Text>}
+                <TextInput
+                  style={[styles.textInput, { color: colors.text }]}
+                  multiline
+                  value={inputText}
+                  onChangeText={setInputText}
+                  placeholder={t('textToSpeech.placeholder')}
+                  placeholderTextColor={colors.textMuted}
                 />
-              </View>
-              
-              <TextInput
-                style={[styles.textInput, { color: colors.text }]}
-                multiline
-                value={inputText}
-                onChangeText={setInputText}
-                placeholder={t('textToSpeech.placeholder')}
-                placeholderTextColor={colors.textMuted}
-              />
-              
-              <View style={styles.characterCount}>
-                <Text style={[styles.characterCountText, { color: colors.textSecondary }]}>
-                  {inputText.length} {t('common.characters')}
-                </Text>
-              </View>
-            </GlassCard>
 
-            {/* Audio Player */}
-            {sound && (
-              <Animated.View
-                style={[
-                  { transform: [{ scale: pulseAnim }] },
-                ]}
-              >
-                <GlassCard style={styles.playerCard} gradient>
-                  {/* Animated Title */}
-                  <View style={styles.playerHeader}>
-                    <LinearGradient
-                      colors={isDark ? ['#6366F1', '#EC4899'] : ['#8B5CF6', '#EC4899']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.playerTitleGradient}
-                    >
-                      <Text style={styles.playerTitle}>
-                        {t('textToSpeech.audioPlayer')}
-                      </Text>
-                    </LinearGradient>
-                  </View>
+                <View style={styles.characterCount}>
+                  <Text style={[styles.characterCountText, { color: colors.textSecondary }]}>
+                    {inputText.length} {t('common.characters')}
+                  </Text>
+                </View>
+              </GlassCard>
 
-                  {/* Waveform Visualization */}
-                  <View style={styles.waveformContainer}>
-                    {waveformAnims.map((anim, i) => (
-                      <Animated.View
-                        key={i}
-                        style={[
-                          styles.waveBar,
-                          {
-                            transform: [
-                              {
-                                scaleY: anim,
-                              },
-                            ],
-                          },
-                        ]}
-                      >
-                        <LinearGradient
-                          colors={
-                            isPlaying
-                              ? ['#6366F1', '#EC4899']
-                              : isDark
-                              ? ['#374151', '#4B5563']
-                              : ['#D1D5DB', '#E5E7EB']
-                          }
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 0, y: 1 }}
-                          style={StyleSheet.absoluteFillObject}
-                        />
-                      </Animated.View>
-                    ))}
-                  </View>
-
-                  {/* Voice Info Section */}
-                  <View style={styles.voiceInfoSection}>
-                    <View style={styles.voiceCard}>
+              {/* Audio Player */}
+              {sound && (
+                <Animated.View style={[{ transform: [{ scale: pulseAnim }] }]}>
+                  <GlassCard style={styles.playerCard} gradient>
+                    {/* Animated Title */}
+                    <View style={styles.playerHeader}>
                       <LinearGradient
-                        colors={['#6366F1', '#8B5CF6']}
+                        colors={isDark ? ['#6366F1', '#EC4899'] : ['#8B5CF6', '#EC4899']}
                         start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.voiceIconGradient}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.playerTitleGradient}
                       >
-                        <Text style={styles.voiceIcon}>🎤</Text>
+                        <Text style={styles.playerTitle}>{t('textToSpeech.audioPlayer')}</Text>
                       </LinearGradient>
-                      <View style={styles.voiceDetails}>
-                        <Text style={[styles.voiceLabel, { color: colors.textSecondary }]}>
-                          {t('textToSpeech.voice')}
-                        </Text>
-                        <Text style={[styles.voiceName, { color: colors.text }]}>
-                          {settings?.ttsVoice ? settings.ttsVoice.charAt(0).toUpperCase() + settings.ttsVoice.slice(1) : 'alloy'}
-                        </Text>
-                      </View>
                     </View>
-                    <View style={styles.modelBadge}>
-                      <Text style={[styles.modelText, { color: colors.primary }]}>
-                        {settings?.ttsModel || 'tts-1'}
-                      </Text>
-                    </View>
-                  </View>
 
-                  {/* Progress Section */}
-                  <View style={styles.progressSection}>
-                    <View style={[styles.progressBar, { backgroundColor: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(139, 92, 246, 0.1)' }]}>
-                      <Animated.View
-                        style={[
-                          styles.progressFill,
-                          {
-                            width: `${(playbackPosition / playbackDuration) * 100 || 0}%`,
-                          },
-                        ]}
-                      >
-                        <LinearGradient
-                          colors={['#6366F1', '#EC4899']}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          style={StyleSheet.absoluteFillObject}
-                        />
-                      </Animated.View>
-                      <Animated.View
-                        style={[
-                          styles.progressThumb,
-                          {
-                            left: `${(playbackPosition / playbackDuration) * 100 || 0}%`,
-                            transform: [{ scale: isPlaying ? pulseAnim : 1 }],
-                          },
-                        ]}
-                      />
-                    </View>
-                    <View style={styles.timeContainer}>
-                      <View style={styles.timeCard}>
-                        <Text style={[styles.timeLabel, { color: colors.textSecondary }]}>
-                          {t('common.current')}
-                        </Text>
-                        <Text style={[styles.timeText, { color: colors.primary }]}>
-                          {formatTime(playbackPosition)}
-                        </Text>
-                      </View>
-                      <View style={styles.timeDivider} />
-                      <View style={styles.timeCard}>
-                        <Text style={[styles.timeLabel, { color: colors.textSecondary }]}>
-                          {t('common.duration')}
-                        </Text>
-                        <Text style={[styles.timeText, { color: colors.text }]}>
-                          {formatTime(playbackDuration)}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-
-                  {/* Modern Control Buttons */}
-                  <View style={styles.modernControls}>
-                    <View style={styles.controlsRow}>
-                      {/* Stop Button */}
-                      <TouchableOpacity
-                        onPress={stopPlayback}
-                        style={styles.sideButton}
-                        activeOpacity={0.7}
-                      >
-                        <LinearGradient
-                          colors={isDark ? ['#1F2937', '#374151'] : ['#F3F4F6', '#E5E7EB']}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 1 }}
-                          style={styles.sideButtonGradient}
-                        >
-                          <Text style={styles.sideButtonIcon}>⏹</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-
-                      {/* Play/Pause Button */}
-                      <TouchableOpacity
-                        onPress={playPause}
-                        style={[styles.mainControlButton]}
-                        activeOpacity={0.8}
-                      >
+                    {/* Waveform Visualization */}
+                    <View style={styles.waveformContainer}>
+                      {waveformAnims.map((anim, i) => (
                         <Animated.View
+                          key={i}
                           style={[
-                            styles.mainControlOuter,
+                            styles.waveBar,
                             {
-                              transform: [{ scale: isPlaying ? 0.95 : 1 }],
+                              transform: [
+                                {
+                                  scaleY: anim,
+                                },
+                              ],
                             },
                           ]}
                         >
                           <LinearGradient
-                            colors={['rgba(99, 102, 241, 0.1)', 'rgba(236, 72, 153, 0.1)']}
+                            colors={
+                              isPlaying
+                                ? ['#6366F1', '#EC4899']
+                                : isDark
+                                  ? ['#374151', '#4B5563']
+                                  : ['#D1D5DB', '#E5E7EB']
+                            }
                             start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                            style={styles.mainControlRing}
+                            end={{ x: 0, y: 1 }}
+                            style={StyleSheet.absoluteFillObject}
                           />
-                          <LinearGradient
-                            colors={isPlaying ? ['#EC4899', '#6366F1'] : ['#6366F1', '#EC4899']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                            style={styles.mainControlGradient}
-                          >
-                            <Text style={styles.mainControlIcon}>
-                              {isPlaying ? '⏸' : '▶️'}
-                            </Text>
-                          </LinearGradient>
                         </Animated.View>
-                      </TouchableOpacity>
+                      ))}
+                    </View>
 
-                      {/* Download Button */}
-                      <TouchableOpacity
-                        onPress={downloadAudio}
-                        style={styles.sideButton}
-                        activeOpacity={0.7}
-                      >
+                    {/* Voice Info Section */}
+                    <View style={styles.voiceInfoSection}>
+                      <View style={styles.voiceCard}>
                         <LinearGradient
-                          colors={isDark ? ['#1F2937', '#374151'] : ['#F3F4F6', '#E5E7EB']}
+                          colors={['#6366F1', '#8B5CF6']}
                           start={{ x: 0, y: 0 }}
                           end={{ x: 1, y: 1 }}
-                          style={styles.sideButtonGradient}
+                          style={styles.voiceIconGradient}
                         >
-                          <Text style={styles.sideButtonIcon}>💾</Text>
+                          <Text style={styles.voiceIcon}>🎤</Text>
                         </LinearGradient>
-                      </TouchableOpacity>
+                        <View style={styles.voiceDetails}>
+                          <Text style={[styles.voiceLabel, { color: colors.textSecondary }]}>
+                            {t('textToSpeech.voice')}
+                          </Text>
+                          <Text style={[styles.voiceName, { color: colors.text }]}>
+                            {settings?.ttsVoice
+                              ? settings.ttsVoice.charAt(0).toUpperCase() +
+                                settings.ttsVoice.slice(1)
+                              : 'alloy'}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.modelBadge}>
+                        <Text style={[styles.modelText, { color: colors.primary }]}>
+                          {settings?.ttsModel || 'tts-1'}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                </GlassCard>
-              </Animated.View>
-            )}
 
-            {/* Action Buttons */}
-            <View style={styles.buttonContainer}>
-              <AnimatedButton
-                title={isGenerating ? t('textToSpeech.generating') : t('textToSpeech.generateSpeech')}
-                onPress={generateSpeech}
-                variant="primary"
-                size="large"
-                disabled={isGenerating}
-                icon={<Text>🎙</Text>}
-              />
-              
-              <AnimatedButton
-                title={t('textToSpeech.clearAll')}
-                onPress={clearAll}
-                variant="glass"
-                size="medium"
-                style={styles.clearButton}
-                icon={<Text>🗑</Text>}
-              />
-            </View>
-          </Animated.View>
-        </ScrollView>
+                    {/* Progress Section */}
+                    <View style={styles.progressSection}>
+                      <View
+                        style={[
+                          styles.progressBar,
+                          {
+                            backgroundColor: isDark
+                              ? 'rgba(99, 102, 241, 0.1)'
+                              : 'rgba(139, 92, 246, 0.1)',
+                          },
+                        ]}
+                      >
+                        <Animated.View
+                          style={[
+                            styles.progressFill,
+                            {
+                              width: `${(playbackPosition / playbackDuration) * 100 || 0}%`,
+                            },
+                          ]}
+                        >
+                          <LinearGradient
+                            colors={['#6366F1', '#EC4899']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={StyleSheet.absoluteFillObject}
+                          />
+                        </Animated.View>
+                        <Animated.View
+                          style={[
+                            styles.progressThumb,
+                            {
+                              left: `${(playbackPosition / playbackDuration) * 100 || 0}%`,
+                              transform: [{ scale: isPlaying ? pulseAnim : 1 }],
+                            },
+                          ]}
+                        />
+                      </View>
+                      <View style={styles.timeContainer}>
+                        <View style={styles.timeCard}>
+                          <Text style={[styles.timeLabel, { color: colors.textSecondary }]}>
+                            {t('common.current')}
+                          </Text>
+                          <Text style={[styles.timeText, { color: colors.primary }]}>
+                            {formatTime(playbackPosition)}
+                          </Text>
+                        </View>
+                        <View style={styles.timeDivider} />
+                        <View style={styles.timeCard}>
+                          <Text style={[styles.timeLabel, { color: colors.textSecondary }]}>
+                            {t('common.duration')}
+                          </Text>
+                          <Text style={[styles.timeText, { color: colors.text }]}>
+                            {formatTime(playbackDuration)}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* Modern Control Buttons */}
+                    <View style={styles.modernControls}>
+                      <View style={styles.controlsRow}>
+                        {/* Stop Button */}
+                        <TouchableOpacity
+                          onPress={stopPlayback}
+                          style={styles.sideButton}
+                          activeOpacity={0.7}
+                        >
+                          <LinearGradient
+                            colors={isDark ? ['#1F2937', '#374151'] : ['#F3F4F6', '#E5E7EB']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.sideButtonGradient}
+                          >
+                            <Text style={styles.sideButtonIcon}>⏹</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+
+                        {/* Play/Pause Button */}
+                        <TouchableOpacity
+                          onPress={playPause}
+                          style={[styles.mainControlButton]}
+                          activeOpacity={0.8}
+                        >
+                          <Animated.View
+                            style={[
+                              styles.mainControlOuter,
+                              {
+                                transform: [{ scale: isPlaying ? 0.95 : 1 }],
+                              },
+                            ]}
+                          >
+                            <LinearGradient
+                              colors={['rgba(99, 102, 241, 0.1)', 'rgba(236, 72, 153, 0.1)']}
+                              start={{ x: 0, y: 0 }}
+                              end={{ x: 1, y: 1 }}
+                              style={styles.mainControlRing}
+                            />
+                            <LinearGradient
+                              colors={isPlaying ? ['#EC4899', '#6366F1'] : ['#6366F1', '#EC4899']}
+                              start={{ x: 0, y: 0 }}
+                              end={{ x: 1, y: 1 }}
+                              style={styles.mainControlGradient}
+                            >
+                              <Text style={styles.mainControlIcon}>{isPlaying ? '⏸' : '▶️'}</Text>
+                            </LinearGradient>
+                          </Animated.View>
+                        </TouchableOpacity>
+
+                        {/* Download Button */}
+                        <TouchableOpacity
+                          onPress={downloadAudio}
+                          style={styles.sideButton}
+                          activeOpacity={0.7}
+                        >
+                          <LinearGradient
+                            colors={isDark ? ['#1F2937', '#374151'] : ['#F3F4F6', '#E5E7EB']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.sideButtonGradient}
+                          >
+                            <Text style={styles.sideButtonIcon}>💾</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </GlassCard>
+                </Animated.View>
+              )}
+
+              {/* Action Buttons */}
+              <View style={styles.buttonContainer}>
+                <AnimatedButton
+                  title={
+                    isGenerating ? t('textToSpeech.generating') : t('textToSpeech.generateSpeech')
+                  }
+                  onPress={generateSpeech}
+                  variant="primary"
+                  size="large"
+                  disabled={isGenerating}
+                  icon={<Text>🎙</Text>}
+                />
+
+                <AnimatedButton
+                  title={t('textToSpeech.clearAll')}
+                  onPress={clearAll}
+                  variant="glass"
+                  size="medium"
+                  style={styles.clearButton}
+                  icon={<Text>🗑</Text>}
+                />
+              </View>
+            </Animated.View>
+          </ScrollView>
         </KeyboardAvoidingView>
       </LinearGradient>
     </SafeAreaView>

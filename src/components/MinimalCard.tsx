@@ -42,14 +42,7 @@ export const MinimalCard: React.FC<MinimalCardProps> = ({
   };
 
   return (
-    <View
-      style={[
-        styles.card,
-        getCardStyle(),
-        !noPadding && styles.padding,
-        style,
-      ]}
-    >
+    <View style={[styles.card, getCardStyle(), !noPadding && styles.padding, style]}>
       {children}
     </View>
   );

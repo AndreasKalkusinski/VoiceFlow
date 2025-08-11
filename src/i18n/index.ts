@@ -25,7 +25,7 @@ const getDeviceLanguage = () => {
   try {
     const locale = Localization.getLocales()[0]?.languageTag || 'en';
     const languageCode = locale.split('-')[0];
-    
+
     // Check if we support this language
     if (resources[languageCode as keyof typeof resources]) {
       return languageCode;
@@ -33,32 +33,30 @@ const getDeviceLanguage = () => {
   } catch (error) {
     console.log('Could not detect device language, defaulting to English');
   }
-  
+
   // Default to English
   return 'en';
 };
 
 // Initialize i18n synchronously first
-i18n
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: 'en', // Default language initially
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false,
-    },
-    react: {
-      useSuspense: false,
-    },
-  });
+i18n.use(initReactI18next).init({
+  resources,
+  lng: 'en', // Default language initially
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+  react: {
+    useSuspense: false,
+  },
+});
 
 // Then load saved language asynchronously
 const initI18n = async () => {
   try {
     const savedLanguage = await AsyncStorage.getItem(LANGUAGE_KEY);
     const language = savedLanguage || getDeviceLanguage();
-    
+
     if (language !== i18n.language) {
       await i18n.changeLanguage(language);
     }

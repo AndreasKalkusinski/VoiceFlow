@@ -25,7 +25,15 @@ import { Settings } from '../types';
 import { useTheme, ThemeMode } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage, availableLanguages } from '../i18n';
-import { wp, hp, spacing, fontSize, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
+import {
+  wp,
+  hp,
+  spacing,
+  fontSize,
+  fontSizes,
+  componentHeights,
+  adaptiveSpacing,
+} from '../utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
 
 export const ModernSettingsScreen: React.FC = () => {
@@ -54,7 +62,7 @@ export const ModernSettingsScreen: React.FC = () => {
   const [autoSave, setAutoSave] = useState(false);
   const modelRefreshInterval = useRef<NodeJS.Timeout | null>(null);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
-  
+
   const { colors, theme, isDark, themeMode, setTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -102,7 +110,7 @@ export const ModernSettingsScreen: React.FC = () => {
           clearInterval(modelRefreshInterval.current);
         }
       };
-    }, [settings?.openaiApiKey])
+    }, [settings?.openaiApiKey]),
   );
 
   const animateEntry = () => {
@@ -140,7 +148,7 @@ export const ModernSettingsScreen: React.FC = () => {
       };
       setSettings(migratedSettings);
       showStatus(t('settings.status.loaded'));
-      
+
       // Fetch models if API key is available
       if (migratedSettings.apiKeys?.openai || loadedSettings.openaiApiKey) {
         fetchAvailableModels();
@@ -189,39 +197,39 @@ export const ModernSettingsScreen: React.FC = () => {
 
   const fetchAvailableModels = async (silent = false) => {
     if (!settings?.openaiApiKey) return;
-    
+
     if (!silent) {
       setModelsLoading(true);
     }
-    
+
     try {
       const openaiService = new OpenAIService(settings.openaiApiKey);
-      
+
       // Fetch models in parallel
       const [whisper, tts] = await Promise.all([
         openaiService.getWhisperModels(),
         openaiService.getTTSModels(),
       ]);
-      
+
       // Add default models if not in list
       const defaultWhisper = { id: 'whisper-1', object: 'model', created: 0, owned_by: 'openai' };
       const defaultTTS = { id: 'tts-1', object: 'model', created: 0, owned_by: 'openai' };
       const defaultTTSHD = { id: 'tts-1-hd', object: 'model', created: 0, owned_by: 'openai' };
-      
-      if (!whisper.find(m => m.id === 'whisper-1')) {
+
+      if (!whisper.find((m) => m.id === 'whisper-1')) {
         whisper.push(defaultWhisper);
       }
-      
-      if (!tts.find(m => m.id === 'tts-1')) {
+
+      if (!tts.find((m) => m.id === 'tts-1')) {
         tts.push(defaultTTS);
       }
-      if (!tts.find(m => m.id === 'tts-1-hd')) {
+      if (!tts.find((m) => m.id === 'tts-1-hd')) {
         tts.push(defaultTTSHD);
       }
-      
+
       setWhisperModels(whisper);
       setTtsModels(tts);
-      
+
       if (!silent) {
         showStatus('Models loaded', 2000);
       }
@@ -252,11 +260,11 @@ export const ModernSettingsScreen: React.FC = () => {
     setIsValidating(true);
     showStatus(t('settings.status.validating'));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
     try {
       const openaiService = new OpenAIService(settings.openaiApiKey);
       const isValid = await openaiService.validateApiKey();
-      
+
       if (isValid) {
         showStatus(t('settings.status.apiKeyValid'));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -278,7 +286,7 @@ export const ModernSettingsScreen: React.FC = () => {
     setIsSaving(true);
     showStatus(t('settings.status.saving'));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
     try {
       await StorageService.saveSettings(settings);
       showStatus(t('settings.status.saved'));
@@ -298,7 +306,7 @@ export const ModernSettingsScreen: React.FC = () => {
       setSelectedLanguage(languageCode);
       await changeLanguage(languageCode);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      showStatus(`${availableLanguages.find(l => l.code === languageCode)?.name} selected`, 2000);
+      showStatus(`${availableLanguages.find((l) => l.code === languageCode)?.name} selected`, 2000);
     } catch (error) {
       console.error('Failed to change language:', error);
       setSelectedLanguage(i18n.language); // Revert to current language
@@ -314,163 +322,173 @@ export const ModernSettingsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <LinearGradient
-        colors={isDark 
-          ? ['#0F0F23', '#1A1A3E', '#0F0F23']
-          : ['#F0F4FF', '#FFFFFF', '#F0F4FF']
-        }
+        colors={isDark ? ['#0F0F23', '#1A1A3E', '#0F0F23'] : ['#F0F4FF', '#FFFFFF', '#F0F4FF']}
         style={styles.container}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-        <Animated.View
-          style={[
-            styles.content,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
-          {/* Status Message */}
-          {statusMessage !== '' && (
-            <Animated.View style={styles.statusContainer}>
-              <GlassCard style={styles.statusCard}>
-                <Text style={[styles.statusText, { color: colors.text }]}>
-                  {statusMessage}
-                </Text>
-              </GlassCard>
-            </Animated.View>
-          )}
-
-          {/* Appearance Settings */}
-          <GlassCard style={styles.section} gradient>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              {t('settings.appearance')}
-            </Text>
-            
-            {/* Theme Selection */}
-            <Text style={[styles.subsectionTitle, { color: colors.textSecondary }]}>
-              {t('settings.appearance')}
-            </Text>
-            <View style={styles.themeContainer}>
-              {themeOptions.map((option) => (
-                <AnimatedButton
-                  key={option.id}
-                  title={`${option.icon} ${option.name}`}
-                  onPress={() => {
-                    setTheme(option.id as ThemeMode);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                  variant={themeMode === option.id ? 'primary' : 'glass'}
-                  size="small"
-                  style={styles.themeButton}
-                />
-              ))}
-            </View>
-
-            {/* Language Selection */}
-            <Text style={[styles.subsectionTitle, { color: colors.textSecondary, marginTop: 20 }]}>
-              {t('settings.language')}
-            </Text>
-            <View style={styles.languageContainer}>
-              {availableLanguages.map((lang) => (
-                <AnimatedButton
-                  key={lang.code}
-                  title={`${lang.flag} ${lang.name}`}
-                  onPress={() => handleLanguageChange(lang.code)}
-                  variant={selectedLanguage === lang.code ? 'primary' : 'glass'}
-                  size="small"
-                  style={styles.languageButton}
-                />
-              ))}
-            </View>
-          </GlassCard>
-
-          {/* Provider Selection */}
-          <ProviderSettings
-            type="stt"
-            selectedProvider={settings.sttProvider || 'openai-stt'}
-            apiKeys={settings.apiKeys || {}}
-            providerSettings={settings.providerSettings || {}}
-            onProviderChange={(providerId) => setSettings({ ...settings, sttProvider: providerId })}
-            onApiKeyChange={(provider, key) => setSettings({
-              ...settings,
-              apiKeys: { ...settings.apiKeys, [provider]: key },
-              openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
-            })}
-            onSettingChange={(providerId, setting, value) => setSettings({
-              ...settings,
-              providerSettings: {
-                ...settings.providerSettings,
-                [providerId]: {
-                  ...settings.providerSettings?.[providerId],
-                  [setting]: value,
-                },
+          <Animated.View
+            style={[
+              styles.content,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
               },
-            })}
-          />
+            ]}
+          >
+            {/* Status Message */}
+            {statusMessage !== '' && (
+              <Animated.View style={styles.statusContainer}>
+                <GlassCard style={styles.statusCard}>
+                  <Text style={[styles.statusText, { color: colors.text }]}>{statusMessage}</Text>
+                </GlassCard>
+              </Animated.View>
+            )}
 
-          <ProviderSettings
-            type="tts"
-            selectedProvider={settings.ttsProvider || 'openai-tts'}
-            apiKeys={settings.apiKeys || {}}
-            providerSettings={settings.providerSettings || {}}
-            onProviderChange={(providerId) => setSettings({ ...settings, ttsProvider: providerId })}
-            onApiKeyChange={(provider, key) => setSettings({
-              ...settings,
-              apiKeys: { ...settings.apiKeys, [provider]: key },
-              openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
-            })}
-            onSettingChange={(providerId, setting, value) => setSettings({
-              ...settings,
-              providerSettings: {
-                ...settings.providerSettings,
-                [providerId]: {
-                  ...settings.providerSettings?.[providerId],
-                  [setting]: value,
-                },
-              },
-            })}
-          />
+            {/* Appearance Settings */}
+            <GlassCard style={styles.section} gradient>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                {t('settings.appearance')}
+              </Text>
 
-
-          {/* Auto-Save Toggle */}
-          <GlassCard style={styles.section}>
-            <View style={styles.autoSaveContainer}>
-              <View style={styles.autoSaveText}>
-                <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: spacing.xs }]}>
-                  {t('settings.autoSave')}
-                </Text>
-                <Text style={[styles.autoSaveDescription, { color: colors.textSecondary }]}>
-                  {t('settings.autoSaveDescription')}
-                </Text>
+              {/* Theme Selection */}
+              <Text style={[styles.subsectionTitle, { color: colors.textSecondary }]}>
+                {t('settings.appearance')}
+              </Text>
+              <View style={styles.themeContainer}>
+                {themeOptions.map((option) => (
+                  <AnimatedButton
+                    key={option.id}
+                    title={`${option.icon} ${option.name}`}
+                    onPress={() => {
+                      setTheme(option.id as ThemeMode);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    variant={themeMode === option.id ? 'primary' : 'glass'}
+                    size="small"
+                    style={styles.themeButton}
+                  />
+                ))}
               </View>
-              <Switch
-                value={autoSave}
-                onValueChange={toggleAutoSave}
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={autoSave ? '#ffffff' : '#f4f3f4'}
-                ios_backgroundColor={colors.border}
-              />
-            </View>
-          </GlassCard>
 
-          {/* Save Button (visible when auto-save is off) */}
-          {!autoSave && (
-            <View style={styles.saveButtonContainer}>
-              <AnimatedButton
-                title={t('settings.saveSettings')}
-                onPress={saveSettings}
-                variant="primary"
-                size="large"
-                disabled={isSaving}
-                icon={<Text>💾</Text>}
-              />
-            </View>
-          )}
-        </Animated.View>
+              {/* Language Selection */}
+              <Text
+                style={[styles.subsectionTitle, { color: colors.textSecondary, marginTop: 20 }]}
+              >
+                {t('settings.language')}
+              </Text>
+              <View style={styles.languageContainer}>
+                {availableLanguages.map((lang) => (
+                  <AnimatedButton
+                    key={lang.code}
+                    title={`${lang.flag} ${lang.name}`}
+                    onPress={() => handleLanguageChange(lang.code)}
+                    variant={selectedLanguage === lang.code ? 'primary' : 'glass'}
+                    size="small"
+                    style={styles.languageButton}
+                  />
+                ))}
+              </View>
+            </GlassCard>
+
+            {/* Provider Selection */}
+            <ProviderSettings
+              type="stt"
+              selectedProvider={settings.sttProvider || 'openai-stt'}
+              apiKeys={settings.apiKeys || {}}
+              providerSettings={settings.providerSettings || {}}
+              onProviderChange={(providerId) =>
+                setSettings({ ...settings, sttProvider: providerId })
+              }
+              onApiKeyChange={(provider, key) =>
+                setSettings({
+                  ...settings,
+                  apiKeys: { ...settings.apiKeys, [provider]: key },
+                  openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
+                })
+              }
+              onSettingChange={(providerId, setting, value) =>
+                setSettings({
+                  ...settings,
+                  providerSettings: {
+                    ...settings.providerSettings,
+                    [providerId]: {
+                      ...settings.providerSettings?.[providerId],
+                      [setting]: value,
+                    },
+                  },
+                })
+              }
+            />
+
+            <ProviderSettings
+              type="tts"
+              selectedProvider={settings.ttsProvider || 'openai-tts'}
+              apiKeys={settings.apiKeys || {}}
+              providerSettings={settings.providerSettings || {}}
+              onProviderChange={(providerId) =>
+                setSettings({ ...settings, ttsProvider: providerId })
+              }
+              onApiKeyChange={(provider, key) =>
+                setSettings({
+                  ...settings,
+                  apiKeys: { ...settings.apiKeys, [provider]: key },
+                  openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
+                })
+              }
+              onSettingChange={(providerId, setting, value) =>
+                setSettings({
+                  ...settings,
+                  providerSettings: {
+                    ...settings.providerSettings,
+                    [providerId]: {
+                      ...settings.providerSettings?.[providerId],
+                      [setting]: value,
+                    },
+                  },
+                })
+              }
+            />
+
+            {/* Auto-Save Toggle */}
+            <GlassCard style={styles.section}>
+              <View style={styles.autoSaveContainer}>
+                <View style={styles.autoSaveText}>
+                  <Text
+                    style={[styles.sectionTitle, { color: colors.text, marginBottom: spacing.xs }]}
+                  >
+                    {t('settings.autoSave')}
+                  </Text>
+                  <Text style={[styles.autoSaveDescription, { color: colors.textSecondary }]}>
+                    {t('settings.autoSaveDescription')}
+                  </Text>
+                </View>
+                <Switch
+                  value={autoSave}
+                  onValueChange={toggleAutoSave}
+                  trackColor={{ false: colors.border, true: colors.primary }}
+                  thumbColor={autoSave ? '#ffffff' : '#f4f3f4'}
+                  ios_backgroundColor={colors.border}
+                />
+              </View>
+            </GlassCard>
+
+            {/* Save Button (visible when auto-save is off) */}
+            {!autoSave && (
+              <View style={styles.saveButtonContainer}>
+                <AnimatedButton
+                  title={t('settings.saveSettings')}
+                  onPress={saveSettings}
+                  variant="primary"
+                  size="large"
+                  disabled={isSaving}
+                  icon={<Text>💾</Text>}
+                />
+              </View>
+            )}
+          </Animated.View>
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>

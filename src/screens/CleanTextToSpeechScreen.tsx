@@ -28,7 +28,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
-  
+
   const { colors } = useTheme();
   const { t } = useTranslation();
 
@@ -44,7 +44,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
-    }, [])
+    }, []),
   );
 
   const loadSettings = async () => {
@@ -76,7 +76,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
   const generateSpeech = async () => {
     const currentSettings = await StorageService.getSettings();
     setSettings(currentSettings);
-    
+
     if (!currentSettings?.openaiApiKey) {
       Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
       return;
@@ -95,7 +95,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
       const audioUri = await openaiService.textToSpeech(
         inputText,
         currentSettings.ttsModel,
-        currentSettings.ttsVoice
+        currentSettings.ttsVoice,
       );
 
       if (sound) {
@@ -104,7 +104,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
 
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: audioUri },
-        { shouldPlay: true }
+        { shouldPlay: true },
       );
 
       setSound(newSound);
@@ -156,7 +156,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -168,9 +168,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
             {/* Status Message */}
             {statusMessage !== '' && (
               <MinimalCard variant="elevated" style={styles.statusCard}>
-                <Text style={[styles.statusText, { color: colors.text }]}>
-                  {statusMessage}
-                </Text>
+                <Text style={[styles.statusText, { color: colors.text }]}>{statusMessage}</Text>
               </MinimalCard>
             )}
 
@@ -186,7 +184,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
                   </Text>
                 </View>
               </View>
-              
+
               <TextInput
                 style={[styles.textInput, { color: colors.text }]}
                 multiline
@@ -207,7 +205,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
                 size="small"
                 style={styles.quickButton}
               />
-              
+
               <SimpleButton
                 title={t('textToSpeech.clearText')}
                 onPress={clearText}

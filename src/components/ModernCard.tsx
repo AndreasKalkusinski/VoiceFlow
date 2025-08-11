@@ -26,7 +26,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
 }) => {
   const { isDark } = useTheme();
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
-  
+
   // Create animation value for scale only
   const [scaleAnim] = React.useState(() => new Animated.Value(1));
 
@@ -95,7 +95,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
           />
           <LinearGradient
             colors={
-              isDark 
+              isDark
                 ? ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']
                 : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)']
             }
@@ -105,18 +105,17 @@ export const ModernCard: React.FC<ModernCardProps> = ({
       )}
       {variant === 'gradient' && (
         <LinearGradient
-          colors={isDark 
-            ? ['rgba(124, 124, 255, 0.1)', 'rgba(124, 124, 255, 0.05)']
-            : ['rgba(94, 92, 230, 0.05)', 'rgba(94, 92, 230, 0.02)']
+          colors={
+            isDark
+              ? ['rgba(124, 124, 255, 0.1)', 'rgba(124, 124, 255, 0.05)']
+              : ['rgba(94, 92, 230, 0.05)', 'rgba(94, 92, 230, 0.02)']
           }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFillObject}
         />
       )}
-      <View style={styles.content}>
-        {children}
-      </View>
+      <View style={styles.content}>{children}</View>
     </>
   );
 
@@ -124,7 +123,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
     return (
       <Animated.View
         style={[
-          { 
+          {
             transform: [{ scale: animated ? scaleAnim : 1 }],
           },
         ]}
@@ -133,11 +132,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
           onPress={handlePress}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
-          style={[
-            styles.card,
-            getCardStyle(),
-            style,
-          ]}
+          style={[styles.card, getCardStyle(), style]}
         >
           {content}
         </Pressable>
@@ -145,17 +140,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
     );
   }
 
-  return (
-    <View
-      style={[
-        styles.card,
-        getCardStyle(),
-        style,
-      ]}
-    >
-      {content}
-    </View>
-  );
+  return <View style={[styles.card, getCardStyle(), style]}>{content}</View>;
 };
 
 const styles = StyleSheet.create({

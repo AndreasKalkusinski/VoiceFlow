@@ -21,32 +21,32 @@ export const responsiveDimensions = {
     width: screenWidth,
     height: screenHeight,
   },
-  
+
   // Cards and containers
   card: {
     minHeight: contentVH(25), // 25% of content height
     maxHeight: contentVH(50), // 50% of content height
     padding: vw(5), // 5% of screen width
   },
-  
+
   // Text input areas
   textInput: {
     minHeight: contentVH(20), // 20% of content height
     maxHeight: contentVH(40), // 40% of content height
   },
-  
+
   // Buttons
   button: {
     height: contentVH(7), // 7% of content height
     minWidth: vw(30), // 30% of screen width
   },
-  
+
   // FAB
   fab: {
     size: vw(15), // 15% of screen width
     bottom: contentVH(5), // 5% from bottom
   },
-  
+
   // Padding and margins
   padding: {
     screen: vw(4), // 4% of screen width
@@ -55,7 +55,7 @@ export const responsiveDimensions = {
     medium: vw(4), // 4% of screen width
     large: vw(6), // 6% of screen width
   },
-  
+
   // Font sizes (responsive to screen width)
   fontSize: {
     tiny: vw(3),
@@ -66,7 +66,7 @@ export const responsiveDimensions = {
     xxlarge: vw(8),
     title: vw(10),
   },
-  
+
   // Status bar and tab bar
   statusBar: statusBarHeight,
   tabBar: contentVH(8), // 8% of content height
