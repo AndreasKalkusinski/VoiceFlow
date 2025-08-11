@@ -20,7 +20,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
-import { ModernButton } from '../components/ModernButton';
 import { StorageService } from '../services/storage';
 import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';

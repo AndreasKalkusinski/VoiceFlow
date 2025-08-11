@@ -22,14 +22,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
-import { ModernButton } from '../components/ModernButton';
 import { StorageService } from '../services/storage';
 import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { designTokens } from '../utils/design-system';
-import { vw, vh, contentVH, responsiveDimensions } from '../utils/responsive-dimensions';
+import { vw, vh, responsiveDimensions } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -40,7 +39,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
-  const [playbackProgress, setPlaybackProgress] = useState(0);
+  // const [playbackProgress, setPlaybackProgress] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [audioUri, setAudioUri] = useState<string | null>(null);
   const [duration, setDuration] = useState(0);

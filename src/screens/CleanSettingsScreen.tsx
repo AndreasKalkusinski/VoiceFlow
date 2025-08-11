@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   ScrollView,
   Alert,
@@ -20,7 +19,6 @@ import { Settings } from '../types';
 import { useTheme, ThemeMode } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage, availableLanguages } from '../i18n';
-import { useFocusEffect } from '@react-navigation/native';
 
 export const CleanSettingsScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings>({
@@ -41,7 +39,7 @@ export const CleanSettingsScreen: React.FC = () => {
   const [autoSave, setAutoSave] = useState(false);
   const saveTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
-  const { colors, isDark, themeMode, setTheme } = useTheme();
+  const { colors, themeMode, setTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
