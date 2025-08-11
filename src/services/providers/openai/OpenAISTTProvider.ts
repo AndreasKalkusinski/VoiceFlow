@@ -1,5 +1,4 @@
 import axios from 'axios';
-import * as FileSystem from 'expo-file-system';
 import { BaseSTTProvider } from '../BaseProvider';
 import { STTOptions, STTModel } from '../types';
 
@@ -85,7 +84,7 @@ export class OpenAISTTProvider extends BaseSTTProvider {
         },
       });
       return response.status === 200;
-    } catch (_error) {
+    } catch {
       return false;
     }
   }

@@ -122,11 +122,9 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   if (onPress) {
     return (
       <Animated.View
-        style={[
-          {
-            transform: [{ scale: animated ? scaleAnim : 1 }],
-          },
-        ]}
+        style={{
+          transform: [{ scale: animated ? scaleAnim : 1 }],
+        }}
       >
         <Pressable
           onPress={handlePress}

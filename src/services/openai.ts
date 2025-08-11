@@ -73,7 +73,7 @@ export class OpenAIService {
         );
       }
 
-      const audioBase64 = await FileSystem.readAsStringAsync(audioUri, {
+      await FileSystem.readAsStringAsync(audioUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 

@@ -30,7 +30,7 @@ const getDeviceLanguage = () => {
     if (resources[languageCode as keyof typeof resources]) {
       return languageCode;
     }
-  } catch (error) {
+  } catch {
     console.log('Could not detect device language, defaulting to English');
   }
 
@@ -60,7 +60,7 @@ const initI18n = async () => {
     if (language !== i18n.language) {
       await i18n.changeLanguage(language);
     }
-  } catch (error) {
+  } catch {
     console.error('Failed to load language preference:', error);
   }
 };
@@ -71,7 +71,7 @@ export const changeLanguage = async (languageCode: string) => {
     if (i18n.isInitialized) {
       await i18n.changeLanguage(languageCode);
     }
-  } catch (error) {
+  } catch {
     console.error('Failed to change language:', error);
     throw error;
   }

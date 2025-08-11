@@ -80,7 +80,7 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({
         Alert.alert(t('alerts.error'), t('alerts.apiKeyInvalidMessage'));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
-    } catch (error) {
+    } catch {
       Alert.alert(t('alerts.error'), t('alerts.apiKeyInvalidMessage'));
     }
   };

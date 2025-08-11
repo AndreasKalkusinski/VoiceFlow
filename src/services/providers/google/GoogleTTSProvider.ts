@@ -222,7 +222,7 @@ export class GoogleTTSProvider extends BaseTTSProvider {
         },
       });
       return response.status === 200;
-    } catch (_error) {
+    } catch {
       return false;
     }
   }

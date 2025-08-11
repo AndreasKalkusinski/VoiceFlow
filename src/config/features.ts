@@ -28,7 +28,6 @@ interface FeatureFlags {
 // Environment-based feature flags
 const isDevelopment = __DEV__;
 const isStaging = process.env.APP_ENV === 'staging';
-const isProduction = process.env.APP_ENV === 'production';
 
 export const FEATURES: FeatureFlags = {
   // Stable features (enabled in production)
