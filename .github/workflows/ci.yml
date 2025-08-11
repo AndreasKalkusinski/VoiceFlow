@@ -85,6 +85,8 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Create preview
+        env:
+          EAS_SKIP_AUTO_FINGERPRINT: 1
         run: eas build --platform ios --profile preview --non-interactive
 
       - name: Comment PR
@@ -122,6 +124,8 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Development Version
+        env:
+          EAS_SKIP_AUTO_FINGERPRINT: 1
         run: |
           # Production builds require Apple Developer credentials
           # For now, we'll build development version only
