@@ -40,11 +40,8 @@ function ThemedApp() {
     };
   }, [i18n]);
 
-  // Wait for i18n to be ready
-  if (!ready) {
-    if (!__DEV__) {
-      Alert.alert('Debug', 'Waiting for i18n...');
-    }
+  // Don't wait for i18n in release builds
+  if (!ready && __DEV__) {
     return <LoadingFallback />;
   }
 
@@ -93,9 +90,9 @@ function LoadingFallback() {
 }
 
 export default function App() {
-  React.useEffect(() => {
-    // Debug alerts for release build
+  const [isReady, setIsReady] = React.useState(false);
 
+  React.useEffect(() => {
     // Show debug info in release
     if (!__DEV__) {
       Alert.alert('Debug', 'App mounted, starting initialization');
@@ -104,7 +101,20 @@ export default function App() {
     if (__DEV__) {
       console.log('App mounted successfully');
     }
+
+    // Delay initialization to avoid hang
+    setTimeout(() => {
+      setIsReady(true);
+    }, 100);
   }, []);
+
+  if (!isReady) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
   return (
     <ErrorBoundary>
