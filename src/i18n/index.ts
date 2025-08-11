@@ -66,13 +66,9 @@ const initI18n = async () => {
 };
 
 export const changeLanguage = async (languageCode: string) => {
-  try {
-    await AsyncStorage.setItem(LANGUAGE_KEY, languageCode);
-    if (i18n.isInitialized) {
-      await i18n.changeLanguage(languageCode);
-    }
-  } catch {
-    throw error;
+  await AsyncStorage.setItem(LANGUAGE_KEY, languageCode);
+  if (i18n.isInitialized) {
+    await i18n.changeLanguage(languageCode);
   }
 };
 
