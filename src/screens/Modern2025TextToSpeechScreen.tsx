@@ -92,7 +92,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-    } catch (error) {
+    } catch {
       console.error('Error loading settings:', error);
     }
   };
@@ -104,7 +104,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
       });
-    } catch (error) {
+    } catch {
       console.error('Failed to setup audio:', error);
     }
   };
@@ -275,7 +275,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
               setIsPlaying(status.isPlaying);
             }
           });
-        } catch (error) {
+        } catch {
           console.error('Failed to recreate sound:', error);
         }
       }
@@ -326,7 +326,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       } else {
         Alert.alert(t('common.error'), t('textToSpeech.status.downloadFailed'));
       }
-    } catch (error) {
+    } catch {
       console.error('Download failed:', error);
       Alert.alert(t('common.error'), t('textToSpeech.status.downloadFailed'));
     }
@@ -344,7 +344,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       await loadSettings();
       showStatus(t('textToSpeech.refreshed'), 1500);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
+    } catch {
       console.error('Refresh failed:', error);
     } finally {
       // Ensure refresh state is reset

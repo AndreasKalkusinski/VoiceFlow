@@ -99,7 +99,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
         providerSettings: loadedSettings.providerSettings || {},
       };
       setSettings(migratedSettings);
-    } catch (error) {
+    } catch {
       console.error('Failed to load settings:', error);
     }
   };
@@ -110,7 +110,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       if (savedAutoSave !== null) {
         setAutoSave(savedAutoSave === 'true');
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to load auto-save preference:', error);
     }
   };
@@ -120,7 +120,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       await AsyncStorage.setItem('@voiceflow_autosave', value.toString());
       setAutoSave(value);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
+    } catch {
       console.error('Failed to save auto-save preference:', error);
     }
   };
@@ -128,7 +128,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
   const saveSettingsSilently = async () => {
     try {
       await StorageService.saveSettings(settings);
-    } catch (error) {
+    } catch {
       console.error('Auto-save failed:', error);
     }
   };
@@ -139,7 +139,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       await StorageService.saveSettings(settings);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(t('alerts.settingsSavedTitle'), t('alerts.settingsSavedMessage'));
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(t('common.error'), t('settings.status.failed'));
     } finally {
@@ -152,7 +152,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       setSelectedLanguage(languageCode);
       await changeLanguage(languageCode);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
+    } catch {
       console.error('Failed to change language:', error);
       setSelectedLanguage(i18n.language);
     }

@@ -153,7 +153,7 @@ export const ModernSettingsScreen: React.FC = () => {
       if (migratedSettings.apiKeys?.openai || loadedSettings.openaiApiKey) {
         fetchAvailableModels();
       }
-    } catch (error) {
+    } catch {
       showStatus(t('settings.status.failed'));
     } finally {
       setIsLoading(false);
@@ -166,7 +166,7 @@ export const ModernSettingsScreen: React.FC = () => {
       if (savedAutoSave !== null) {
         setAutoSave(savedAutoSave === 'true');
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to load auto-save preference:', error);
     }
   };
@@ -181,7 +181,7 @@ export const ModernSettingsScreen: React.FC = () => {
       } else {
         showStatus(t('settings.autoSaveDisabled'), 2000);
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to save auto-save preference:', error);
     }
   };
@@ -190,7 +190,7 @@ export const ModernSettingsScreen: React.FC = () => {
     try {
       await StorageService.saveSettings(settings);
       showStatus(t('settings.status.autoSaved'), 1500);
-    } catch (error) {
+    } catch {
       console.error('Auto-save failed:', error);
     }
   };
@@ -233,7 +233,7 @@ export const ModernSettingsScreen: React.FC = () => {
       if (!silent) {
         showStatus('Models loaded', 2000);
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to fetch models:', error);
       // Set default models on error
       setWhisperModels([{ id: 'whisper-1', object: 'model', created: 0, owned_by: 'openai' }]);
@@ -274,7 +274,7 @@ export const ModernSettingsScreen: React.FC = () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert(t('alerts.apiKeyInvalidTitle'), t('alerts.apiKeyInvalidMessage'));
       }
-    } catch (error) {
+    } catch {
       showStatus(t('settings.status.failed'));
       Alert.alert(t('common.error'), t('settings.status.failed'));
     } finally {
@@ -292,7 +292,7 @@ export const ModernSettingsScreen: React.FC = () => {
       showStatus(t('settings.status.saved'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(t('alerts.settingsSavedTitle'), t('alerts.settingsSavedMessage'));
-    } catch (error) {
+    } catch {
       showStatus(t('settings.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(t('common.error'), t('settings.status.failed'));
@@ -307,7 +307,7 @@ export const ModernSettingsScreen: React.FC = () => {
       await changeLanguage(languageCode);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       showStatus(`${availableLanguages.find((l) => l.code === languageCode)?.name} selected`, 2000);
-    } catch (error) {
+    } catch {
       console.error('Failed to change language:', error);
       setSelectedLanguage(i18n.language); // Revert to current language
     }

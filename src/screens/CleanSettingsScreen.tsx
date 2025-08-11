@@ -81,7 +81,7 @@ export const CleanSettingsScreen: React.FC = () => {
         providerSettings: loadedSettings.providerSettings || {},
       };
       setSettings(migratedSettings);
-    } catch (error) {
+    } catch {
       console.error('Failed to load settings:', error);
     }
   };
@@ -92,7 +92,7 @@ export const CleanSettingsScreen: React.FC = () => {
       if (savedAutoSave !== null) {
         setAutoSave(savedAutoSave === 'true');
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to load auto-save preference:', error);
     }
   };
@@ -101,7 +101,7 @@ export const CleanSettingsScreen: React.FC = () => {
     try {
       await AsyncStorage.setItem('@voiceflow_autosave', value.toString());
       setAutoSave(value);
-    } catch (error) {
+    } catch {
       console.error('Failed to save auto-save preference:', error);
     }
   };
@@ -109,7 +109,7 @@ export const CleanSettingsScreen: React.FC = () => {
   const saveSettingsSilently = async () => {
     try {
       await StorageService.saveSettings(settings);
-    } catch (error) {
+    } catch {
       console.error('Auto-save failed:', error);
     }
   };
@@ -119,7 +119,7 @@ export const CleanSettingsScreen: React.FC = () => {
     try {
       await StorageService.saveSettings(settings);
       Alert.alert(t('alerts.settingsSavedTitle'), t('alerts.settingsSavedMessage'));
-    } catch (error) {
+    } catch {
       Alert.alert(t('common.error'), t('settings.status.failed'));
     } finally {
       setIsSaving(false);
@@ -130,7 +130,7 @@ export const CleanSettingsScreen: React.FC = () => {
     try {
       setSelectedLanguage(languageCode);
       await changeLanguage(languageCode);
-    } catch (error) {
+    } catch {
       console.error('Failed to change language:', error);
       setSelectedLanguage(i18n.language);
     }

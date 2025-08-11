@@ -47,7 +47,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-    } catch (error) {
+    } catch {
       console.error('Error loading settings:', error);
     }
   };
@@ -59,7 +59,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-    } catch (error) {
+    } catch {
       console.error('Failed to setup audio:', error);
     }
   };
@@ -99,7 +99,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
       setRecording(recording);
       setIsRecording(true);
       showStatus(t('speechToText.status.recording'));
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
     }
   };
@@ -130,7 +130,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
       }
 
       setRecording(null);
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
     } finally {
       setIsProcessing(false);

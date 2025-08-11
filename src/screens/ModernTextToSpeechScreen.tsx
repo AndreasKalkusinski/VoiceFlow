@@ -85,7 +85,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         shouldDuckAndroid: true,
         playThroughEarpieceAndroid: false,
       });
-    } catch (error) {
+    } catch {
       console.error('Failed to setup audio mode:', error);
     }
   };
@@ -178,7 +178,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         'TTS Settings loaded:',
         loadedSettings?.openaiApiKey ? 'API key present' : 'No API key',
       );
-    } catch (error) {
+    } catch {
       console.error('Error loading settings:', error);
     }
   };
@@ -198,7 +198,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
       } else {
         Alert.alert(t('alerts.clipboardEmptyTitle'), t('alerts.clipboardEmptyMessage'));
       }
-    } catch (error) {
+    } catch {
       showStatus(t('textToSpeech.status.pasteFailed'));
     }
   };
@@ -260,7 +260,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
       setAudioUri(audioUri); // Store the URI for download
       showStatus(t('textToSpeech.status.ready'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch {
       showStatus(t('textToSpeech.status.failed'));
       Alert.alert(t('common.error'), t('textToSpeech.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -318,7 +318,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         }
       }
-    } catch (error) {
+    } catch {
       showStatus(t('textToSpeech.status.error'));
     }
   };
@@ -330,7 +330,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         setPlaybackPosition(0);
         showStatus(t('textToSpeech.status.stopped'));
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      } catch (error) {
+      } catch {
         showStatus(t('textToSpeech.status.stopFailed'));
       }
     }
@@ -387,7 +387,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
 
       showStatus(t('textToSpeech.status.downloaded'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch {
       console.error('Download error:', error);
       showStatus(t('textToSpeech.status.downloadFailed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -466,7 +466,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
 
               {/* Audio Player */}
               {sound && (
-                <Animated.View style={[{ transform: [{ scale: pulseAnim }] }]}>
+                <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                   <GlassCard style={styles.playerCard} gradient>
                     {/* Animated Title */}
                     <View style={styles.playerHeader}>
@@ -622,7 +622,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
                         {/* Play/Pause Button */}
                         <TouchableOpacity
                           onPress={playPause}
-                          style={[styles.mainControlButton]}
+                          style={styles.mainControlButton}
                           activeOpacity={0.8}
                         >
                           <Animated.View

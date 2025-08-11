@@ -43,7 +43,7 @@ export const SpeechToTextScreen: React.FC = () => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-    } catch (error) {
+    } catch {
       console.error('Failed to setup audio:', error);
     }
   };
@@ -91,7 +91,7 @@ export const SpeechToTextScreen: React.FC = () => {
       setRecording(recording);
       setIsRecording(true);
       addLog('Recording started', 'success');
-    } catch (error) {
+    } catch {
       addLog('Failed to start recording', 'error');
       clearLogs();
     }
@@ -124,7 +124,7 @@ export const SpeechToTextScreen: React.FC = () => {
       }
 
       setRecording(null);
-    } catch (error) {
+    } catch {
       addLog('Failed to transcribe audio', 'error');
       clearLogs();
     } finally {

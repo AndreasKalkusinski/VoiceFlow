@@ -65,7 +65,7 @@ export const TextToSpeechScreen: React.FC = () => {
       } else {
         Alert.alert('Clipboard Empty', 'No text found in clipboard');
       }
-    } catch (error) {
+    } catch {
       addLog('Failed to paste from clipboard', 'error');
       clearLogs();
     }
@@ -109,7 +109,7 @@ export const TextToSpeechScreen: React.FC = () => {
       setSound(newSound);
       addLog('Ready to play', 'success');
       clearLogs();
-    } catch (error) {
+    } catch {
       addLog('Failed to generate speech', 'error');
       Alert.alert('Error', 'Failed to generate speech');
       clearLogs();
@@ -146,7 +146,7 @@ export const TextToSpeechScreen: React.FC = () => {
         }
         clearLogs();
       }
-    } catch (error) {
+    } catch {
       addLog('Playback error', 'error');
       clearLogs();
     }
@@ -160,7 +160,7 @@ export const TextToSpeechScreen: React.FC = () => {
         setLogs([]);
         addLog('Playback stopped', 'info');
         clearLogs();
-      } catch (error) {
+      } catch {
         addLog('Failed to stop playback', 'error');
         clearLogs();
       }

@@ -38,7 +38,7 @@ export const SettingsScreen: React.FC = () => {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
       addLog('Settings loaded successfully', 'success');
-    } catch (error) {
+    } catch {
       addLog('Failed to load settings', 'error');
     } finally {
       setIsLoading(false);
@@ -77,7 +77,7 @@ export const SettingsScreen: React.FC = () => {
         addLog('API key is invalid', 'error');
         Alert.alert('Error', 'API key is invalid');
       }
-    } catch (error) {
+    } catch {
       addLog('Failed to validate API key', 'error');
       Alert.alert('Error', 'Failed to validate API key');
     } finally {
@@ -95,7 +95,7 @@ export const SettingsScreen: React.FC = () => {
       await StorageService.saveSettings(settings);
       addLog('Settings saved successfully', 'success');
       Alert.alert('Success', 'Settings saved successfully');
-    } catch (error) {
+    } catch {
       addLog('Failed to save settings', 'error');
       Alert.alert('Error', 'Failed to save settings');
     } finally {

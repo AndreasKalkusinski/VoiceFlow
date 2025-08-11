@@ -129,7 +129,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
         'Loaded settings:',
         loadedSettings?.openaiApiKey ? 'API key present' : 'No API key',
       );
-    } catch (error) {
+    } catch {
       console.error('Error loading settings:', error);
     }
   };
@@ -141,7 +141,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-    } catch (error) {
+    } catch {
       console.error('Failed to setup audio:', error);
     }
   };
@@ -183,7 +183,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       setRecording(recording);
       setIsRecording(true);
       showStatus(t('speechToText.status.recording'));
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
     }
   };
@@ -216,7 +216,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       }
 
       setRecording(null);
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {

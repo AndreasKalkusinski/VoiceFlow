@@ -1,21 +1,7 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  AccessibilityInfo,
-} from 'react-native';
+import { AccessibilityInfo } from 'react-native';
 import { Modern2025SpeechToTextScreen } from './Modern2025SpeechToTextScreen';
-import {
-  buttonA11y,
-  inputA11y,
-  loadingA11y,
-  announce,
-  createA11yProps,
-} from '../utils/accessibility';
+import { buttonA11y, inputA11y } from '../utils/accessibility';
 
 /**
  * Wrapper component that adds comprehensive accessibility to Modern2025SpeechToTextScreen

@@ -51,7 +51,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-    } catch (error) {
+    } catch {
       console.error('Error loading settings:', error);
     }
   };
@@ -63,7 +63,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
       });
-    } catch (error) {
+    } catch {
       console.error('Failed to setup audio:', error);
     }
   };
@@ -117,7 +117,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
           showStatus(t('textToSpeech.status.complete'));
         }
       });
-    } catch (error) {
+    } catch {
       showStatus(t('textToSpeech.status.failed'));
       Alert.alert(t('common.error'), t('textToSpeech.status.failed'));
     } finally {
