@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
@@ -95,9 +95,7 @@ export default function App() {
     <ErrorBoundary>
       <SafeAreaProvider>
         <ThemeProvider>
-          <Suspense fallback={<LoadingFallback />}>
-            <ThemedApp />
-          </Suspense>
+          <ThemedApp />
         </ThemeProvider>
       </SafeAreaProvider>
     </ErrorBoundary>

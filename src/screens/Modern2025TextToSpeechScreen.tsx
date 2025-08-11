@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -49,10 +49,10 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   const screenTheme = getScreenTheme('Text to Speech', isDark);
   const { t } = useTranslation();
 
-  // Use useState for Animated values to avoid freezing issues
-  const [fadeAnim] = useState(() => new Animated.Value(0));
-  const [slideAnim] = useState(() => new Animated.Value(30));
-  const [progressAnim] = useState(() => new Animated.Value(0));
+  // Use useRef for Animated values to work in release builds
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+  const progressAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     setupAudio();

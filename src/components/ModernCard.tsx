@@ -28,7 +28,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
 
   // Create animation value for scale only
-  const [scaleAnim] = React.useState(() => new Animated.Value(1));
+  const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
     if (onPress && animated) {

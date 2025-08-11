@@ -47,7 +47,7 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
   react: {
-    useSuspense: true, // Enable suspense for proper loading
+    useSuspense: false, // Disable suspense for React Native
   },
   compatibilityJSON: 'v3', // Fix for React Native
 });
