@@ -11,6 +11,7 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Audio } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
@@ -23,8 +24,9 @@ import { StorageService } from '../services/storage';
 import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
-
-const { width, height } = Dimensions.get('window');
+import { useTranslation } from 'react-i18next';
+import { wp, hp, spacing, fontSize, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
+import { useFocusEffect } from '@react-navigation/native';
 
 export const ModernSpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -35,6 +37,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   const [statusMessage, setStatusMessage] = useState('');
   
   const { colors, theme, isDark } = useTheme();
+  const { t } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const waveAnims = useRef(
@@ -42,10 +45,16 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   ).current;
 
   useEffect(() => {
-    loadSettings();
     setupAudio();
     animateEntry();
   }, []);
+
+  // Reload settings when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadSettings();
+    }, [])
+  );
 
   useEffect(() => {
     if (isRecording) {
@@ -103,8 +112,13 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   };
 
   const loadSettings = async () => {
-    const loadedSettings = await StorageService.getSettings();
-    setSettings(loadedSettings);
+    try {
+      const loadedSettings = await StorageService.getSettings();
+      setSettings(loadedSettings);
+      console.log('Loaded settings:', loadedSettings?.openaiApiKey ? 'API key present' : 'No API key');
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
   };
 
   const setupAudio = async () => {
@@ -125,18 +139,22 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   };
 
   const startRecording = async () => {
-    if (!settings?.openaiApiKey) {
-      Alert.alert('Configuration Required', 'Please configure your OpenAI API key in Settings');
+    // Reload settings to ensure we have the latest
+    const currentSettings = await StorageService.getSettings();
+    setSettings(currentSettings);
+    
+    if (!currentSettings?.openaiApiKey) {
+      Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
       return;
     }
 
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      showStatus('Starting recording...');
+      showStatus(t('speechToText.status.starting'));
       
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
-        showStatus('Microphone permission denied');
+        showStatus(t('speechToText.status.microphoneDenied'));
         return;
       }
 
@@ -151,9 +169,9 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       
       setRecording(recording);
       setIsRecording(true);
-      showStatus('Recording... Speak now');
+      showStatus(t('speechToText.status.recording'));
     } catch (error) {
-      showStatus('Failed to start recording');
+      showStatus(t('speechToText.status.failed'));
     }
   };
 
@@ -164,13 +182,13 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setIsRecording(false);
       setIsProcessing(true);
-      showStatus('Processing your speech...');
+      showStatus(t('speechToText.status.processing'));
       
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
       
       if (uri && settings) {
-        showStatus('Transcribing with AI...');
+        showStatus(t('speechToText.status.transcribing'));
         const openaiService = new OpenAIService(settings.openaiApiKey);
         const text = await openaiService.transcribeAudio(uri, settings.sttModel);
         
@@ -180,13 +198,13 @@ export const ModernSpeechToTextScreen: React.FC = () => {
           setTranscribedText(text);
         }
         
-        showStatus('Transcription complete!');
+        showStatus(t('speechToText.status.complete'));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
       
       setRecording(null);
     } catch (error) {
-      showStatus('Failed to transcribe audio');
+      showStatus(t('speechToText.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsProcessing(false);
@@ -195,33 +213,36 @@ export const ModernSpeechToTextScreen: React.FC = () => {
 
   const copyToClipboard = async () => {
     if (!transcribedText) {
-      Alert.alert('No Text', 'There is no text to copy');
+      Alert.alert(t('alerts.noTextTitle'), t('alerts.noTextMessage'));
       return;
     }
     
     await Clipboard.setStringAsync(transcribedText);
-    showStatus('Copied to clipboard!');
+    showStatus(t('speechToText.copiedToClipboard'));
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const clearText = () => {
     setTranscribedText('');
-    showStatus('Text cleared');
+    showStatus(t('speechToText.textCleared'));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
+  const wordCount = transcribedText.split(' ').filter(w => w).length;
+
   return (
-    <LinearGradient
-      colors={isDark 
-        ? ['#0F0F23', '#1A1A3E', '#0F0F23']
-        : ['#F0F4FF', '#FFFFFF', '#F0F4FF']
-      }
-      style={styles.container}
-    >
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <SafeAreaView style={styles.safeArea}>
+      <LinearGradient
+        colors={isDark 
+          ? ['#0F0F23', '#1A1A3E', '#0F0F23']
+          : ['#F0F4FF', '#FFFFFF', '#F0F4FF']
+        }
+        style={styles.container}
       >
+        <KeyboardAvoidingView
+          style={styles.keyboardAvoid}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
         <ScrollView 
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -250,11 +271,11 @@ export const ModernSpeechToTextScreen: React.FC = () => {
             <GlassCard style={styles.textCard} gradient>
               <View style={styles.textHeader}>
                 <Text style={[styles.label, { color: colors.text }]}>
-                  Your Transcription
+                  {t('speechToText.subtitle')}
                 </Text>
                 <View style={styles.wordCount}>
                   <Text style={[styles.wordCountText, { color: colors.textSecondary }]}>
-                    {transcribedText.split(' ').filter(w => w).length} words
+                    {wordCount} {t('common.words')}
                   </Text>
                 </View>
               </View>
@@ -264,7 +285,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
                 multiline
                 value={transcribedText}
                 onChangeText={setTranscribedText}
-                placeholder="Your voice will be transformed into text here..."
+                placeholder={t('speechToText.placeholder')}
                 placeholderTextColor={colors.textMuted}
               />
             </GlassCard>
@@ -324,7 +345,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
 
               <View style={styles.actionButtons}>
                 <AnimatedButton
-                  title="Copy"
+                  title={t('speechToText.copyText')}
                   onPress={copyToClipboard}
                   variant="glass"
                   size="medium"
@@ -333,7 +354,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
                 />
                 
                 <AnimatedButton
-                  title="Clear"
+                  title={t('speechToText.clearText')}
                   onPress={clearText}
                   variant="glass"
                   size="medium"
@@ -344,12 +365,22 @@ export const ModernSpeechToTextScreen: React.FC = () => {
             </View>
           </Animated.View>
         </ScrollView>
-      </KeyboardAvoidingView>
-    </LinearGradient>
+        </KeyboardAvoidingView>
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    ...Platform.select({
+      android: {
+        paddingTop: 0,
+      },
+    }),
+  },
   container: {
     flex: 1,
   },
@@ -358,85 +389,89 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: componentHeights.tabBar + spacing.xl,
   },
   content: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: adaptiveSpacing.screenPadding,
+    paddingTop: componentHeights.header + spacing.md,
   },
   statusContainer: {
     position: 'absolute',
-    top: 10,
-    left: 20,
-    right: 20,
+    top: hp(1),
+    left: adaptiveSpacing.screenPadding,
+    right: adaptiveSpacing.screenPadding,
     zIndex: 1000,
   },
   statusCard: {
-    padding: 12,
+    padding: spacing.sm,
     alignItems: 'center',
   },
   statusText: {
-    fontSize: 14,
+    fontSize: fontSizes.small,
     fontWeight: '600',
   },
   textCard: {
     flex: 1,
-    padding: 20,
-    marginBottom: 20,
-    minHeight: 300,
+    padding: adaptiveSpacing.cardPadding,
+    marginBottom: spacing.md,
+    minHeight: componentHeights.textInput,
+    maxHeight: hp(50),
   },
   textHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   label: {
-    fontSize: 20,
+    fontSize: fontSizes.xl,
     fontWeight: '700',
     letterSpacing: -0.5,
   },
   wordCount: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     borderRadius: 20,
     backgroundColor: 'rgba(99, 102, 241, 0.1)',
   },
   wordCountText: {
-    fontSize: 12,
+    fontSize: fontSizes.tiny,
     fontWeight: '600',
   },
   textInput: {
     flex: 1,
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: fontSizes.medium,
+    lineHeight: fontSizes.medium * 1.5,
     textAlignVertical: 'top',
   },
   visualizationContainer: {
-    height: 120,
+    height: componentHeights.visualization,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: spacing.md,
   },
   waveContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 80,
+    height: componentHeights.visualization * 0.7,
   },
   wave: {
-    width: 6,
-    height: 50,
+    width: wp(1.5),
+    height: componentHeights.visualization * 0.4,
     borderRadius: 3,
-    marginHorizontal: 4,
+    marginHorizontal: spacing.xs / 2,
   },
   buttonContainer: {
-    marginTop: 20,
+    marginTop: spacing.md,
+    paddingBottom: spacing.lg,
   },
   mainButtonWrapper: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: spacing.xl,
   },
   micIcon: {
-    fontSize: 32,
+    fontSize: fontSizes.xxxl,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -444,6 +479,6 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    marginHorizontal: 8,
+    marginHorizontal: spacing.xs,
   },
 });

@@ -1,5 +1,14 @@
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
+import { Buffer } from 'buffer';
+import { handleApiError, ApplicationError, ErrorType, ErrorLogger } from '../utils/errorHandler';
+
+export interface Model {
+  id: string;
+  object: string;
+  created: number;
+  owned_by: string;
+}
 
 export class OpenAIService {
   private apiKey: string;
@@ -18,13 +27,57 @@ export class OpenAIService {
       });
       return response.status === 200;
     } catch (error) {
-      console.error('API Key validation failed:', error);
+      const appError = handleApiError(error);
+      ErrorLogger.log(appError, { method: 'validateApiKey' });
       return false;
     }
   }
 
+  async getAvailableModels(): Promise<Model[]> {
+    try {
+      const response = await axios.get(`${this.baseURL}/models`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+      });
+      return response.data.data || [];
+    } catch (error) {
+      const appError = handleApiError(error);
+      ErrorLogger.log(appError, { method: 'getAvailableModels' });
+      throw appError;
+    }
+  }
+
+  async getWhisperModels(): Promise<Model[]> {
+    const models = await this.getAvailableModels();
+    return models.filter(model => 
+      model.id.includes('whisper') || 
+      model.id === 'whisper-1'
+    );
+  }
+
+  async getTTSModels(): Promise<Model[]> {
+    const models = await this.getAvailableModels();
+    return models.filter(model => 
+      model.id.includes('tts') || 
+      model.id === 'tts-1' || 
+      model.id === 'tts-1-hd'
+    );
+  }
+
   async transcribeAudio(audioUri: string, model: string = 'whisper-1'): Promise<string> {
     try {
+      // Validate file exists
+      const fileInfo = await FileSystem.getInfoAsync(audioUri);
+      if (!fileInfo.exists) {
+        throw new ApplicationError(
+          ErrorType.VALIDATION,
+          'Audio file does not exist',
+          'FILE_NOT_FOUND',
+          { audioUri }
+        );
+      }
+
       const audioBase64 = await FileSystem.readAsStringAsync(audioUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
@@ -50,19 +103,42 @@ export class OpenAIService {
 
       return response.data.text;
     } catch (error) {
-      console.error('Transcription failed:', error);
-      throw new Error('Failed to transcribe audio');
+      if (error instanceof ApplicationError) {
+        throw error;
+      }
+      const appError = handleApiError(error);
+      ErrorLogger.log(appError, { method: 'transcribeAudio', model });
+      throw appError;
     }
   }
 
   async textToSpeech(text: string, model: string = 'tts-1', voice: string = 'alloy'): Promise<string> {
     try {
+      // Validate input
+      if (!text || text.trim().length === 0) {
+        throw new ApplicationError(
+          ErrorType.VALIDATION,
+          'Text cannot be empty',
+          'EMPTY_TEXT'
+        );
+      }
+
+      if (text.length > 4096) {
+        throw new ApplicationError(
+          ErrorType.VALIDATION,
+          'Text is too long (max 4096 characters)',
+          'TEXT_TOO_LONG',
+          { length: text.length }
+        );
+      }
+      
       const response = await axios.post(
         `${this.baseURL}/audio/speech`,
         {
           model,
           input: text,
           voice,
+          response_format: 'mp3',
         },
         {
           headers: {
@@ -73,19 +149,38 @@ export class OpenAIService {
         }
       );
 
-      const audioUri = FileSystem.documentDirectory + 'speech.mp3';
+      // Convert arraybuffer to base64 using Buffer polyfill
+      const base64Audio = Buffer.from(response.data).toString('base64');
+      
+      // Use timestamp to avoid caching issues
+      const audioUri = FileSystem.documentDirectory + `speech_${Date.now()}.mp3`;
+      
       await FileSystem.writeAsStringAsync(
         audioUri,
-        Buffer.from(response.data).toString('base64'),
+        base64Audio,
         {
           encoding: FileSystem.EncodingType.Base64,
         }
       );
 
+      // Verify file was written
+      const fileInfo = await FileSystem.getInfoAsync(audioUri);
+      if (!fileInfo.exists) {
+        throw new ApplicationError(
+          ErrorType.STORAGE,
+          'Failed to save audio file',
+          'FILE_SAVE_ERROR'
+        );
+      }
+
       return audioUri;
     } catch (error) {
-      console.error('Text to speech failed:', error);
-      throw new Error('Failed to generate speech');
+      if (error instanceof ApplicationError) {
+        throw error;
+      }
+      const appError = handleApiError(error);
+      ErrorLogger.log(appError, { method: 'textToSpeech', model, voice });
+      throw appError;
     }
   }
 }

@@ -1,9 +1,4 @@
-export interface Settings {
-  openaiApiKey: string;
-  sttModel: string;
-  ttsModel: string;
-  ttsVoice: string;
-}
+export { Settings } from './settings';
 
 export interface LogMessage {
   id: string;

@@ -1,8 +1,29 @@
 # VoiceFlow 🎤🔊
 
-Eine moderne React Native App mit Expo für Speech-to-Text und Text-to-Speech Funktionalität mit OpenAI's Whisper und TTS APIs.
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![React Native](https://img.shields.io/badge/React%20Native-0.79-blue.svg)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-53-000.svg)](https://expo.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## Features
+A modern, open-source React Native app for Speech-to-Text and Text-to-Speech using OpenAI's Whisper and TTS APIs.
+
+🌍 **[English](#english)** | 🇩🇪 **[Deutsch](#deutsch)**
+
+## 🌟 Why VoiceFlow?
+
+- 🆓 **100% Free & Open Source** - No hidden costs, no subscriptions
+- 🔒 **Privacy First** - Your data stays on your device
+- 🎨 **Beautiful UI** - Three modern themes with dark mode support
+- 🌍 **Multi-language** - Supports English, German, Spanish
+- ⚡ **Fast & Reliable** - Built with performance in mind
+- 🧩 **Extensible** - Easy to add new providers and features
+
+---
+
+## English
+
+### Features
 
 ### 🎤 Speech-to-Text
 - Sprachaufnahme mit visueller Animation
@@ -65,10 +86,73 @@ https://platform.openai.com/api-keys
 - Eine aktive Internetverbindung ist für die API-Aufrufe erforderlich
 - Der API Key wird lokal auf dem Gerät gespeichert
 
-## Entwicklung
+## 🤝 Contributing
+
+We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Quick Start for Contributors
+
+```bash
+# Fork and clone the repo
+git clone https://github.com/yourusername/VoiceFlow.git
+
+# Install dependencies
+npm install
+
+# Start development
+npm start
+```
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔒 Privacy & Security
+
+- [Privacy Policy](PRIVACY.md)
+- [Terms of Service](TERMS.md)
+- [Security Policy](SECURITY.md)
+
+## 📊 Project Status
+
+- ✅ Core features complete
+- ✅ Production ready
+- ✅ Fully tested
+- 🚧 Continuous improvements
+
+## 🙏 Acknowledgments
+
+- OpenAI for the amazing Whisper and TTS APIs
+- The React Native and Expo communities
+- All our contributors
+
+---
+
+## Deutsch
+
+### Entwicklung
 
 Die App ist modular aufgebaut:
 - `/src/screens/` - Die drei Hauptbildschirme
-- `/src/components/` - Wiederverwendbare Komponenten
+- `/src/components/` - Wiederverwendbare Komponenten  
 - `/src/services/` - API und Storage Services
 - `/src/types/` - TypeScript Type Definitionen
+
+## ⭐ Support the Project
+
+If you like VoiceFlow, please:
+- ⭐ Star this repository
+- 🐛 Report bugs
+- 💡 Suggest new features
+- 🤝 Contribute code
+- 📣 Share with others
+
+## 📬 Contact
+
+- **Issues**: [GitHub Issues](https://github.com/yourusername/VoiceFlow/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/VoiceFlow/discussions)
+- **Email**: support@voiceflow.app
+
+---
+
+Made with ❤️ by the VoiceFlow community

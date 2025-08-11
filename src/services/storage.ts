@@ -39,4 +39,49 @@ export const StorageService = {
       throw e;
     }
   },
+
+  // Legacy methods for backward compatibility
+  async getApiKey(): Promise<string | null> {
+    const settings = await this.getSettings();
+    return settings.openaiApiKey || null;
+  },
+
+  async setApiKey(apiKey: string): Promise<void> {
+    const settings = await this.getSettings();
+    settings.openaiApiKey = apiKey;
+    await this.saveSettings(settings);
+  },
+
+  async getSelectedModel(): Promise<string> {
+    const settings = await this.getSettings();
+    return settings.sttModel || 'whisper-1';
+  },
+
+  async setSelectedModel(model: string): Promise<void> {
+    const settings = await this.getSettings();
+    settings.sttModel = model;
+    await this.saveSettings(settings);
+  },
+
+  async getSelectedVoice(): Promise<string> {
+    const settings = await this.getSettings();
+    return settings.ttsVoice || 'alloy';
+  },
+
+  async setSelectedVoice(voice: string): Promise<void> {
+    const settings = await this.getSettings();
+    settings.ttsVoice = voice;
+    await this.saveSettings(settings);
+  },
+
+  async getTTSModel(): Promise<string> {
+    const settings = await this.getSettings();
+    return settings.ttsModel || 'tts-1';
+  },
+
+  async setTTSModel(model: string): Promise<void> {
+    const settings = await this.getSettings();
+    settings.ttsModel = model;
+    await this.saveSettings(settings);
+  },
 };

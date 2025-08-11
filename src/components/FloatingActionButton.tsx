@@ -118,7 +118,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         style={styles.touchable}
       >
         <LinearGradient
-          colors={isActive ? colors.secondaryGradient : colors.primaryGradient}
+          colors={isActive ? (colors.secondaryGradient as [string, string]) : (colors.primaryGradient as [string, string])}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradient}

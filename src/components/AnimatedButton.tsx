@@ -64,12 +64,12 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     onPress();
   };
 
-  const getGradientColors = () => {
+  const getGradientColors = (): [string, string] => {
     switch (variant) {
       case 'primary':
-        return colors.primaryGradient;
+        return colors.primaryGradient as [string, string];
       case 'secondary':
-        return colors.secondaryGradient;
+        return colors.secondaryGradient as [string, string];
       case 'success':
         return [colors.success, colors.success];
       case 'danger':
@@ -79,7 +79,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
           ? ['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']
           : ['rgba(0, 0, 0, 0.05)', 'rgba(0, 0, 0, 0.02)'];
       default:
-        return colors.primaryGradient;
+        return colors.primaryGradient as [string, string];
     }
   };
 
