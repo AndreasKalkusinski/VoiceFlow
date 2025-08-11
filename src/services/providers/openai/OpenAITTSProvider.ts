@@ -51,23 +51,19 @@ export class OpenAITTSProvider extends BaseTTSProvider {
         },
         {
           headers: {
-            'Authorization': `Bearer ${options.apiKey}`,
+            Authorization: `Bearer ${options.apiKey}`,
             'Content-Type': 'application/json',
           },
           responseType: 'arraybuffer',
-        }
+        },
       );
 
       const base64Audio = Buffer.from(response.data).toString('base64');
       const audioUri = FileSystem.documentDirectory + `speech_${Date.now()}.mp3`;
-      
-      await FileSystem.writeAsStringAsync(
-        audioUri,
-        base64Audio,
-        {
-          encoding: FileSystem.EncodingType.Base64,
-        }
-      );
+
+      await FileSystem.writeAsStringAsync(audioUri, base64Audio, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
       return audioUri;
     } catch (error: any) {

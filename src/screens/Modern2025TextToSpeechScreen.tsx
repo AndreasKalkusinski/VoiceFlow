@@ -22,14 +22,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
-import { ModernButton } from '../components/ModernButton';
 import { StorageService } from '../services/storage';
 import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { designTokens } from '../utils/design-system';
-import { vw, vh, contentVH, responsiveDimensions } from '../utils/responsive-dimensions';
+import { vw, vh, responsiveDimensions } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -40,17 +39,16 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
-  const [playbackProgress, setPlaybackProgress] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [audioUri, setAudioUri] = useState<string | null>(null);
   const [duration, setDuration] = useState(0);
   const [playbackPosition, setPlaybackPosition] = useState(0);
-  
+
   const { isDark } = useTheme();
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
   const screenTheme = getScreenTheme('Text to Speech', isDark);
   const { t } = useTranslation();
-  
+
   // Use useState for Animated values to avoid freezing issues
   const [fadeAnim] = useState(() => new Animated.Value(0));
   const [slideAnim] = useState(() => new Animated.Value(30));
@@ -69,7 +67,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
-    }, [])
+    }, []),
   );
 
   const animateEntry = () => {
@@ -92,8 +90,8 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-    } catch (error) {
-      console.error('Error loading settings:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -104,8 +102,8 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
       });
-    } catch (error) {
-      console.error('Failed to setup audio:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -117,7 +115,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   const generateSpeech = async () => {
     const currentSettings = await StorageService.getSettings();
     setSettings(currentSettings);
-    
+
     if (!currentSettings?.apiKeys?.openai && !currentSettings?.openaiApiKey) {
       Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
       return;
@@ -134,29 +132,31 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
 
     try {
       const apiKey = currentSettings.apiKeys?.openai || currentSettings.openaiApiKey;
-      
+
       // Get model and voice from providerSettings or fallback to defaults
-      const ttsModel = currentSettings.providerSettings?.['openai-tts']?.model || currentSettings.ttsModel || 'tts-1';
-      const ttsVoice = currentSettings.providerSettings?.['openai-tts']?.voice || currentSettings.ttsVoice || 'alloy';
-      
+      const ttsModel =
+        currentSettings.providerSettings?.['openai-tts']?.model ||
+        currentSettings.ttsModel ||
+        'tts-1';
+      const ttsVoice =
+        currentSettings.providerSettings?.['openai-tts']?.voice ||
+        currentSettings.ttsVoice ||
+        'alloy';
+
       console.log('TTS Settings:', {
         apiKey: apiKey ? 'Set (hidden)' : 'Not set',
         model: ttsModel,
         voice: ttsVoice,
         inputLength: inputText.length,
-        providerSettings: currentSettings.providerSettings?.['openai-tts']
+        providerSettings: currentSettings.providerSettings?.['openai-tts'],
       });
-      
+
       if (!apiKey) {
         throw new Error('API key is missing');
       }
-      
+
       const openaiService = new OpenAIService(apiKey);
-      const newAudioUri = await openaiService.textToSpeech(
-        inputText,
-        ttsModel,
-        ttsVoice
-      );
+      const newAudioUri = await openaiService.textToSpeech(inputText, ttsModel, ttsVoice);
 
       if (sound) {
         await sound.unloadAsync();
@@ -164,7 +164,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
 
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: newAudioUri },
-        { shouldPlay: true }
+        { shouldPlay: true },
       );
 
       setSound(newSound);
@@ -176,7 +176,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         if (status.isLoaded) {
           if (status.didJustFinish) {
             setIsPlaying(false);
-            setPlaybackProgress(0);
+
             setPlaybackPosition(0);
             progressAnim.setValue(0);
             showStatus(t('textToSpeech.status.complete'));
@@ -185,7 +185,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
             await newSound.setPositionAsync(0);
           } else if (status.positionMillis && status.durationMillis) {
             const progress = status.positionMillis / status.durationMillis;
-            setPlaybackProgress(progress);
+
             setPlaybackPosition(status.positionMillis);
             setDuration(status.durationMillis);
             progressAnim.setValue(progress);
@@ -194,34 +194,20 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         }
       });
     } catch (error: any) {
-      console.error('TTS Generation Error:', error);
       console.error('Error details:', {
         message: error.message,
         response: error.response?.data,
-        stack: error.stack
+        stack: error.stack,
       });
       showStatus(t('textToSpeech.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      
+
       // More specific error message
-      const errorMessage = error.response?.data?.error?.message || 
-                          error.message || 
-                          t('textToSpeech.status.failed');
+      const errorMessage =
+        error.response?.data?.error?.message || error.message || t('textToSpeech.status.failed');
       Alert.alert(t('common.error'), errorMessage);
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const stopPlayback = async () => {
-    if (sound) {
-      await sound.stopAsync();
-      setIsPlaying(false);
-      setPlaybackProgress(0);
-      setPlaybackPosition(0);
-      progressAnim.setValue(0);
-      showStatus(t('textToSpeech.status.stopped'));
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
   };
 
@@ -249,24 +235,24 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         try {
           const { sound: newSound } = await Audio.Sound.createAsync(
             { uri: audioUri },
-            { shouldPlay: true }
+            { shouldPlay: true },
           );
-          
+
           setSound(newSound);
           setIsPlaying(true);
-          
+
           newSound.setOnPlaybackStatusUpdate(async (status) => {
             if (status.isLoaded) {
               if (status.didJustFinish) {
                 setIsPlaying(false);
-                setPlaybackProgress(0);
+
                 setPlaybackPosition(0);
                 progressAnim.setValue(0);
                 // Rewind to beginning
                 await newSound.setPositionAsync(0);
               } else if (status.positionMillis && status.durationMillis) {
                 const progress = status.positionMillis / status.durationMillis;
-                setPlaybackProgress(progress);
+
                 setPlaybackPosition(status.positionMillis);
                 setDuration(status.durationMillis);
                 progressAnim.setValue(progress);
@@ -274,13 +260,13 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
               setIsPlaying(status.isPlaying);
             }
           });
-        } catch (error) {
-          console.error('Failed to recreate sound:', error);
+        } catch {
+          /* ignore */
         }
       }
       return;
     }
-    
+
     if (isPlaying) {
       await sound.pauseAsync();
       setIsPlaying(false);
@@ -293,10 +279,10 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
 
   const seekToPosition = async (progress: number) => {
     if (!sound || !duration) return;
-    
+
     const position = progress * duration;
     await sound.setPositionAsync(position);
-    setPlaybackProgress(progress);
+
     setPlaybackPosition(position);
     progressAnim.setValue(progress);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -304,7 +290,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
 
   const downloadAudio = async () => {
     if (!audioUri) return;
-    
+
     try {
       const isAvailable = await Sharing.isAvailableAsync();
       if (isAvailable) {
@@ -313,9 +299,9 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         const newUri = FileSystem.documentDirectory + filename;
         await FileSystem.copyAsync({
           from: audioUri,
-          to: newUri
+          to: newUri,
         });
-        
+
         await Sharing.shareAsync(newUri, {
           mimeType: 'audio/mpeg',
           dialogTitle: t('textToSpeech.downloadAudio'),
@@ -325,26 +311,25 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       } else {
         Alert.alert(t('common.error'), t('textToSpeech.status.downloadFailed'));
       }
-    } catch (error) {
-      console.error('Download failed:', error);
+    } catch {
       Alert.alert(t('common.error'), t('textToSpeech.status.downloadFailed'));
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    
+
     try {
       // Reset animations
       fadeAnim.setValue(1);
       slideAnim.setValue(0);
-      
+
       // Reload settings and show a brief status
       await loadSettings();
       showStatus(t('textToSpeech.refreshed'), 1500);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
-      console.error('Refresh failed:', error);
+    } catch {
+      /* ignore */
     } finally {
       // Ensure refresh state is reset
       setRefreshing(false);
@@ -358,15 +343,19 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       {/* Screen-specific gradient background */}
       <LinearGradient
-        colors={screenTheme ? screenTheme.gradient as [string, string] : [colors.background, colors.background]}
+        colors={
+          screenTheme
+            ? (screenTheme.gradient as [string, string])
+            : [colors.background, colors.background]
+        }
         style={StyleSheet.absoluteFillObject}
       />
-      
+
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -397,10 +386,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
             </View>
 
             {/* Main Text Input with modern design */}
-            <ModernCard 
-              variant={isPlaying ? 'gradient' : 'glass'} 
-              style={styles.textCard}
-            >
+            <ModernCard variant={isPlaying ? 'gradient' : 'glass'} style={styles.textCard}>
               <View style={styles.textHeader}>
                 <Text style={[styles.label, { color: colors.textSecondary }]}>
                   {t('textToSpeech.inputLabel')}
@@ -420,7 +406,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                   )}
                 </View>
               </View>
-              
+
               <TextInput
                 style={[styles.textInput, { color: colors.text }]}
                 multiline
@@ -431,7 +417,6 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                 textAlignVertical="top"
               />
 
-              
               {/* Footer Actions inside card with status area */}
               <View style={styles.cardFooter}>
                 {/* Status Message Area - Always reserved space */}
@@ -447,7 +432,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                     <View style={styles.statusPlaceholder} />
                   )}
                 </View>
-                
+
                 {/* Action Buttons */}
                 <View style={styles.footerActions}>
                   <TouchableOpacity
@@ -457,9 +442,9 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                   >
                     <Ionicons name="clipboard-outline" size={22} color={colors.text} />
                   </TouchableOpacity>
-                  
+
                   <View style={[styles.footerDivider, { backgroundColor: colors.border }]} />
-                  
+
                   <TouchableOpacity
                     onPress={clearText}
                     style={styles.footerAction}
@@ -472,47 +457,55 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
             </ModernCard>
 
             {/* Audio Player - Always visible */}
-            <ModernCard variant="glass" style={StyleSheet.flatten([styles.audioPlayerCard, audioUri ? {} : { opacity: 0.5 }])}>
+            <ModernCard
+              variant="glass"
+              style={StyleSheet.flatten([styles.audioPlayerCard, audioUri ? {} : { opacity: 0.5 }])}
+            >
               <View style={styles.audioPlayerHeader}>
-                <Ionicons 
-                  name="musical-notes-outline" 
-                  size={20} 
-                  color={audioUri ? colors.primary : colors.textMuted} 
+                <Ionicons
+                  name="musical-notes-outline"
+                  size={20}
+                  color={audioUri ? colors.primary : colors.textMuted}
                 />
-                <Text style={[styles.audioPlayerTitle, { color: audioUri ? colors.text : colors.textMuted }]}>
+                <Text
+                  style={[
+                    styles.audioPlayerTitle,
+                    { color: audioUri ? colors.text : colors.textMuted },
+                  ]}
+                >
                   {t('textToSpeech.audioPlayer')}
                 </Text>
               </View>
-              
+
               {/* Playback Controls */}
               <View style={styles.audioControls}>
                 <TouchableOpacity
                   onPress={togglePlayPause}
                   style={[
-                    styles.audioControlButton, 
-                    { 
+                    styles.audioControlButton,
+                    {
                       backgroundColor: audioUri ? colors.primary + '15' : colors.border + '20',
-                    }
+                    },
                   ]}
                   activeOpacity={audioUri ? 0.7 : 1}
                   disabled={!audioUri}
                 >
-                  <Ionicons 
-                    name={isPlaying ? 'pause' : 'play'} 
-                    size={24} 
-                    color={audioUri ? colors.primary : colors.textMuted} 
+                  <Ionicons
+                    name={isPlaying ? 'pause' : 'play'}
+                    size={24}
+                    color={audioUri ? colors.primary : colors.textMuted}
                   />
                 </TouchableOpacity>
-                
+
                 {/* Progress Bar - Seekable */}
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.audioProgressContainer}
                   activeOpacity={audioUri ? 1 : 1}
                   disabled={!audioUri}
                   onPress={(e) => {
                     if (!audioUri) return;
                     const { locationX } = e.nativeEvent;
-                    const containerWidth = e.currentTarget.measure?.((x, y, width) => {
+                    e.currentTarget.measure?.((x, y, width) => {
                       const progress = Math.max(0, Math.min(1, locationX / width));
                       seekToPosition(progress);
                     });
@@ -524,7 +517,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                         <Animated.View
                           style={[
                             styles.audioProgressFill,
-                            { 
+                            {
                               backgroundColor: colors.primary,
                               width: progressAnim.interpolate({
                                 inputRange: [0, 1],
@@ -549,29 +542,33 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                       </>
                     )}
                   </View>
-                  <Text style={[styles.durationText, { color: audioUri ? colors.textSecondary : colors.textMuted }]}>
-                    {audioUri && duration > 0 
+                  <Text
+                    style={[
+                      styles.durationText,
+                      { color: audioUri ? colors.textSecondary : colors.textMuted },
+                    ]}
+                  >
+                    {audioUri && duration > 0
                       ? `${Math.floor(playbackPosition / 1000)}s / ${Math.floor(duration / 1000)}s`
-                      : '0s / 0s'
-                    }
+                      : '0s / 0s'}
                   </Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity
                   onPress={downloadAudio}
                   style={[
-                    styles.audioControlButton, 
-                    { 
+                    styles.audioControlButton,
+                    {
                       backgroundColor: audioUri ? colors.success + '15' : colors.border + '20',
-                    }
+                    },
                   ]}
                   activeOpacity={audioUri ? 0.7 : 1}
                   disabled={!audioUri}
                 >
-                  <Ionicons 
-                    name="download-outline" 
-                    size={24} 
-                    color={audioUri ? colors.success : colors.textMuted} 
+                  <Ionicons
+                    name="download-outline"
+                    size={24}
+                    color={audioUri ? colors.success : colors.textMuted}
                   />
                 </TouchableOpacity>
               </View>
@@ -581,17 +578,28 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
             <View style={styles.playButtonContainer}>
               <TouchableOpacity
                 onPress={generateSpeech}
-                disabled={isGenerating || !inputText.trim() || (!settings?.apiKeys?.openai && !settings?.openaiApiKey)}
+                disabled={
+                  isGenerating ||
+                  !inputText.trim() ||
+                  (!settings?.apiKeys?.openai && !settings?.openaiApiKey)
+                }
                 activeOpacity={0.8}
                 style={styles.playButtonWrapper}
               >
-                <Animated.View style={[
-                  styles.playButton,
-                  {
-                    opacity: isGenerating || !inputText.trim() || (!settings?.apiKeys?.openai && !settings?.openaiApiKey) ? 0.5 : 1,
-                    borderColor: colors.primary,
-                  }
-                ]}>
+                <Animated.View
+                  style={[
+                    styles.playButton,
+                    {
+                      opacity:
+                        isGenerating ||
+                        !inputText.trim() ||
+                        (!settings?.apiKeys?.openai && !settings?.openaiApiKey)
+                          ? 0.5
+                          : 1,
+                      borderColor: colors.primary,
+                    },
+                  ]}
+                >
                   <BlurView
                     intensity={70}
                     tint={isDark ? 'dark' : 'light'}
@@ -605,14 +613,14 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                     }
                     style={StyleSheet.absoluteFillObject}
                   />
-                  <Ionicons 
-                    name={isGenerating ? 'hourglass-outline' : 'volume-high-outline'} 
-                    size={vw(5.5)} 
-                    color={colors.primary} 
+                  <Ionicons
+                    name={isGenerating ? 'hourglass-outline' : 'volume-high-outline'}
+                    size={vw(5.5)}
+                    color={colors.primary}
                   />
                 </Animated.View>
               </TouchableOpacity>
-              
+
               {/* Tips below button */}
               {!audioUri && inputText && (
                 <View style={styles.playInfo}>
@@ -622,18 +630,20 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                 </View>
               )}
             </View>
-            
+
             {/* Settings Info - compact version */}
             {settings && (
               <View style={styles.settingsInfo}>
-                <Ionicons 
-                  name="settings-outline" 
-                  size={14} 
-                  color={colors.textMuted} 
+                <Ionicons
+                  name="settings-outline"
+                  size={14}
+                  color={colors.textMuted}
                   style={styles.settingsIcon}
                 />
                 <Text style={[styles.settingsInfoText, { color: colors.textSecondary }]}>
-                  {settings.providerSettings?.['openai-tts']?.model || settings.ttsModel || 'tts-1'} • {settings.providerSettings?.['openai-tts']?.voice || settings.ttsVoice || 'alloy'}
+                  {settings.providerSettings?.['openai-tts']?.model || settings.ttsModel || 'tts-1'}{' '}
+                  •{' '}
+                  {settings.providerSettings?.['openai-tts']?.voice || settings.ttsVoice || 'alloy'}
                 </Text>
               </View>
             )}
@@ -671,9 +681,6 @@ const styles = StyleSheet.create({
     fontSize: responsiveDimensions.fontSize.title,
     fontWeight: '700',
     marginBottom: responsiveDimensions.padding.small,
-  },
-  subtitle: {
-    fontSize: responsiveDimensions.fontSize.medium,
   },
   statusArea: {
     minHeight: vh(3.5),

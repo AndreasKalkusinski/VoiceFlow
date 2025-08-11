@@ -1,16 +1,10 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlassCard } from './GlassCard';
 import { useTheme } from '../hooks/useTheme';
 import * as Haptics from 'expo-haptics';
-import { wp, hp, spacing, fontSize, fontSizes } from '../utils/responsive';
+import { spacing, fontSizes } from '../utils/responsive';
 
 interface ProviderCardProps {
   id: string;
@@ -31,7 +25,7 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
   hasApiKey,
   onPress,
 }) => {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -55,10 +49,7 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
 
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
-      <GlassCard style={StyleSheet.flatten([
-        styles.card,
-        isSelected && styles.selectedCard,
-      ])}>
+      <GlassCard style={StyleSheet.flatten([styles.card, isSelected && styles.selectedCard])}>
         {isSelected && (
           <LinearGradient
             colors={['#6366F1', '#EC4899']}
@@ -67,13 +58,11 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
             style={styles.selectedGradient}
           />
         )}
-        
+
         <View style={styles.header}>
           <Text style={styles.icon}>{getProviderIcon()}</Text>
           <View style={styles.titleContainer}>
-            <Text style={[styles.name, { color: colors.text }]}>
-              {name}
-            </Text>
+            <Text style={[styles.name, { color: colors.text }]}>{name}</Text>
             {isSelected && (
               <View style={styles.selectedBadge}>
                 <Text style={styles.selectedText}>Active</Text>
@@ -82,19 +71,14 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
           </View>
         </View>
 
-        <Text style={[styles.description, { color: colors.textSecondary }]}>
-          {description}
-        </Text>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>{description}</Text>
 
         {requiresApiKey && (
           <View style={styles.footer}>
-            <View style={[
-              styles.apiKeyStatus,
-              { backgroundColor: hasApiKey ? '#10B981' : '#EF4444' }
-            ]}>
-              <Text style={styles.apiKeyText}>
-                {hasApiKey ? '✓ API Key' : '✗ No Key'}
-              </Text>
+            <View
+              style={[styles.apiKeyStatus, { backgroundColor: hasApiKey ? '#10B981' : '#EF4444' }]}
+            >
+              <Text style={styles.apiKeyText}>{hasApiKey ? '✓ API Key' : '✗ No Key'}</Text>
             </View>
           </View>
         )}

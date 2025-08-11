@@ -8,32 +8,32 @@ export const designTokens = {
       primary: '#5E5CE6', // Modern purple
       primaryLight: '#7C7CFF',
       primaryDark: '#4A48C4',
-      
+
       // Accent colors
       accent: '#FF6B6B',
       accentGradient: ['#FF6B6B', '#FF8E53'] as [string, string],
-      
+
       // Semantic colors
       success: '#4ECDC4',
       warning: '#FFD93D',
       error: '#FF6B6B',
       info: '#5E5CE6',
-      
+
       // Base colors
       background: '#FAFBFF',
       surface: '#FFFFFF',
       surfaceElevated: '#FFFFFF',
-      
+
       // Text colors
       text: '#1A1C1E',
       textSecondary: '#5F6368',
       textMuted: '#9AA0A6',
       textOnPrimary: '#FFFFFF',
-      
+
       // Borders and dividers
       border: 'rgba(0, 0, 0, 0.06)',
       divider: 'rgba(0, 0, 0, 0.04)',
-      
+
       // Overlays
       overlay: 'rgba(0, 0, 0, 0.5)',
       scrim: 'rgba(0, 0, 0, 0.32)',
@@ -42,32 +42,32 @@ export const designTokens = {
       primary: '#7C7CFF',
       primaryLight: '#9999FF',
       primaryDark: '#5E5CE6',
-      
+
       accent: '#FF8E53',
       accentGradient: ['#FF8E53', '#FF6B6B'] as [string, string],
-      
+
       success: '#52D9D0',
       warning: '#FFE066',
       error: '#FF8080',
       info: '#7C7CFF',
-      
+
       background: '#0A0B0D',
       surface: '#1C1C1F',
       surfaceElevated: '#2A2A2F',
-      
+
       text: '#F7F8F9',
       textSecondary: '#B4B8C0',
       textMuted: '#6C7078',
       textOnPrimary: '#0A0B0D',
-      
+
       border: 'rgba(255, 255, 255, 0.08)',
       divider: 'rgba(255, 255, 255, 0.06)',
-      
+
       overlay: 'rgba(0, 0, 0, 0.7)',
       scrim: 'rgba(0, 0, 0, 0.6)',
     },
   },
-  
+
   // Modern Typography Scale
   typography: {
     // Display
@@ -89,7 +89,7 @@ export const designTokens = {
       fontWeight: '400' as const,
       letterSpacing: 0,
     },
-    
+
     // Headline
     headlineLarge: {
       fontSize: 32,
@@ -109,7 +109,7 @@ export const designTokens = {
       fontWeight: '600' as const,
       letterSpacing: 0,
     },
-    
+
     // Title
     titleLarge: {
       fontSize: 22,
@@ -129,7 +129,7 @@ export const designTokens = {
       fontWeight: '600' as const,
       letterSpacing: 0.1,
     },
-    
+
     // Body
     bodyLarge: {
       fontSize: 16,
@@ -149,7 +149,7 @@ export const designTokens = {
       fontWeight: '400' as const,
       letterSpacing: 0.4,
     },
-    
+
     // Label
     labelLarge: {
       fontSize: 14,
@@ -170,7 +170,7 @@ export const designTokens = {
       letterSpacing: 0.5,
     },
   },
-  
+
   // Modern Spacing System (8pt grid)
   spacing: {
     none: 0,
@@ -183,7 +183,7 @@ export const designTokens = {
     xxl: 48,
     xxxl: 64,
   },
-  
+
   // Border Radius
   radius: {
     none: 0,
@@ -195,7 +195,7 @@ export const designTokens = {
     xxl: 32,
     full: 9999,
   },
-  
+
   // Elevation (Material Design 3 inspired)
   elevation: {
     none: {
@@ -234,7 +234,7 @@ export const designTokens = {
       elevation: 12,
     },
   },
-  
+
   // Animation Timing
   animation: {
     instant: 0,
@@ -242,7 +242,7 @@ export const designTokens = {
     normal: 300,
     slow: 500,
     verySlow: 1000,
-    
+
     // Easing curves
     easing: {
       standard: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
@@ -251,7 +251,7 @@ export const designTokens = {
       sharp: 'cubic-bezier(0.4, 0.0, 0.6, 1)',
     },
   },
-  
+
   // Z-index layers
   zIndex: {
     base: 0,

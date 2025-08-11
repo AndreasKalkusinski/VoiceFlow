@@ -43,8 +43,8 @@ export const SpeechToTextScreen: React.FC = () => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-    } catch (error) {
-      console.error('Failed to setup audio:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -55,7 +55,7 @@ export const SpeechToTextScreen: React.FC = () => {
       type,
       timestamp: new Date(),
     };
-    setLogs(prev => [...prev, newLog]);
+    setLogs((prev) => [...prev, newLog]);
   };
 
   const clearLogs = () => {
@@ -71,7 +71,7 @@ export const SpeechToTextScreen: React.FC = () => {
     try {
       setLogs([]);
       addLog('Starting recording...', 'info');
-      
+
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
         addLog('Microphone permission denied', 'error');
@@ -85,13 +85,13 @@ export const SpeechToTextScreen: React.FC = () => {
       });
 
       const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
       );
-      
+
       setRecording(recording);
       setIsRecording(true);
       addLog('Recording started', 'success');
-    } catch (error) {
+    } catch {
       addLog('Failed to start recording', 'error');
       clearLogs();
     }
@@ -104,27 +104,27 @@ export const SpeechToTextScreen: React.FC = () => {
       setIsRecording(false);
       setIsProcessing(true);
       addLog('Stopping recording...', 'info');
-      
+
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
-      
+
       if (uri && settings) {
         addLog('Transcribing audio...', 'info');
         const openaiService = new OpenAIService(settings.openaiApiKey);
         const text = await openaiService.transcribeAudio(uri, settings.sttModel);
-        
+
         if (transcribedText) {
           setTranscribedText(transcribedText + ' ' + text);
         } else {
           setTranscribedText(text);
         }
-        
+
         addLog('Transcription completed', 'success');
         clearLogs();
       }
-      
+
       setRecording(null);
-    } catch (error) {
+    } catch {
       addLog('Failed to transcribe audio', 'error');
       clearLogs();
     } finally {
@@ -137,7 +137,7 @@ export const SpeechToTextScreen: React.FC = () => {
       Alert.alert('No Text', 'There is no text to copy');
       return;
     }
-    
+
     setLogs([]);
     await Clipboard.setStringAsync(transcribedText);
     addLog('Text copied to clipboard', 'success');
@@ -158,7 +158,7 @@ export const SpeechToTextScreen: React.FC = () => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <LogView messages={logs} />
-        
+
         <View style={styles.textContainer}>
           <Text style={styles.label}>Transcribed Text</Text>
           <TextInput
@@ -192,7 +192,7 @@ export const SpeechToTextScreen: React.FC = () => {
             <TouchableOpacity style={styles.actionButton} onPress={copyToClipboard}>
               <Text style={styles.actionButtonText}>Copy Text</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={[styles.actionButton, styles.clearButton]} onPress={clearText}>
               <Text style={styles.actionButtonText}>Clear</Text>
             </TouchableOpacity>

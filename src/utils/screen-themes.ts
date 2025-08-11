@@ -33,7 +33,7 @@ export const screenThemes = {
       accent: '#DC2626',
     },
   },
-  'Settings': {
+  Settings: {
     light: {
       primary: '#10B981', // Emerald green
       secondary: '#34D399',

@@ -1,44 +1,43 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  Platform,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../hooks/useTheme';
-import { vw, vh, responsiveDimensions } from '../utils/responsive-dimensions';
+import { vw, vh } from '../utils/responsive-dimensions';
 
-interface TabBarProps {
-  state: any;
-  descriptors: any;
-  navigation: any;
-}
+import { TabBarProps } from '../types/navigation';
 
 export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, navigation }) => {
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
-  const colors = isDark 
-    ? { bg: 'rgba(28, 28, 31, 0.98)', active: '#7C7CFF', inactive: '#8E8E93', glow: 'rgba(124, 124, 255, 0.3)' }
-    : { bg: 'rgba(255, 255, 255, 0.98)', active: '#5E5CE6', inactive: '#8E8E93', glow: 'rgba(94, 92, 230, 0.2)' };
+  const colors = isDark
+    ? {
+        bg: 'rgba(28, 28, 31, 0.98)',
+        active: '#7C7CFF',
+        inactive: '#8E8E93',
+        glow: 'rgba(124, 124, 255, 0.3)',
+      }
+    : {
+        bg: 'rgba(255, 255, 255, 0.98)',
+        active: '#5E5CE6',
+        inactive: '#8E8E93',
+        glow: 'rgba(94, 92, 230, 0.2)',
+      };
 
   const animations = useRef(
     state.routes.map(() => ({
       scale: new Animated.Value(1),
       translateY: new Animated.Value(0),
       opacity: new Animated.Value(0),
-    }))
+    })),
   ).current;
 
   const icons: { [key: string]: string } = {
     'Speech to Text': '🎙️',
     'Text to Speech': '🔊',
-    'Settings': '⚙️',
+    Settings: '⚙️',
   };
 
   const handlePress = (route: any, index: number, isFocused: boolean) => {
@@ -51,7 +50,7 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
     if (!isFocused && !event.defaultPrevented) {
       navigation.navigate(route.name);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      
+
       // Animate the pressed tab
       Animated.sequence([
         Animated.parallel([
@@ -95,16 +94,21 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom, backgroundColor: colors.bg }]}>
-      <BlurView intensity={90} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
-      
+      <BlurView
+        intensity={90}
+        tint={isDark ? 'dark' : 'light'}
+        style={StyleSheet.absoluteFillObject}
+      />
+
       <View style={styles.tabContainer}>
         {state.routes.map((route: any, index: number) => {
           const { options } = descriptors[route.key];
-          const label = options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name;
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+                ? options.title
+                : route.name;
 
           const isFocused = state.index === index;
 
@@ -135,41 +139,44 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
                   <Animated.View
                     style={[
                       styles.activeGlow,
-                      { 
+                      {
                         backgroundColor: colors.glow,
                         opacity: animations[index].opacity,
                       },
                     ]}
                   />
                 )}
-                
+
                 {/* Icon container with gradient when active */}
                 <View style={styles.iconContainer}>
                   {isFocused && (
                     <LinearGradient
-                      colors={isDark 
-                        ? ['rgba(124, 124, 255, 0.2)', 'rgba(124, 124, 255, 0.1)']
-                        : ['rgba(94, 92, 230, 0.15)', 'rgba(94, 92, 230, 0.05)']
+                      colors={
+                        isDark
+                          ? ['rgba(124, 124, 255, 0.2)', 'rgba(124, 124, 255, 0.1)']
+                          : ['rgba(94, 92, 230, 0.15)', 'rgba(94, 92, 230, 0.05)']
                       }
                       style={styles.iconGradient}
                     />
                   )}
-                  <Text style={[
-                    styles.icon,
-                    { 
-                      fontSize: isFocused ? vw(7) : vw(6),
-                      transform: [{ scale: isFocused ? 1.1 : 1 }],
-                    }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.icon,
+                      {
+                        fontSize: isFocused ? vw(7) : vw(6),
+                        transform: [{ scale: isFocused ? 1.1 : 1 }],
+                      },
+                    ]}
+                  >
                     {icons[route.name]}
                   </Text>
                 </View>
-                
+
                 {/* Label with modern styling */}
-                <Animated.Text 
+                <Animated.Text
                   style={[
                     styles.label,
-                    { 
+                    {
                       color: isFocused ? colors.active : colors.inactive,
                       opacity: isFocused ? 1 : 0.7,
                       fontWeight: isFocused ? '600' : '500',
@@ -179,13 +186,13 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
                 >
                   {label}
                 </Animated.Text>
-                
+
                 {/* Active dot indicator */}
                 {isFocused && (
                   <Animated.View
                     style={[
                       styles.activeDot,
-                      { 
+                      {
                         backgroundColor: colors.active,
                         opacity: animations[index].opacity,
                       },

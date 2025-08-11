@@ -119,7 +119,7 @@ export const ModernButton: React.FC<ModernButtonProps> = ({
 
   const getTextStyle = (): TextStyle => {
     let textColor: string;
-    
+
     switch (variant) {
       case 'primary':
       case 'gradient':
@@ -195,7 +195,7 @@ export const ModernButton: React.FC<ModernButtonProps> = ({
           {variant === 'glass' && (
             <LinearGradient
               colors={
-                isDark 
+                isDark
                   ? ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.02)']
                   : ['rgba(255,255,255,0.5)', 'rgba(255,255,255,0.2)']
               }
@@ -206,15 +206,15 @@ export const ModernButton: React.FC<ModernButtonProps> = ({
       )}
       <View style={styles.contentContainer}>
         {loading ? (
-          <ActivityIndicator 
-            color={variant === 'primary' || variant === 'gradient' ? colors.textOnPrimary : colors.text} 
+          <ActivityIndicator
+            color={
+              variant === 'primary' || variant === 'gradient' ? colors.textOnPrimary : colors.text
+            }
           />
         ) : (
           <>
             {icon && <View style={{ marginRight: sizeStyles.spacing }}>{icon}</View>}
-            <Text style={[styles.text, getTextStyle(), textStyle]}>
-              {title}
-            </Text>
+            <Text style={[styles.text, getTextStyle(), textStyle]}>{title}</Text>
           </>
         )}
       </View>
@@ -222,12 +222,7 @@ export const ModernButton: React.FC<ModernButtonProps> = ({
   );
 
   return (
-    <Animated.View
-      style={[
-        { transform: [{ scale: scaleAnim }] },
-        fullWidth && styles.fullWidth,
-      ]}
-    >
+    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, fullWidth && styles.fullWidth]}>
       <TouchableOpacity
         style={[
           styles.button,

@@ -29,7 +29,7 @@ export const RecordingAnimation: React.FC<RecordingAnimationProps> = ({ isRecord
             duration: 500,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       ).start();
 
       waveAnims.forEach((anim, index) => {
@@ -46,12 +46,12 @@ export const RecordingAnimation: React.FC<RecordingAnimationProps> = ({ isRecord
               duration: 400,
               useNativeDriver: true,
             }),
-          ])
+          ]),
         ).start();
       });
     } else {
       pulseAnim.stopAnimation();
-      waveAnims.forEach(anim => {
+      waveAnims.forEach((anim) => {
         anim.stopAnimation();
         anim.setValue(0);
       });

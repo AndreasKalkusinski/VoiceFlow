@@ -29,12 +29,42 @@ export class ElevenLabsTTSProvider extends BaseTTSProvider {
   ];
 
   voices: TTSVoice[] = [
-    { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel', gender: 'female', description: 'American, young adult' },
-    { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi', gender: 'female', description: 'American, young adult' },
-    { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella', gender: 'female', description: 'American, young adult' },
-    { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni', gender: 'male', description: 'American, young adult' },
-    { id: 'VR6AewLTigWG4xSOukaG', name: 'Arnold', gender: 'male', description: 'American, middle-aged' },
-    { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam', gender: 'male', description: 'American, middle-aged' },
+    {
+      id: '21m00Tcm4TlvDq8ikWAM',
+      name: 'Rachel',
+      gender: 'female',
+      description: 'American, young adult',
+    },
+    {
+      id: 'AZnzlk1XvdvUeBnXmlld',
+      name: 'Domi',
+      gender: 'female',
+      description: 'American, young adult',
+    },
+    {
+      id: 'EXAVITQu4vr4xnSDxMaL',
+      name: 'Bella',
+      gender: 'female',
+      description: 'American, young adult',
+    },
+    {
+      id: 'ErXwobaYiN019PkySvjV',
+      name: 'Antoni',
+      gender: 'male',
+      description: 'American, young adult',
+    },
+    {
+      id: 'VR6AewLTigWG4xSOukaG',
+      name: 'Arnold',
+      gender: 'male',
+      description: 'American, middle-aged',
+    },
+    {
+      id: 'pNInz6obpgDQGcFmaJgB',
+      name: 'Adam',
+      gender: 'male',
+      description: 'American, middle-aged',
+    },
   ];
 
   private baseURL = 'https://api.elevenlabs.io/v1';
@@ -46,7 +76,7 @@ export class ElevenLabsTTSProvider extends BaseTTSProvider {
 
     try {
       const voiceId = options.voice || '21m00Tcm4TlvDq8ikWAM'; // Default to Rachel
-      
+
       const response = await axios.post(
         `${this.baseURL}/text-to-speech/${voiceId}`,
         {
@@ -63,22 +93,18 @@ export class ElevenLabsTTSProvider extends BaseTTSProvider {
           headers: {
             'xi-api-key': options.apiKey,
             'Content-Type': 'application/json',
-            'Accept': 'audio/mpeg',
+            Accept: 'audio/mpeg',
           },
           responseType: 'arraybuffer',
-        }
+        },
       );
 
       const base64Audio = Buffer.from(response.data).toString('base64');
       const audioUri = FileSystem.documentDirectory + `elevenlabs_${Date.now()}.mp3`;
-      
-      await FileSystem.writeAsStringAsync(
-        audioUri,
-        base64Audio,
-        {
-          encoding: FileSystem.EncodingType.Base64,
-        }
-      );
+
+      await FileSystem.writeAsStringAsync(audioUri, base64Audio, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
       return audioUri;
     } catch (error: any) {
@@ -89,7 +115,7 @@ export class ElevenLabsTTSProvider extends BaseTTSProvider {
 
   async validateConfig(config: any): Promise<boolean> {
     if (!config.apiKey) return false;
-    
+
     try {
       const response = await axios.get(`${this.baseURL}/voices`, {
         headers: {
@@ -97,7 +123,7 @@ export class ElevenLabsTTSProvider extends BaseTTSProvider {
         },
       });
       return response.status === 200;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

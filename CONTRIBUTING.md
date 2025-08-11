@@ -118,7 +118,7 @@ export const calculateTotal = (items: Item[]): number => {
 // Bad
 export const calc = (i) => {
   let t = 0;
-  for(let x of i) t += x.p;
+  for (let x of i) t += x.p;
   return t;
 };
 ```
@@ -191,6 +191,7 @@ footer (optional)
 ```
 
 Types:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -200,6 +201,7 @@ Types:
 - `chore`: Maintenance tasks
 
 Examples:
+
 ```
 feat(audio): add support for multiple audio formats
 fix(api): handle rate limiting errors gracefully
@@ -290,6 +292,7 @@ npm run build:android # Build for Android
 ## Recognition
 
 Contributors will be recognized in:
+
 - The project's README
 - Release notes
 - Our contributors page

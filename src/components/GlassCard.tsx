@@ -11,20 +11,21 @@ interface GlassCardProps {
   gradient?: boolean;
 }
 
-export const GlassCard: React.FC<GlassCardProps> = ({ 
-  children, 
-  style, 
+export const GlassCard: React.FC<GlassCardProps> = ({
+  children,
+  style,
   intensity = 30,
-  gradient = false 
+  gradient = false,
 }) => {
   const { colors, theme, isDark } = useTheme();
 
   if (gradient) {
     return (
       <LinearGradient
-        colors={isDark 
-          ? ['rgba(99, 102, 241, 0.1)', 'rgba(236, 72, 153, 0.1)']
-          : ['rgba(99, 102, 241, 0.05)', 'rgba(236, 72, 153, 0.05)']
+        colors={
+          isDark
+            ? ['rgba(99, 102, 241, 0.1)', 'rgba(236, 72, 153, 0.1)']
+            : ['rgba(99, 102, 241, 0.05)', 'rgba(236, 72, 153, 0.05)']
         }
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -37,14 +38,12 @@ export const GlassCard: React.FC<GlassCardProps> = ({
           style,
         ]}
       >
-        <BlurView 
-          intensity={intensity} 
+        <BlurView
+          intensity={intensity}
           tint={isDark ? 'dark' : 'light'}
           style={StyleSheet.absoluteFillObject}
         />
-        <View style={styles.content}>
-          {children}
-        </View>
+        <View style={styles.content}>{children}</View>
       </LinearGradient>
     );
   }
@@ -61,14 +60,12 @@ export const GlassCard: React.FC<GlassCardProps> = ({
         style,
       ]}
     >
-      <BlurView 
-        intensity={intensity} 
+      <BlurView
+        intensity={intensity}
         tint={isDark ? 'dark' : 'light'}
         style={StyleSheet.absoluteFillObject}
       />
-      <View style={styles.content}>
-        {children}
-      </View>
+      <View style={styles.content}>{children}</View>
     </View>
   );
 };

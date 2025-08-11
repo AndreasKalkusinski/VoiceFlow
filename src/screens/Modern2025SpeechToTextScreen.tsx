@@ -20,7 +20,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
-import { ModernButton } from '../components/ModernButton';
 import { StorageService } from '../services/storage';
 import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
@@ -39,12 +38,12 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  
+
   const { isDark } = useTheme();
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
   const screenTheme = getScreenTheme('Speech to Text', isDark);
   const { t } = useTranslation();
-  
+
   // Use useState for Animated values to avoid freezing issues
   const [fadeAnim] = useState(() => new Animated.Value(0));
   const [slideAnim] = useState(() => new Animated.Value(30));
@@ -58,7 +57,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -98,7 +97,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
           duration: 1000,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
   };
 
@@ -106,8 +105,8 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-    } catch (error) {
-      console.error('Error loading settings:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -118,8 +117,8 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-    } catch (error) {
-      console.error('Failed to setup audio:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -131,7 +130,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const startRecording = async () => {
     const currentSettings = await StorageService.getSettings();
     setSettings(currentSettings);
-    
+
     if (!currentSettings?.openaiApiKey) {
       Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
       return;
@@ -140,7 +139,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       showStatus(t('speechToText.status.starting'));
-      
+
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
         showStatus(t('speechToText.status.microphoneDenied'));
@@ -153,13 +152,13 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       });
 
       const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
       );
-      
+
       setRecording(recording);
       setIsRecording(true);
       showStatus(t('speechToText.status.recording'));
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
     }
   };
@@ -172,27 +171,27 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       setIsRecording(false);
       setIsProcessing(true);
       showStatus(t('speechToText.status.processing'));
-      
+
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
-      
+
       if (uri && settings) {
         showStatus(t('speechToText.status.transcribing'));
         const openaiService = new OpenAIService(settings.openaiApiKey);
         const text = await openaiService.transcribeAudio(uri, settings.sttModel);
-        
+
         if (transcribedText) {
           setTranscribedText(transcribedText + ' ' + text);
         } else {
           setTranscribedText(text);
         }
-        
+
         showStatus(t('speechToText.status.complete'));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
-      
+
       setRecording(null);
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
@@ -205,7 +204,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       Alert.alert(t('alerts.noTextTitle'), t('alerts.noTextMessage'));
       return;
     }
-    
+
     await Clipboard.setStringAsync(transcribedText);
     showStatus(t('speechToText.copiedToClipboard'));
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -219,40 +218,44 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    
+
     try {
       // Reset animations
       fadeAnim.setValue(1);
       slideAnim.setValue(0);
-      
+
       // Reload settings and show a brief status
       await loadSettings();
       showStatus(t('speechToText.refreshed'), 1500);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
-      console.error('Refresh failed:', error);
+    } catch {
+      /* ignore */
     } finally {
       // Ensure refresh state is reset
       setRefreshing(false);
     }
   };
 
-  const wordCount = transcribedText.split(' ').filter(w => w).length;
+  const wordCount = transcribedText.split(' ').filter((w) => w).length;
   const charCount = transcribedText.length;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       {/* Screen-specific gradient background */}
       <LinearGradient
-        colors={screenTheme ? screenTheme.gradient as [string, string] : [colors.background, colors.background]}
+        colors={
+          screenTheme
+            ? (screenTheme.gradient as [string, string])
+            : [colors.background, colors.background]
+        }
         style={StyleSheet.absoluteFillObject}
       />
-      
+
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -287,10 +290,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
 
             {/* Main Text Area with modern styling */}
             <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-              <ModernCard 
-                variant={isRecording ? 'gradient' : 'glass'} 
-                style={styles.textCard}
-              >
+              <ModernCard variant={isRecording ? 'gradient' : 'glass'} style={styles.textCard}>
                 <View style={styles.textHeader}>
                   <Text style={[styles.label, { color: colors.textSecondary }]}>
                     {t('speechToText.transcription')}
@@ -308,7 +308,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                     </View>
                   </View>
                 </View>
-                
+
                 <TextInput
                   style={[styles.textInput, { color: colors.text }]}
                   multiline
@@ -328,14 +328,16 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                     </Text>
                   </View>
                 )}
-                
+
                 {/* Footer Actions inside card with status area */}
                 <View style={styles.cardFooter}>
                   {/* Status Message Area - Always reserved space */}
                   <View style={styles.statusArea}>
                     {statusMessage !== '' ? (
                       <View style={styles.statusContent}>
-                        <View style={[styles.statusIndicator, { backgroundColor: colors.primary }]} />
+                        <View
+                          style={[styles.statusIndicator, { backgroundColor: colors.primary }]}
+                        />
                         <Text style={[styles.statusText, { color: colors.text }]}>
                           {statusMessage}
                         </Text>
@@ -344,7 +346,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                       <View style={styles.statusPlaceholder} />
                     )}
                   </View>
-                  
+
                   {/* Action Buttons */}
                   <View style={styles.footerActions}>
                     <TouchableOpacity
@@ -354,9 +356,9 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                     >
                       <Ionicons name="copy-outline" size={22} color={colors.text} />
                     </TouchableOpacity>
-                    
+
                     <View style={[styles.footerDivider, { backgroundColor: colors.border }]} />
-                    
+
                     <TouchableOpacity
                       onPress={clearText}
                       style={styles.footerAction}
@@ -377,13 +379,15 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                 activeOpacity={0.8}
                 style={styles.recordButtonWrapper}
               >
-                <Animated.View style={[
-                  styles.recordButton,
-                  {
-                    transform: [{ scale: pulseAnim }],
-                    borderColor: isRecording ? colors.error : colors.primary,
-                  }
-                ]}>
+                <Animated.View
+                  style={[
+                    styles.recordButton,
+                    {
+                      transform: [{ scale: pulseAnim }],
+                      borderColor: isRecording ? colors.error : colors.primary,
+                    },
+                  ]}
+                >
                   <BlurView
                     intensity={70}
                     tint={isDark ? 'dark' : 'light'}
@@ -391,7 +395,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                   />
                   <LinearGradient
                     colors={
-                      isRecording 
+                      isRecording
                         ? [colors.error + '20', colors.error + '10']
                         : isDark
                           ? ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.05)']
@@ -399,14 +403,14 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                     }
                     style={StyleSheet.absoluteFillObject}
                   />
-                  <Ionicons 
-                    name={isProcessing ? 'hourglass-outline' : isRecording ? 'stop' : 'mic'} 
-                    size={vw(7)} 
-                    color={isRecording ? colors.error : colors.primary} 
+                  <Ionicons
+                    name={isProcessing ? 'hourglass-outline' : isRecording ? 'stop' : 'mic'}
+                    size={vw(7)}
+                    color={isRecording ? colors.error : colors.primary}
                   />
                 </Animated.View>
               </TouchableOpacity>
-              
+
               {/* Tips below button */}
               {!transcribedText && !isRecording && (
                 <View style={styles.tipsContainer}>
@@ -416,7 +420,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                   </Text>
                 </View>
               )}
-              
+
               {isRecording && (
                 <Animated.View style={[styles.recordingIndicatorNew, { opacity: pulseAnim }]}>
                   <View style={[styles.recordingDotNew, { backgroundColor: colors.error }]} />

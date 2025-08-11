@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   ScrollView,
   Alert,
@@ -13,7 +12,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
@@ -48,7 +46,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
   const [autoSave, setAutoSave] = useState(false);
   const saveTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  
+
   const { isDark, themeMode, setTheme } = useTheme();
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
   const screenTheme = getScreenTheme('Settings', isDark);
@@ -58,14 +56,14 @@ export const Modern2025SettingsScreen: React.FC = () => {
   useEffect(() => {
     loadSettings();
     loadAutoSavePreference();
-    
+
     // Smooth fade in animation
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: designTokens.animation.normal,
       useNativeDriver: true,
     }).start();
-    
+
     return () => {
       if (saveTimeout.current) {
         clearTimeout(saveTimeout.current);
@@ -99,8 +97,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
         providerSettings: loadedSettings.providerSettings || {},
       };
       setSettings(migratedSettings);
-    } catch (error) {
-      console.error('Failed to load settings:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -110,8 +108,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
       if (savedAutoSave !== null) {
         setAutoSave(savedAutoSave === 'true');
       }
-    } catch (error) {
-      console.error('Failed to load auto-save preference:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -120,16 +118,16 @@ export const Modern2025SettingsScreen: React.FC = () => {
       await AsyncStorage.setItem('@voiceflow_autosave', value.toString());
       setAutoSave(value);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
-      console.error('Failed to save auto-save preference:', error);
+    } catch {
+      /* ignore */
     }
   };
 
   const saveSettingsSilently = async () => {
     try {
       await StorageService.saveSettings(settings);
-    } catch (error) {
-      console.error('Auto-save failed:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -139,7 +137,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       await StorageService.saveSettings(settings);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(t('alerts.settingsSavedTitle'), t('alerts.settingsSavedMessage'));
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(t('common.error'), t('settings.status.failed'));
     } finally {
@@ -152,8 +150,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       setSelectedLanguage(languageCode);
       await changeLanguage(languageCode);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
-      console.error('Failed to change language:', error);
+    } catch {
       setSelectedLanguage(i18n.language);
     }
   };
@@ -171,20 +168,19 @@ export const Modern2025SettingsScreen: React.FC = () => {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       {/* Screen-specific gradient background */}
       <LinearGradient
-        colors={screenTheme ? screenTheme.gradient as [string, string] : [colors.background, colors.background]}
+        colors={
+          screenTheme
+            ? (screenTheme.gradient as [string, string])
+            : [colors.background, colors.background]
+        }
         style={StyleSheet.absoluteFillObject}
       />
-      
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           {/* Header with gradient text effect */}
           <View style={styles.header}>
-            <Text style={[styles.screenTitle, { color: colors.text }]}>
-              {t('settings.title')}
-            </Text>
+            <Text style={[styles.screenTitle, { color: colors.text }]}>{t('settings.title')}</Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
               {t('settings.subtitle')}
             </Text>
@@ -195,7 +191,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               {t('settings.appearance')}
             </Text>
-            
+
             <ModernCard variant="glass" style={styles.card}>
               <Text style={[styles.label, { color: colors.textSecondary }]}>
                 {t('settings.theme.title')}
@@ -220,15 +216,17 @@ export const Modern2025SettingsScreen: React.FC = () => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
                   >
-                    <Ionicons 
-                      name={option.iconName as keyof typeof Ionicons.glyphMap} 
-                      size={16} 
-                      color={themeMode === option.id ? colors.primary : colors.text} 
+                    <Ionicons
+                      name={option.iconName as keyof typeof Ionicons.glyphMap}
+                      size={16}
+                      color={themeMode === option.id ? colors.primary : colors.text}
                     />
-                    <Text style={[
-                      styles.segmentText,
-                      { color: themeMode === option.id ? colors.primary : colors.text }
-                    ]}>
+                    <Text
+                      style={[
+                        styles.segmentText,
+                        { color: themeMode === option.id ? colors.primary : colors.text },
+                      ]}
+                    >
                       {option.name}
                     </Text>
                   </TouchableOpacity>
@@ -254,10 +252,15 @@ export const Modern2025SettingsScreen: React.FC = () => {
                       ]}
                       onPress={() => handleLanguageChange(lang.code)}
                     >
-                      <Text style={[
-                        styles.chipText,
-                        { color: selectedLanguage === lang.code ? colors.textOnPrimary : colors.text }
-                      ]}>
+                      <Text
+                        style={[
+                          styles.chipText,
+                          {
+                            color:
+                              selectedLanguage === lang.code ? colors.textOnPrimary : colors.text,
+                          },
+                        ]}
+                      >
                         {lang.flag} {lang.name}
                       </Text>
                     </TouchableOpacity>
@@ -274,34 +277,38 @@ export const Modern2025SettingsScreen: React.FC = () => {
                 {t('settings.providers')}
               </Text>
               <View style={[styles.badge, { backgroundColor: colors.success + '20' }]}>
-                <Text style={[styles.badgeText, { color: colors.success }]}>
-                  2 Active
-                </Text>
+                <Text style={[styles.badgeText, { color: colors.success }]}>2 Active</Text>
               </View>
             </View>
-            
+
             <ModernCard variant="elevated" style={styles.card}>
               <ProviderSettings
                 type="stt"
                 selectedProvider={settings.sttProvider || 'openai-stt'}
                 apiKeys={settings.apiKeys || {}}
                 providerSettings={settings.providerSettings || {}}
-                onProviderChange={(providerId) => setSettings({ ...settings, sttProvider: providerId })}
-                onApiKeyChange={(provider, key) => setSettings({
-                  ...settings,
-                  apiKeys: { ...settings.apiKeys, [provider]: key },
-                  openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
-                })}
-                onSettingChange={(providerId, setting, value) => setSettings({
-                  ...settings,
-                  providerSettings: {
-                    ...settings.providerSettings,
-                    [providerId]: {
-                      ...settings.providerSettings?.[providerId],
-                      [setting]: value,
+                onProviderChange={(providerId) =>
+                  setSettings({ ...settings, sttProvider: providerId })
+                }
+                onApiKeyChange={(provider, key) =>
+                  setSettings({
+                    ...settings,
+                    apiKeys: { ...settings.apiKeys, [provider]: key },
+                    openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
+                  })
+                }
+                onSettingChange={(providerId, setting, value) =>
+                  setSettings({
+                    ...settings,
+                    providerSettings: {
+                      ...settings.providerSettings,
+                      [providerId]: {
+                        ...settings.providerSettings?.[providerId],
+                        [setting]: value,
+                      },
                     },
-                  },
-                })}
+                  })
+                }
               />
             </ModernCard>
 
@@ -311,22 +318,28 @@ export const Modern2025SettingsScreen: React.FC = () => {
                 selectedProvider={settings.ttsProvider || 'openai-tts'}
                 apiKeys={settings.apiKeys || {}}
                 providerSettings={settings.providerSettings || {}}
-                onProviderChange={(providerId) => setSettings({ ...settings, ttsProvider: providerId })}
-                onApiKeyChange={(provider, key) => setSettings({
-                  ...settings,
-                  apiKeys: { ...settings.apiKeys, [provider]: key },
-                  openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
-                })}
-                onSettingChange={(providerId, setting, value) => setSettings({
-                  ...settings,
-                  providerSettings: {
-                    ...settings.providerSettings,
-                    [providerId]: {
-                      ...settings.providerSettings?.[providerId],
-                      [setting]: value,
+                onProviderChange={(providerId) =>
+                  setSettings({ ...settings, ttsProvider: providerId })
+                }
+                onApiKeyChange={(provider, key) =>
+                  setSettings({
+                    ...settings,
+                    apiKeys: { ...settings.apiKeys, [provider]: key },
+                    openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
+                  })
+                }
+                onSettingChange={(providerId, setting, value) =>
+                  setSettings({
+                    ...settings,
+                    providerSettings: {
+                      ...settings.providerSettings,
+                      [providerId]: {
+                        ...settings.providerSettings?.[providerId],
+                        [setting]: value,
+                      },
                     },
-                  },
-                })}
+                  })
+                }
               />
             </ModernCard>
           </View>
@@ -336,7 +349,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               {t('settings.voiceSelection')}
             </Text>
-            
+
             <ModernCard variant="gradient" style={styles.card}>
               <View style={styles.voiceGrid}>
                 {voices.map((voice) => (
@@ -346,7 +359,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
                       styles.voiceCard,
                       settings.ttsVoice === voice.id && [
                         styles.voiceCardActive,
-                        { 
+                        {
                           borderColor: colors.primary,
                           backgroundColor: colors.primary + '10',
                         },
@@ -357,14 +370,18 @@ export const Modern2025SettingsScreen: React.FC = () => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
                   >
-                    <View style={[
-                      styles.voiceIndicator,
-                      settings.ttsVoice === voice.id && { backgroundColor: colors.primary },
-                    ]} />
-                    <Text style={[
-                      styles.voiceName,
-                      { color: settings.ttsVoice === voice.id ? colors.primary : colors.text }
-                    ]}>
+                    <View
+                      style={[
+                        styles.voiceIndicator,
+                        settings.ttsVoice === voice.id && { backgroundColor: colors.primary },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.voiceName,
+                        { color: settings.ttsVoice === voice.id ? colors.primary : colors.text },
+                      ]}
+                    >
                       {voice.name}
                     </Text>
                   </TouchableOpacity>
@@ -390,8 +407,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
                     <Switch
                       value={autoSave}
                       onValueChange={toggleAutoSave}
-                      trackColor={{ 
-                        false: colors.border, 
+                      trackColor={{
+                        false: colors.border,
                         true: colors.primary + '40',
                       }}
                       thumbColor={autoSave ? colors.primary : '#f4f3f4'}
@@ -502,10 +519,6 @@ const styles = StyleSheet.create({
   },
   segmentActive: {
     ...designTokens.elevation.sm,
-  },
-  segmentIcon: {
-    fontSize: 16,
-    marginRight: designTokens.spacing.xs,
   },
   segmentText: {
     ...designTokens.typography.labelMedium,

@@ -1,6 +1,6 @@
 # Terms of Service for VoiceFlow
 
-*Effective Date: January 2024*
+_Effective Date: January 2024_
 
 ## 1. Acceptance of Terms
 
@@ -9,6 +9,7 @@ By downloading, installing, or using VoiceFlow ("the App"), you agree to these T
 ## 2. License
 
 VoiceFlow is licensed under the MIT License. This means:
+
 - ✅ You can use the App for personal and commercial purposes
 - ✅ You can modify the source code
 - ✅ You can distribute your modified versions
@@ -19,6 +20,7 @@ VoiceFlow is licensed under the MIT License. This means:
 ## 3. Open Source Nature
 
 This is a free, open-source application:
+
 - The source code is available on [GitHub](https://github.com/yourusername/VoiceFlow)
 - You can contribute improvements via pull requests
 - You can fork and create your own version
@@ -27,12 +29,14 @@ This is a free, open-source application:
 ## 4. Use of Third-Party Services
 
 ### OpenAI API
+
 - You must provide your own OpenAI API key
 - You are responsible for all costs associated with your API usage
 - You must comply with [OpenAI's Terms of Service](https://openai.com/terms/)
 - We are not responsible for OpenAI's service availability or changes
 
 ### Your Responsibilities
+
 - Keep your API keys secure and confidential
 - Monitor your API usage and costs
 - Ensure you have the right to process any content you submit
@@ -40,6 +44,7 @@ This is a free, open-source application:
 ## 5. User Conduct
 
 You agree NOT to use the App to:
+
 - Violate any laws or regulations
 - Infringe on intellectual property rights
 - Process illegal or harmful content
@@ -58,6 +63,7 @@ You agree NOT to use the App to:
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 Key points:
+
 - The App may contain bugs or errors
 - Features may change or be removed
 - Service availability is not guaranteed
@@ -68,6 +74,7 @@ Key points:
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 This includes but is not limited to:
+
 - Loss of data
 - API costs or overages
 - Service interruptions
@@ -76,6 +83,7 @@ This includes but is not limited to:
 ## 9. Indemnification
 
 You agree to indemnify and hold harmless the App's authors and contributors from any claims, damages, or expenses arising from:
+
 - Your use of the App
 - Your violation of these Terms
 - Your violation of any third-party rights
@@ -84,6 +92,7 @@ You agree to indemnify and hold harmless the App's authors and contributors from
 ## 10. Modifications to Terms
 
 We may update these Terms from time to time:
+
 - Changes will be posted in the repository
 - Continued use after changes constitutes acceptance
 - Major changes will be noted in CHANGELOG.md
@@ -109,6 +118,7 @@ These Terms, along with the Privacy Policy and MIT License, constitute the entir
 ## 15. Contact Information
 
 For questions about these Terms:
+
 - Open an issue on [GitHub](https://github.com/yourusername/VoiceFlow/issues)
 - Email: legal@voiceflow.app (replace with your email)
 

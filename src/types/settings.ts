@@ -4,11 +4,11 @@ export interface Settings {
   sttModel: string;
   ttsModel: string;
   ttsVoice: string;
-  
+
   // New provider-based settings
   sttProvider?: string;
   ttsProvider?: string;
-  
+
   // Provider-specific API keys
   apiKeys?: {
     openai?: string;
@@ -19,7 +19,7 @@ export interface Settings {
     deepgram?: string;
     assemblyai?: string;
   };
-  
+
   // Provider-specific settings
   providerSettings?: {
     [providerId: string]: {

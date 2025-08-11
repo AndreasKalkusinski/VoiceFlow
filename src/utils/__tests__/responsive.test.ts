@@ -5,6 +5,10 @@ jest.mock('react-native', () => ({
   Dimensions: {
     get: jest.fn(() => ({ width: 375, height: 812 })),
   },
+  Platform: {
+    OS: 'ios',
+    select: jest.fn((options) => options.ios),
+  },
 }));
 
 describe('Responsive Utilities', () => {

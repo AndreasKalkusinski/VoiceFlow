@@ -9,13 +9,7 @@ module.exports = {
     },
     project: './tsconfig.json',
   },
-  plugins: [
-    '@typescript-eslint',
-    'react',
-    'react-hooks',
-    'react-native',
-    'prettier',
-  ],
+  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'react-native', 'prettier'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -26,6 +20,8 @@ module.exports = {
   ],
   env: {
     'react-native/react-native': true,
+    node: true,
+    jest: true,
   },
   settings: {
     react: {
@@ -38,18 +34,18 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-non-null-assertion': 'warn',
-    
+
     // React
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
     'react/display-name': 'off',
-    
+
     // React Native
     'react-native/no-inline-styles': 'warn',
     'react-native/no-raw-text': 'off',
     'react-native/no-color-literals': 'off',
     'react-native/sort-styles': 'off',
-    
+
     // General
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'prettier/prettier': 'error',
@@ -61,5 +57,6 @@ module.exports = {
     'web-build/',
     '*.config.js',
     'babel.config.js',
+    'jest-setup.js',
   ],
 };

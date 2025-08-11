@@ -17,27 +17,27 @@ import { LiquidTabBar } from './src/components/LiquidTabBar';
 const Tab = createBottomTabNavigator();
 
 function ThemedApp() {
-  const { colors, isDark } = useTheme();
+  const { isDark } = useTheme();
   const { t, i18n } = useTranslation();
-  
+
   // Force re-render when language changes
   React.useEffect(() => {
     const handleLanguageChange = () => {
       // This will trigger a re-render
     };
-    
+
     i18n.on('languageChanged', handleLanguageChange);
-    
+
     return () => {
       i18n.off('languageChanged', handleLanguageChange);
     };
   }, [i18n]);
-  
+
   return (
     <NavigationContainer>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Tab.Navigator
-        tabBar={(props) => <LiquidTabBar {...props} />}
+        tabBar={(props) => <LiquidTabBar {...(props as any)} />}
         screenOptions={{
           headerShown: false,
           tabBarStyle: { display: 'none' }, // Hide the default tab bar

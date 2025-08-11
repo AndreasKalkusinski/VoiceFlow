@@ -118,9 +118,7 @@ export const SimpleButton: React.FC<SimpleButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : colors.text} />
       ) : (
-        <Text style={[styles.text, sizeStyles.text, getTextStyle(), textStyle]}>
-          {title}
-        </Text>
+        <Text style={[styles.text, sizeStyles.text, getTextStyle(), textStyle]}>{title}</Text>
       )}
     </TouchableOpacity>
   );

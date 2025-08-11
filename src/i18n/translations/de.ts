@@ -15,13 +15,13 @@ export default {
     current: 'Aktuell',
     duration: 'Dauer',
   },
-  
+
   navigation: {
     speechToText: 'Sprache',
-    textToSpeech: 'Stimme', 
+    textToSpeech: 'Stimme',
     settings: 'Einstellung',
   },
-  
+
   speechToText: {
     title: 'Sprache zu Text',
     subtitle: 'Konvertiere deine Stimme in Text',
@@ -42,7 +42,7 @@ export default {
       title: 'Tipp',
       description: 'Tippe auf den Aufnahme-Button und sprich deutlich für beste Ergebnisse.',
     },
-    
+
     status: {
       starting: 'Starte Aufnahme...',
       ready: 'Bereit zur Aufnahme',
@@ -54,11 +54,12 @@ export default {
       microphoneDenied: 'Mikrofonzugriff verweigert',
     },
   },
-  
+
   textToSpeech: {
     title: 'Text zu Sprache',
     subtitle: 'Text eingeben',
-    placeholder: 'Gib deinen Text hier ein oder füge ihn ein, um ihn in natürliche Sprache umzuwandeln...',
+    placeholder:
+      'Gib deinen Text hier ein oder füge ihn ein, um ihn in natürliche Sprache umzuwandeln...',
     generateSpeech: 'Sprache erzeugen',
     generating: 'Erzeuge...',
     play: 'Abspielen',
@@ -78,7 +79,7 @@ export default {
     textCleared: 'Text gelöscht',
     refreshed: 'Aktualisiert',
     tapToPlay: 'Tippe um Sprache zu generieren',
-    
+
     status: {
       generating: 'Erzeuge Sprache mit KI...',
       loading: 'Lade Audio...',
@@ -98,7 +99,7 @@ export default {
       pasteFailed: 'Einfügen fehlgeschlagen',
     },
   },
-  
+
   settings: {
     title: 'Einstellungen',
     subtitle: 'Personalisiere deine App',
@@ -107,13 +108,13 @@ export default {
     configuration: 'OpenAI Konfiguration',
     voiceSelection: 'Stimmauswahl',
     providers: 'Anbieter',
-    
+
     theme: {
       auto: 'Auto',
       light: 'Hell',
       dark: 'Dunkel',
     },
-    
+
     apiKey: 'API-Schlüssel',
     apiKeyPlaceholder: 'sk-...',
     validateApiKey: 'API-Schlüssel prüfen',
@@ -123,12 +124,12 @@ export default {
     textToSpeechProvider: 'Text-zu-Sprache Anbieter',
     model: 'Modell',
     voice: 'Stimme',
-    
+
     models: {
       speechToText: 'Sprache-zu-Text Modell',
       textToSpeech: 'Text-zu-Sprache Modell',
     },
-    
+
     voices: {
       alloy: 'Alloy',
       echo: 'Echo',
@@ -136,7 +137,7 @@ export default {
       onyx: 'Onyx',
       nova: 'Nova',
       shimmer: 'Shimmer',
-      
+
       descriptions: {
         alloy: 'Neutral und ausgeglichen',
         echo: 'Britischer Akzent',
@@ -146,9 +147,9 @@ export default {
         shimmer: 'Sanft und behutsam',
       },
     },
-    
+
     saveSettings: 'Einstellungen speichern',
-    
+
     status: {
       loading: 'Lade Einstellungen...',
       loaded: 'Einstellungen geladen',
@@ -165,7 +166,7 @@ export default {
     autoSaveEnabled: 'Automatisches Speichern aktiviert',
     autoSaveDisabled: 'Automatisches Speichern deaktiviert',
   },
-  
+
   errors: {
     noApiKey: 'Bitte konfiguriere deinen OpenAI API-Schlüssel in den Einstellungen',
     noText: 'Bitte gib einen Text ein',
@@ -173,7 +174,7 @@ export default {
     clipboardEmpty: 'Zwischenablage ist leer',
     microphoneRequired: 'Diese App benötigt Mikrofonzugriff für die Sprache-zu-Text Funktion',
   },
-  
+
   alerts: {
     configRequired: 'Konfiguration erforderlich',
     enterApiKey: 'Bitte gib einen API-Schlüssel ein',

@@ -12,7 +12,7 @@ import { BlurView } from 'expo-blur';
 import { GlassCard } from './GlassCard';
 import { useTheme } from '../hooks/useTheme';
 import * as Haptics from 'expo-haptics';
-import { wp, hp, spacing, fontSize, fontSizes } from '../utils/responsive';
+import { hp, spacing, fontSizes } from '../utils/responsive';
 
 interface ModelOption {
   id: string;
@@ -40,7 +40,7 @@ export const ModelDropdown: React.FC<ModelDropdownProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const { colors, isDark } = useTheme();
 
-  const selectedOption = options.find(opt => opt.id === value);
+  const selectedOption = options.find((opt) => opt.id === value);
 
   const handleSelect = (optionId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -56,7 +56,7 @@ export const ModelDropdown: React.FC<ModelDropdownProps> = ({
   return (
     <View style={styles.container}>
       <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
-      
+
       <TouchableOpacity onPress={openModal} disabled={loading}>
         <GlassCard style={styles.dropdownButton}>
           <View style={styles.dropdownContent}>
@@ -80,22 +80,20 @@ export const ModelDropdown: React.FC<ModelDropdownProps> = ({
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setModalVisible(false)}
         >
           <View style={styles.modalContent}>
-            <BlurView 
-              intensity={80} 
+            <BlurView
+              intensity={80}
               tint={isDark ? 'dark' : 'light'}
               style={StyleSheet.absoluteFillObject}
             />
-            
+
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>
-                {label}
-              </Text>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{label}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Text style={[styles.closeButton, { color: colors.primary }]}>✕</Text>
               </TouchableOpacity>
@@ -110,15 +108,20 @@ export const ModelDropdown: React.FC<ModelDropdownProps> = ({
                   onPress={() => handleSelect(item.id)}
                   style={[
                     styles.optionItem,
-                    item.id === value && [styles.selectedOption, { backgroundColor: colors.primary + '20' }]
+                    item.id === value && [
+                      styles.selectedOption,
+                      { backgroundColor: colors.primary + '20' },
+                    ],
                   ]}
                 >
                   <View>
-                    <Text style={[
-                      styles.optionText,
-                      { color: colors.text },
-                      item.id === value && { color: colors.primary, fontWeight: '600' }
-                    ]}>
+                    <Text
+                      style={[
+                        styles.optionText,
+                        { color: colors.text },
+                        item.id === value && { color: colors.primary, fontWeight: '600' },
+                      ]}
+                    >
                       {item.name}
                     </Text>
                     {item.description && (

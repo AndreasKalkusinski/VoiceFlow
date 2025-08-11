@@ -14,34 +14,89 @@ export class GoogleSTTProvider extends BaseSTTProvider {
       id: 'latest_long',
       name: 'Latest Long',
       description: 'Best for long audio content',
-      languages: ['en-US', 'de-DE', 'es-ES', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU', 'ja-JP', 'ko-KR', 'zh-CN'],
+      languages: [
+        'en-US',
+        'de-DE',
+        'es-ES',
+        'fr-FR',
+        'it-IT',
+        'pt-BR',
+        'ru-RU',
+        'ja-JP',
+        'ko-KR',
+        'zh-CN',
+      ],
     },
     {
       id: 'latest_short',
       name: 'Latest Short',
       description: 'Optimized for short audio clips',
-      languages: ['en-US', 'de-DE', 'es-ES', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU', 'ja-JP', 'ko-KR', 'zh-CN'],
+      languages: [
+        'en-US',
+        'de-DE',
+        'es-ES',
+        'fr-FR',
+        'it-IT',
+        'pt-BR',
+        'ru-RU',
+        'ja-JP',
+        'ko-KR',
+        'zh-CN',
+      ],
     },
     {
       id: 'command_and_search',
       name: 'Command and Search',
       description: 'Best for short queries or commands',
-      languages: ['en-US', 'de-DE', 'es-ES', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU', 'ja-JP', 'ko-KR', 'zh-CN'],
+      languages: [
+        'en-US',
+        'de-DE',
+        'es-ES',
+        'fr-FR',
+        'it-IT',
+        'pt-BR',
+        'ru-RU',
+        'ja-JP',
+        'ko-KR',
+        'zh-CN',
+      ],
     },
   ];
 
   supportedLanguages = [
-    'en-US', 'en-GB', 'en-AU', 'en-IN',
-    'de-DE', 'de-AT', 'de-CH',
-    'es-ES', 'es-MX', 'es-AR',
-    'fr-FR', 'fr-CA',
-    'it-IT', 'pt-BR', 'pt-PT',
-    'ru-RU', 'ja-JP', 'ko-KR',
-    'zh-CN', 'zh-TW', 'zh-HK',
-    'nl-NL', 'pl-PL', 'tr-TR',
-    'sv-SE', 'no-NO', 'da-DK',
-    'fi-FI', 'cs-CZ', 'ar-SA',
-    'he-IL', 'hi-IN', 'th-TH',
+    'en-US',
+    'en-GB',
+    'en-AU',
+    'en-IN',
+    'de-DE',
+    'de-AT',
+    'de-CH',
+    'es-ES',
+    'es-MX',
+    'es-AR',
+    'fr-FR',
+    'fr-CA',
+    'it-IT',
+    'pt-BR',
+    'pt-PT',
+    'ru-RU',
+    'ja-JP',
+    'ko-KR',
+    'zh-CN',
+    'zh-TW',
+    'zh-HK',
+    'nl-NL',
+    'pl-PL',
+    'tr-TR',
+    'sv-SE',
+    'no-NO',
+    'da-DK',
+    'fi-FI',
+    'cs-CZ',
+    'ar-SA',
+    'he-IL',
+    'hi-IN',
+    'th-TH',
   ];
 
   private baseURL = 'https://speech.googleapis.com/v1';
@@ -76,7 +131,7 @@ export class GoogleSTTProvider extends BaseSTTProvider {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (response.data.results && response.data.results.length > 0) {
@@ -94,7 +149,7 @@ export class GoogleSTTProvider extends BaseSTTProvider {
 
   async validateConfig(config: any): Promise<boolean> {
     if (!config.apiKey) return false;
-    
+
     // Google doesn't have a simple validation endpoint
     // We could try a minimal transcribe request
     return true;

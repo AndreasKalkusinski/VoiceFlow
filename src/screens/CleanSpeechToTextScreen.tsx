@@ -29,7 +29,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  
+
   const { colors } = useTheme();
   const { t } = useTranslation();
 
@@ -40,15 +40,15 @@ export const CleanSpeechToTextScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
-    }, [])
+    }, []),
   );
 
   const loadSettings = async () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-    } catch (error) {
-      console.error('Error loading settings:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -59,8 +59,8 @@ export const CleanSpeechToTextScreen: React.FC = () => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-    } catch (error) {
-      console.error('Failed to setup audio:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -72,7 +72,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
   const startRecording = async () => {
     const currentSettings = await StorageService.getSettings();
     setSettings(currentSettings);
-    
+
     if (!currentSettings?.openaiApiKey) {
       Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
       return;
@@ -80,7 +80,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
 
     try {
       showStatus(t('speechToText.status.starting'));
-      
+
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
         showStatus(t('speechToText.status.microphoneDenied'));
@@ -93,13 +93,13 @@ export const CleanSpeechToTextScreen: React.FC = () => {
       });
 
       const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
       );
-      
+
       setRecording(recording);
       setIsRecording(true);
       showStatus(t('speechToText.status.recording'));
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
     }
   };
@@ -111,26 +111,26 @@ export const CleanSpeechToTextScreen: React.FC = () => {
       setIsRecording(false);
       setIsProcessing(true);
       showStatus(t('speechToText.status.processing'));
-      
+
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
-      
+
       if (uri && settings) {
         showStatus(t('speechToText.status.transcribing'));
         const openaiService = new OpenAIService(settings.openaiApiKey);
         const text = await openaiService.transcribeAudio(uri, settings.sttModel);
-        
+
         if (transcribedText) {
           setTranscribedText(transcribedText + ' ' + text);
         } else {
           setTranscribedText(text);
         }
-        
+
         showStatus(t('speechToText.status.complete'));
       }
-      
+
       setRecording(null);
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
     } finally {
       setIsProcessing(false);
@@ -142,7 +142,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
       Alert.alert(t('alerts.noTextTitle'), t('alerts.noTextMessage'));
       return;
     }
-    
+
     await Clipboard.setStringAsync(transcribedText);
     showStatus(t('speechToText.copiedToClipboard'));
   };
@@ -152,7 +152,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
     showStatus(t('speechToText.textCleared'));
   };
 
-  const wordCount = transcribedText.split(' ').filter(w => w).length;
+  const wordCount = transcribedText.split(' ').filter((w) => w).length;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
@@ -160,7 +160,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -172,9 +172,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
             {/* Status Message */}
             {statusMessage !== '' && (
               <MinimalCard variant="elevated" style={styles.statusCard}>
-                <Text style={[styles.statusText, { color: colors.text }]}>
-                  {statusMessage}
-                </Text>
+                <Text style={[styles.statusText, { color: colors.text }]}>{statusMessage}</Text>
               </MinimalCard>
             )}
 
@@ -190,7 +188,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
                   </Text>
                 </View>
               </View>
-              
+
               <TextInput
                 style={[styles.textInput, { color: colors.text }]}
                 multiline
@@ -206,7 +204,12 @@ export const CleanSpeechToTextScreen: React.FC = () => {
             {(isRecording || isProcessing) && (
               <MinimalCard variant="outlined" style={styles.recordingCard}>
                 <View style={styles.recordingIndicator}>
-                  <View style={[styles.recordingDot, { backgroundColor: isRecording ? '#FF4444' : colors.primary }]} />
+                  <View
+                    style={[
+                      styles.recordingDot,
+                      { backgroundColor: isRecording ? '#FF4444' : colors.primary },
+                    ]}
+                  />
                   <Text style={[styles.recordingText, { color: colors.text }]}>
                     {isRecording ? t('speechToText.recording') : t('speechToText.processing')}
                   </Text>
@@ -244,7 +247,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
                 size="medium"
                 style={styles.actionButton}
               />
-              
+
               <SimpleButton
                 title={t('speechToText.clearText')}
                 onPress={clearText}

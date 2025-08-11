@@ -1,53 +1,43 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  Dimensions,
-} from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path, Circle, Line, G } from 'react-native-svg';
+// SVG imports removed - using Ionicons instead
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
 import { vw, vh } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
+import { TabBarProps } from '../types/navigation';
 
 const { width } = Dimensions.get('window');
-const AnimatedPath = Animated.createAnimatedComponent(Path);
 
-interface TabBarProps {
-  state: any;
-  descriptors: any;
-  navigation: any;
-}
-
-export const LiquidTabBar: React.FC<TabBarProps> = ({ state, descriptors, navigation }) => {
+export const LiquidTabBar: React.FC<TabBarProps> = ({ state, navigation }) => {
   const { isDark, colors } = useTheme();
   const insets = useSafeAreaInsets();
   const currentRoute = state.routes[state.index].name;
   const currentTheme = getScreenTheme(currentRoute, isDark);
-  
-  const icons: { [key: string]: { outline: keyof typeof Ionicons.glyphMap; filled: keyof typeof Ionicons.glyphMap } } = {
+
+  const icons: {
+    [key: string]: {
+      outline: keyof typeof Ionicons.glyphMap;
+      filled: keyof typeof Ionicons.glyphMap;
+    };
+  } = {
     'Speech to Text': { outline: 'mic-outline', filled: 'mic' },
     'Text to Speech': { outline: 'volume-high-outline', filled: 'volume-high' },
-    'Settings': { outline: 'settings-outline', filled: 'settings-sharp' },
+    Settings: { outline: 'settings-outline', filled: 'settings-sharp' },
   };
 
   const translateX = useRef(new Animated.Value(0)).current;
-  const scaleAnims = useRef(
-    state.routes.map(() => new Animated.Value(1))
-  ).current;
+  const scaleAnims = useRef(state.routes.map(() => new Animated.Value(1))).current;
 
   useEffect(() => {
     // Animate blob position
     const tabWidth = width / state.routes.length;
     const toValue = state.index * tabWidth;
-    
+
     Animated.spring(translateX, {
       toValue,
       damping: 20,
@@ -84,30 +74,25 @@ export const LiquidTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       {/* Enhanced glassmorphism background */}
-      <BlurView 
-        intensity={isDark ? 85 : 80} 
-        tint={isDark ? 'dark' : 'light'} 
-        style={StyleSheet.absoluteFillObject} 
+      <BlurView
+        intensity={isDark ? 85 : 80}
+        tint={isDark ? 'dark' : 'light'}
+        style={StyleSheet.absoluteFillObject}
       />
-      
+
       {/* Glass overlay with subtle gradient */}
       <LinearGradient
         colors={
-          isDark 
+          isDark
             ? ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)']
             : ['rgba(255,255,255,0.7)', 'rgba(255,255,255,0.5)']
         }
         style={[StyleSheet.absoluteFillObject, styles.glassOverlay]}
       />
-      
+
       {/* Subtle color accent from current screen */}
       {currentTheme && (
-        <View
-          style={[
-            styles.colorAccent,
-            { backgroundColor: currentTheme.primary + '08' }
-          ]}
-        />
+        <View style={[styles.colorAccent, { backgroundColor: currentTheme.primary + '08' }]} />
       )}
 
       {/* Modern active indicator */}
@@ -121,22 +106,19 @@ export const LiquidTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
         ]}
       >
         {/* Glow effect */}
-        <View 
+        <View
           style={[
             styles.glowEffect,
-            { 
+            {
               backgroundColor: currentTheme?.primary || '#6366F1',
               shadowColor: currentTheme?.primary || '#6366F1',
-            }
-          ]} 
+            },
+          ]}
         />
-        
+
         {/* Bottom line indicator */}
-        <View 
-          style={[
-            styles.lineIndicator,
-            { backgroundColor: currentTheme?.primary || '#6366F1' }
-          ]} 
+        <View
+          style={[styles.lineIndicator, { backgroundColor: currentTheme?.primary || '#6366F1' }]}
         />
       </Animated.View>
 
@@ -169,7 +151,7 @@ export const LiquidTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
                     style={[
                       styles.iconGlassEffect,
                       {
-                        backgroundColor: isDark 
+                        backgroundColor: isDark
                           ? 'rgba(255,255,255,0.08)'
                           : 'rgba(255,255,255,0.5)',
                         borderColor: routeTheme?.primary + '30',
@@ -177,12 +159,12 @@ export const LiquidTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
                     ]}
                   />
                 )}
-                
+
                 {/* Modern Icon */}
                 <Ionicons
                   name={isFocused ? icons[route.name].filled : icons[route.name].outline}
                   size={vw(6.5)}
-                  color={isFocused ? (routeTheme?.primary || colors.primary) : colors.textSecondary}
+                  color={isFocused ? routeTheme?.primary || colors.primary : colors.textSecondary}
                   style={styles.icon}
                 />
               </Animated.View>

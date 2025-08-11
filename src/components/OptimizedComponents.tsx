@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { ModernCard } from './ModernCard';
 import { ModernButton } from './ModernButton';
 import { GlassCard } from './GlassCard';
@@ -59,12 +59,9 @@ export const OptimizedMinimalCard = memo(MinimalCard, (prevProps, nextProps) => 
  * Optimized RecordingAnimation component with memoization
  * Only re-renders when isRecording changes
  */
-export const OptimizedRecordingAnimation = memo(
-  RecordingAnimation,
-  (prevProps, nextProps) => {
-    return prevProps.isRecording === nextProps.isRecording;
-  }
-);
+export const OptimizedRecordingAnimation = memo(RecordingAnimation, (prevProps, nextProps) => {
+  return prevProps.isRecording === nextProps.isRecording;
+});
 
 // Export display names for debugging
 OptimizedModernCard.displayName = 'OptimizedModernCard';

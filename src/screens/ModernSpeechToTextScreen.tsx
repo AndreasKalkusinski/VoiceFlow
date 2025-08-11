@@ -9,14 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Audio } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 import { FloatingActionButton } from '../components/FloatingActionButton';
@@ -25,7 +23,7 @@ import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
-import { wp, hp, spacing, fontSize, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
+import { wp, hp, spacing, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
 
 export const ModernSpeechToTextScreen: React.FC = () => {
@@ -35,13 +33,15 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  
-  const { colors, theme, isDark } = useTheme();
+
+  const { colors, isDark } = useTheme();
   const { t } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const waveAnims = useRef(
-    Array(5).fill(0).map(() => new Animated.Value(0))
+    Array(5)
+      .fill(0)
+      .map(() => new Animated.Value(0)),
   ).current;
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -95,13 +95,13 @@ export const ModernSpeechToTextScreen: React.FC = () => {
             duration: 600,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       ).start();
     });
   };
 
   const stopWaveAnimation = () => {
-    waveAnims.forEach(anim => {
+    waveAnims.forEach((anim) => {
       anim.stopAnimation();
       Animated.timing(anim, {
         toValue: 0,
@@ -115,9 +115,12 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-      console.log('Loaded settings:', loadedSettings?.openaiApiKey ? 'API key present' : 'No API key');
-    } catch (error) {
-      console.error('Error loading settings:', error);
+      console.log(
+        'Loaded settings:',
+        loadedSettings?.openaiApiKey ? 'API key present' : 'No API key',
+      );
+    } catch {
+      /* ignore */
     }
   };
 
@@ -128,8 +131,8 @@ export const ModernSpeechToTextScreen: React.FC = () => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-    } catch (error) {
-      console.error('Failed to setup audio:', error);
+    } catch {
+      /* ignore */
     }
   };
 
@@ -142,7 +145,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     // Reload settings to ensure we have the latest
     const currentSettings = await StorageService.getSettings();
     setSettings(currentSettings);
-    
+
     if (!currentSettings?.openaiApiKey) {
       Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
       return;
@@ -151,7 +154,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       showStatus(t('speechToText.status.starting'));
-      
+
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
         showStatus(t('speechToText.status.microphoneDenied'));
@@ -164,13 +167,13 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       });
 
       const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
       );
-      
+
       setRecording(recording);
       setIsRecording(true);
       showStatus(t('speechToText.status.recording'));
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
     }
   };
@@ -183,27 +186,27 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       setIsRecording(false);
       setIsProcessing(true);
       showStatus(t('speechToText.status.processing'));
-      
+
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
-      
+
       if (uri && settings) {
         showStatus(t('speechToText.status.transcribing'));
         const openaiService = new OpenAIService(settings.openaiApiKey);
         const text = await openaiService.transcribeAudio(uri, settings.sttModel);
-        
+
         if (transcribedText) {
           setTranscribedText(transcribedText + ' ' + text);
         } else {
           setTranscribedText(text);
         }
-        
+
         showStatus(t('speechToText.status.complete'));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
-      
+
       setRecording(null);
-    } catch (error) {
+    } catch {
       showStatus(t('speechToText.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
@@ -216,7 +219,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       Alert.alert(t('alerts.noTextTitle'), t('alerts.noTextMessage'));
       return;
     }
-    
+
     await Clipboard.setStringAsync(transcribedText);
     showStatus(t('speechToText.copiedToClipboard'));
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -228,143 +231,136 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const wordCount = transcribedText.split(' ').filter(w => w).length;
+  const wordCount = transcribedText.split(' ').filter((w) => w).length;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <LinearGradient
-        colors={isDark 
-          ? ['#0F0F23', '#1A1A3E', '#0F0F23']
-          : ['#F0F4FF', '#FFFFFF', '#F0F4FF']
-        }
+        colors={isDark ? ['#0F0F23', '#1A1A3E', '#0F0F23'] : ['#F0F4FF', '#FFFFFF', '#F0F4FF']}
         style={styles.container}
       >
         <KeyboardAvoidingView
           style={styles.keyboardAvoid}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-        <ScrollView 
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <Animated.View
-            style={[
-              styles.content,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
           >
-            {/* Status Message */}
-            {statusMessage !== '' && (
-              <Animated.View style={styles.statusContainer}>
-                <GlassCard style={styles.statusCard}>
-                  <Text style={[styles.statusText, { color: colors.text }]}>
-                    {statusMessage}
+            <Animated.View
+              style={[
+                styles.content,
+                {
+                  opacity: fadeAnim,
+                  transform: [{ translateY: slideAnim }],
+                },
+              ]}
+            >
+              {/* Status Message */}
+              {statusMessage !== '' && (
+                <Animated.View style={styles.statusContainer}>
+                  <GlassCard style={styles.statusCard}>
+                    <Text style={[styles.statusText, { color: colors.text }]}>{statusMessage}</Text>
+                  </GlassCard>
+                </Animated.View>
+              )}
+
+              {/* Main Text Area */}
+              <GlassCard style={styles.textCard} gradient>
+                <View style={styles.textHeader}>
+                  <Text style={[styles.label, { color: colors.text }]}>
+                    {t('speechToText.subtitle')}
                   </Text>
-                </GlassCard>
-              </Animated.View>
-            )}
-
-            {/* Main Text Area */}
-            <GlassCard style={styles.textCard} gradient>
-              <View style={styles.textHeader}>
-                <Text style={[styles.label, { color: colors.text }]}>
-                  {t('speechToText.subtitle')}
-                </Text>
-                <View style={styles.wordCount}>
-                  <Text style={[styles.wordCountText, { color: colors.textSecondary }]}>
-                    {wordCount} {t('common.words')}
-                  </Text>
-                </View>
-              </View>
-              
-              <TextInput
-                style={[styles.textInput, { color: colors.text }]}
-                multiline
-                value={transcribedText}
-                onChangeText={setTranscribedText}
-                placeholder={t('speechToText.placeholder')}
-                placeholderTextColor={colors.textMuted}
-              />
-            </GlassCard>
-
-            {/* Recording Visualization */}
-            {(isRecording || isProcessing) && (
-              <View style={styles.visualizationContainer}>
-                <View style={styles.waveContainer}>
-                  {waveAnims.map((anim, index) => (
-                    <Animated.View
-                      key={index}
-                      style={[
-                        styles.wave,
-                        {
-                          backgroundColor: isRecording 
-                            ? colors.primary 
-                            : colors.secondary,
-                          transform: [
-                            {
-                              scaleY: anim.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [0.3, 1.5],
-                              }),
-                            },
-                            {
-                              scaleX: anim.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [1, 1.2],
-                              }),
-                            },
-                          ],
-                          opacity: anim.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [0.6, 1],
-                          }),
-                        },
-                      ]}
-                    />
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Action Buttons */}
-            <View style={styles.buttonContainer}>
-              <View style={styles.mainButtonWrapper}>
-                <FloatingActionButton
-                  onPress={isRecording ? stopRecording : startRecording}
-                  isActive={isRecording}
-                  icon={
-                    <Text style={styles.micIcon}>
-                      {isProcessing ? '⏳' : isRecording ? '⏹' : '🎤'}
+                  <View style={styles.wordCount}>
+                    <Text style={[styles.wordCountText, { color: colors.textSecondary }]}>
+                      {wordCount} {t('common.words')}
                     </Text>
-                  }
-                />
-              </View>
+                  </View>
+                </View>
 
-              <View style={styles.actionButtons}>
-                <AnimatedButton
-                  title={t('speechToText.copyText')}
-                  onPress={copyToClipboard}
-                  variant="glass"
-                  size="medium"
-                  style={styles.actionButton}
-                  icon={<Text>📋</Text>}
+                <TextInput
+                  style={[styles.textInput, { color: colors.text }]}
+                  multiline
+                  value={transcribedText}
+                  onChangeText={setTranscribedText}
+                  placeholder={t('speechToText.placeholder')}
+                  placeholderTextColor={colors.textMuted}
                 />
-                
-                <AnimatedButton
-                  title={t('speechToText.clearText')}
-                  onPress={clearText}
-                  variant="glass"
-                  size="medium"
-                  style={styles.actionButton}
-                  icon={<Text>🗑</Text>}
-                />
+              </GlassCard>
+
+              {/* Recording Visualization */}
+              {(isRecording || isProcessing) && (
+                <View style={styles.visualizationContainer}>
+                  <View style={styles.waveContainer}>
+                    {waveAnims.map((anim, index) => (
+                      <Animated.View
+                        key={index}
+                        style={[
+                          styles.wave,
+                          {
+                            backgroundColor: isRecording ? colors.primary : colors.secondary,
+                            transform: [
+                              {
+                                scaleY: anim.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [0.3, 1.5],
+                                }),
+                              },
+                              {
+                                scaleX: anim.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [1, 1.2],
+                                }),
+                              },
+                            ],
+                            opacity: anim.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [0.6, 1],
+                            }),
+                          },
+                        ]}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Action Buttons */}
+              <View style={styles.buttonContainer}>
+                <View style={styles.mainButtonWrapper}>
+                  <FloatingActionButton
+                    onPress={isRecording ? stopRecording : startRecording}
+                    isActive={isRecording}
+                    icon={
+                      <Text style={styles.micIcon}>
+                        {isProcessing ? '⏳' : isRecording ? '⏹' : '🎤'}
+                      </Text>
+                    }
+                  />
+                </View>
+
+                <View style={styles.actionButtons}>
+                  <AnimatedButton
+                    title={t('speechToText.copyText')}
+                    onPress={copyToClipboard}
+                    variant="glass"
+                    size="medium"
+                    style={styles.actionButton}
+                    icon={<Text>📋</Text>}
+                  />
+
+                  <AnimatedButton
+                    title={t('speechToText.clearText')}
+                    onPress={clearText}
+                    variant="glass"
+                    size="medium"
+                    style={styles.actionButton}
+                    icon={<Text>🗑</Text>}
+                  />
+                </View>
               </View>
-            </View>
-          </Animated.View>
-        </ScrollView>
+            </Animated.View>
+          </ScrollView>
         </KeyboardAvoidingView>
       </LinearGradient>
     </SafeAreaView>

@@ -47,7 +47,7 @@ export const TextToSpeechScreen: React.FC = () => {
       type,
       timestamp: new Date(),
     };
-    setLogs(prev => [...prev, newLog]);
+    setLogs((prev) => [...prev, newLog]);
   };
 
   const clearLogs = () => {
@@ -65,7 +65,7 @@ export const TextToSpeechScreen: React.FC = () => {
       } else {
         Alert.alert('Clipboard Empty', 'No text found in clipboard');
       }
-    } catch (error) {
+    } catch {
       addLog('Failed to paste from clipboard', 'error');
       clearLogs();
     }
@@ -91,7 +91,7 @@ export const TextToSpeechScreen: React.FC = () => {
       const audioUri = await openaiService.textToSpeech(
         inputText,
         settings.ttsModel,
-        settings.ttsVoice
+        settings.ttsVoice,
       );
 
       addLog('Speech generated successfully', 'success');
@@ -103,13 +103,13 @@ export const TextToSpeechScreen: React.FC = () => {
 
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: audioUri },
-        { shouldPlay: false }
+        { shouldPlay: false },
       );
 
       setSound(newSound);
       addLog('Ready to play', 'success');
       clearLogs();
-    } catch (error) {
+    } catch {
       addLog('Failed to generate speech', 'error');
       Alert.alert('Error', 'Failed to generate speech');
       clearLogs();
@@ -126,7 +126,7 @@ export const TextToSpeechScreen: React.FC = () => {
 
     try {
       const status = await sound.getStatusAsync();
-      
+
       if (status.isLoaded) {
         if (isPlaying) {
           await sound.pauseAsync();
@@ -136,7 +136,7 @@ export const TextToSpeechScreen: React.FC = () => {
           await sound.playAsync();
           setIsPlaying(true);
           addLog('Playing audio', 'info');
-          
+
           sound.setOnPlaybackStatusUpdate((status) => {
             if (status.isLoaded && status.didJustFinish) {
               setIsPlaying(false);
@@ -146,7 +146,7 @@ export const TextToSpeechScreen: React.FC = () => {
         }
         clearLogs();
       }
-    } catch (error) {
+    } catch {
       addLog('Playback error', 'error');
       clearLogs();
     }
@@ -160,7 +160,7 @@ export const TextToSpeechScreen: React.FC = () => {
         setLogs([]);
         addLog('Playback stopped', 'info');
         clearLogs();
-      } catch (error) {
+      } catch {
         addLog('Failed to stop playback', 'error');
         clearLogs();
       }
@@ -186,7 +186,7 @@ export const TextToSpeechScreen: React.FC = () => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <LogView messages={logs} />
-        
+
         <View style={styles.textContainer}>
           <View style={styles.labelContainer}>
             <Text style={styles.label}>Input Text</Text>
@@ -194,7 +194,7 @@ export const TextToSpeechScreen: React.FC = () => {
               <Text style={styles.pasteButtonText}>Paste</Text>
             </TouchableOpacity>
           </View>
-          
+
           <TextInput
             style={styles.textInput}
             multiline
@@ -224,11 +224,9 @@ export const TextToSpeechScreen: React.FC = () => {
                 style={[styles.playButton, isPlaying && styles.pauseButton]}
                 onPress={playPause}
               >
-                <Text style={styles.playButtonText}>
-                  {isPlaying ? 'Pause' : 'Play'}
-                </Text>
+                <Text style={styles.playButtonText}>{isPlaying ? 'Pause' : 'Play'}</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity style={styles.stopButton} onPress={stopPlayback}>
                 <Text style={styles.stopButtonText}>Stop</Text>
               </TouchableOpacity>

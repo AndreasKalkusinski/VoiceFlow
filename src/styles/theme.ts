@@ -9,15 +9,15 @@ export const theme = {
       warning: '#F59E0B',
       error: '#EF4444',
       info: '#3B82F6',
-      
+
       background: '#FAFAFA',
       surface: 'rgba(255, 255, 255, 0.95)',
       glassSurface: 'rgba(255, 255, 255, 0.7)',
-      
+
       text: '#1F2937',
       textSecondary: '#6B7280',
       textMuted: '#9CA3AF',
-      
+
       border: 'rgba(209, 213, 219, 0.3)',
       shadow: 'rgba(0, 0, 0, 0.1)',
     },
@@ -30,20 +30,20 @@ export const theme = {
       warning: '#FBBF24',
       error: '#F87171',
       info: '#60A5FA',
-      
+
       background: '#0F0F23',
       surface: 'rgba(30, 30, 46, 0.95)',
       glassSurface: 'rgba(30, 30, 46, 0.7)',
-      
+
       text: '#F9FAFB',
       textSecondary: '#D1D5DB',
       textMuted: '#9CA3AF',
-      
+
       border: 'rgba(75, 85, 99, 0.3)',
       shadow: 'rgba(0, 0, 0, 0.3)',
-    }
+    },
   },
-  
+
   spacing: {
     xs: 4,
     sm: 8,
@@ -52,7 +52,7 @@ export const theme = {
     xl: 32,
     xxl: 48,
   },
-  
+
   borderRadius: {
     sm: 8,
     md: 16,
@@ -60,7 +60,7 @@ export const theme = {
     xl: 32,
     full: 9999,
   },
-  
+
   typography: {
     heading1: {
       fontSize: 36,
@@ -88,13 +88,13 @@ export const theme = {
       letterSpacing: 0.2,
     },
   },
-  
+
   animation: {
     fast: 200,
     normal: 300,
     slow: 500,
   },
-  
+
   effects: {
     glassmorphism: {
       borderWidth: 1,
@@ -115,7 +115,7 @@ export const theme = {
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 5,
-      }
-    }
-  }
+      },
+    },
+  },
 };

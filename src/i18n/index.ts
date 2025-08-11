@@ -25,57 +25,50 @@ const getDeviceLanguage = () => {
   try {
     const locale = Localization.getLocales()[0]?.languageTag || 'en';
     const languageCode = locale.split('-')[0];
-    
+
     // Check if we support this language
     if (resources[languageCode as keyof typeof resources]) {
       return languageCode;
     }
-  } catch (error) {
+  } catch {
     console.log('Could not detect device language, defaulting to English');
   }
-  
+
   // Default to English
   return 'en';
 };
 
 // Initialize i18n synchronously first
-i18n
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: 'en', // Default language initially
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false,
-    },
-    react: {
-      useSuspense: false,
-    },
-  });
+i18n.use(initReactI18next).init({
+  resources,
+  lng: 'en', // Default language initially
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+  react: {
+    useSuspense: false,
+  },
+});
 
 // Then load saved language asynchronously
 const initI18n = async () => {
   try {
     const savedLanguage = await AsyncStorage.getItem(LANGUAGE_KEY);
     const language = savedLanguage || getDeviceLanguage();
-    
+
     if (language !== i18n.language) {
       await i18n.changeLanguage(language);
     }
-  } catch (error) {
-    console.error('Failed to load language preference:', error);
+  } catch {
+    /* ignore */
   }
 };
 
 export const changeLanguage = async (languageCode: string) => {
-  try {
-    await AsyncStorage.setItem(LANGUAGE_KEY, languageCode);
-    if (i18n.isInitialized) {
-      await i18n.changeLanguage(languageCode);
-    }
-  } catch (error) {
-    console.error('Failed to change language:', error);
-    throw error;
+  await AsyncStorage.setItem(LANGUAGE_KEY, languageCode);
+  if (i18n.isInitialized) {
+    await i18n.changeLanguage(languageCode);
   }
 };
 

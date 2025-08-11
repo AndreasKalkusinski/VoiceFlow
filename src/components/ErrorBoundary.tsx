@@ -1,11 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -45,7 +39,7 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to error reporting service
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+
     this.setState({
       error,
       errorInfo,
@@ -79,7 +73,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <Ionicons name="alert-circle" size={64} color="#FF6B6B" />
               <Text style={styles.title}>Oops! Something went wrong</Text>
               <Text style={styles.subtitle}>
-                We're sorry for the inconvenience. The app encountered an unexpected error.
+                We&apos;re sorry for the inconvenience. The app encountered an unexpected error.
               </Text>
             </View>
 
@@ -91,7 +85,7 @@ export class ErrorBoundary extends Component<Props, State> {
             {__DEV__ && (
               <View style={styles.errorDetails}>
                 <Text style={styles.errorDetailsTitle}>Error Details (Development Only)</Text>
-                
+
                 {error && (
                   <View style={styles.errorSection}>
                     <Text style={styles.errorLabel}>Error:</Text>
