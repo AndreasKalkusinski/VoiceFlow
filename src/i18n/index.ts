@@ -61,7 +61,7 @@ const initI18n = async () => {
       await i18n.changeLanguage(language);
     }
   } catch {
-    console.error('Failed to load language preference:', error);
+    /* ignore */
   }
 };
 
@@ -72,7 +72,6 @@ export const changeLanguage = async (languageCode: string) => {
       await i18n.changeLanguage(languageCode);
     }
   } catch {
-    console.error('Failed to change language:', error);
     throw error;
   }
 };

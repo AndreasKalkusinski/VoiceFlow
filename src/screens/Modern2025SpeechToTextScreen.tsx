@@ -106,7 +106,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
     } catch {
-      console.error('Error loading settings:', error);
+      /* ignore */
     }
   };
 
@@ -118,7 +118,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
         playsInSilentModeIOS: true,
       });
     } catch {
-      console.error('Failed to setup audio:', error);
+      /* ignore */
     }
   };
 
@@ -229,7 +229,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       showStatus(t('speechToText.refreshed'), 1500);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {
-      console.error('Refresh failed:', error);
+      /* ignore */
     } finally {
       // Ensure refresh state is reset
       setRefreshing(false);

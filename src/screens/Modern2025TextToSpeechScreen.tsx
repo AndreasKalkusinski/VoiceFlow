@@ -39,7 +39,6 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
-  // const [playbackProgress, setPlaybackProgress] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [audioUri, setAudioUri] = useState<string | null>(null);
   const [duration, setDuration] = useState(0);
@@ -92,7 +91,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
     } catch {
-      console.error('Error loading settings:', error);
+      /* ignore */
     }
   };
 
@@ -104,7 +103,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         staysActiveInBackground: false,
       });
     } catch {
-      console.error('Failed to setup audio:', error);
+      /* ignore */
     }
   };
 
@@ -177,7 +176,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         if (status.isLoaded) {
           if (status.didJustFinish) {
             setIsPlaying(false);
-            setPlaybackProgress(0);
+
             setPlaybackPosition(0);
             progressAnim.setValue(0);
             showStatus(t('textToSpeech.status.complete'));
@@ -186,7 +185,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
             await newSound.setPositionAsync(0);
           } else if (status.positionMillis && status.durationMillis) {
             const progress = status.positionMillis / status.durationMillis;
-            setPlaybackProgress(progress);
+
             setPlaybackPosition(status.positionMillis);
             setDuration(status.durationMillis);
             progressAnim.setValue(progress);
@@ -195,7 +194,6 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         }
       });
     } catch (error: any) {
-      console.error('TTS Generation Error:', error);
       console.error('Error details:', {
         message: error.message,
         response: error.response?.data,
@@ -210,18 +208,6 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       Alert.alert(t('common.error'), errorMessage);
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const _stopPlayback = async () => {
-    if (sound) {
-      await sound.stopAsync();
-      setIsPlaying(false);
-      setPlaybackProgress(0);
-      setPlaybackPosition(0);
-      progressAnim.setValue(0);
-      showStatus(t('textToSpeech.status.stopped'));
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
   };
 
@@ -259,14 +245,14 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
             if (status.isLoaded) {
               if (status.didJustFinish) {
                 setIsPlaying(false);
-                setPlaybackProgress(0);
+
                 setPlaybackPosition(0);
                 progressAnim.setValue(0);
                 // Rewind to beginning
                 await newSound.setPositionAsync(0);
               } else if (status.positionMillis && status.durationMillis) {
                 const progress = status.positionMillis / status.durationMillis;
-                setPlaybackProgress(progress);
+
                 setPlaybackPosition(status.positionMillis);
                 setDuration(status.durationMillis);
                 progressAnim.setValue(progress);
@@ -275,7 +261,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
             }
           });
         } catch {
-          console.error('Failed to recreate sound:', error);
+          /* ignore */
         }
       }
       return;
@@ -296,7 +282,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
 
     const position = progress * duration;
     await sound.setPositionAsync(position);
-    setPlaybackProgress(progress);
+
     setPlaybackPosition(position);
     progressAnim.setValue(progress);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -326,7 +312,6 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         Alert.alert(t('common.error'), t('textToSpeech.status.downloadFailed'));
       }
     } catch {
-      console.error('Download failed:', error);
       Alert.alert(t('common.error'), t('textToSpeech.status.downloadFailed'));
     }
   };
@@ -344,7 +329,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       showStatus(t('textToSpeech.refreshed'), 1500);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {
-      console.error('Refresh failed:', error);
+      /* ignore */
     } finally {
       // Ensure refresh state is reset
       setRefreshing(false);

@@ -17,19 +17,12 @@ import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 import { ProviderSettings } from '../components/ProviderSettings';
 import { StorageService } from '../services/storage';
-import { OpenAIService, Model } from '../services/openai';
+import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme, ThemeMode } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage, availableLanguages } from '../i18n';
-import {
-  wp,
-  hp,
-  spacing,
-  fontSizes,
-  componentHeights,
-  adaptiveSpacing,
-} from '../utils/responsive';
+import { hp, spacing, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
 
 export const ModernSettingsScreen: React.FC = () => {
@@ -47,14 +40,8 @@ export const ModernSettingsScreen: React.FC = () => {
     },
     providerSettings: {},
   });
-  // const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  // const [isValidating, setIsValidating] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  // const [apiKeyVisible, setApiKeyVisible] = useState(false);
-  // const [whisperModels, setWhisperModels] = useState<Model[]>([]);
-  // const [ttsModels, setTtsModels] = useState<Model[]>([]);
-  // const [modelsLoading, setModelsLoading] = useState(false);
   const [autoSave, setAutoSave] = useState(false);
   const modelRefreshInterval = useRef<NodeJS.Timeout | null>(null);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -126,7 +113,6 @@ export const ModernSettingsScreen: React.FC = () => {
   };
 
   const loadSettings = async () => {
-    setIsLoading(true);
     showStatus(t('settings.status.loading'));
     try {
       const loadedSettings = await StorageService.getSettings();
@@ -152,7 +138,7 @@ export const ModernSettingsScreen: React.FC = () => {
     } catch {
       showStatus(t('settings.status.failed'));
     } finally {
-      setIsLoading(false);
+      /* nothing to cleanup */
     }
   };
 
@@ -163,7 +149,7 @@ export const ModernSettingsScreen: React.FC = () => {
         setAutoSave(savedAutoSave === 'true');
       }
     } catch {
-      console.error('Failed to load auto-save preference:', error);
+      /* ignore */
     }
   };
 
@@ -178,7 +164,7 @@ export const ModernSettingsScreen: React.FC = () => {
         showStatus(t('settings.autoSaveDisabled'), 2000);
       }
     } catch {
-      console.error('Failed to save auto-save preference:', error);
+      /* ignore */
     }
   };
 
@@ -187,7 +173,7 @@ export const ModernSettingsScreen: React.FC = () => {
       await StorageService.saveSettings(settings);
       showStatus(t('settings.status.autoSaved'), 1500);
     } catch {
-      console.error('Auto-save failed:', error);
+      /* ignore */
     }
   };
 
@@ -195,7 +181,7 @@ export const ModernSettingsScreen: React.FC = () => {
     if (!settings?.openaiApiKey) return;
 
     if (!silent) {
-      setModelsLoading(true);
+      // Show loading status if not silent
     }
 
     try {
@@ -223,59 +209,19 @@ export const ModernSettingsScreen: React.FC = () => {
         tts.push(defaultTTSHD);
       }
 
-      setWhisperModels(whisper);
-      setTtsModels(tts);
-
       if (!silent) {
         showStatus('Models loaded', 2000);
       }
     } catch {
-      console.error('Failed to fetch models:', error);
       // Set default models on error
-      setWhisperModels([{ id: 'whisper-1', object: 'model', created: 0, owned_by: 'openai' }]);
-      setTtsModels([
-        { id: 'tts-1', object: 'model', created: 0, owned_by: 'openai' },
-        { id: 'tts-1-hd', object: 'model', created: 0, owned_by: 'openai' },
-      ]);
     } finally {
-      setModelsLoading(false);
+      /* cleanup */
     }
   };
 
   const showStatus = (message: string, duration: number = 3000) => {
     setStatusMessage(message);
     setTimeout(() => setStatusMessage(''), duration);
-  };
-
-  const _validateApiKey = async () => {
-    if (!settings.openaiApiKey) {
-      Alert.alert(t('alerts.apiKeyInvalidTitle'), t('alerts.enterApiKey'));
-      return;
-    }
-
-    // setIsValidating(true);
-    showStatus(t('settings.status.validating'));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
-    try {
-      const openaiService = new OpenAIService(settings.openaiApiKey);
-      const isValid = await openaiService.validateApiKey();
-
-      if (isValid) {
-        showStatus(t('settings.status.apiKeyValid'));
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert(t('alerts.apiKeyValidTitle'), t('alerts.apiKeyValidMessage'));
-      } else {
-        showStatus(t('settings.status.apiKeyInvalid'));
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        Alert.alert(t('alerts.apiKeyInvalidTitle'), t('alerts.apiKeyInvalidMessage'));
-      }
-    } catch {
-      showStatus(t('settings.status.failed'));
-      Alert.alert(t('common.error'), t('settings.status.failed'));
-    } finally {
-      // setIsValidating(false);
-    }
   };
 
   const saveSettings = async () => {
@@ -304,7 +250,6 @@ export const ModernSettingsScreen: React.FC = () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       showStatus(`${availableLanguages.find((l) => l.code === languageCode)?.name} selected`, 2000);
     } catch {
-      console.error('Failed to change language:', error);
       setSelectedLanguage(i18n.language); // Revert to current language
     }
   };

@@ -13,7 +13,15 @@ export interface TabBarState extends NavigationState<ParamListBase> {
 export interface TabBarDescriptor {
   options: {
     tabBarLabel?: string;
-    tabBarIcon?: ({ color, size, focused }: { color: string; size: number; focused: boolean }) => React.ReactNode;
+    tabBarIcon?: ({
+      color,
+      size,
+      focused,
+    }: {
+      color: string;
+      size: number;
+      focused: boolean;
+    }) => React.ReactNode;
   };
   navigation: BottomTabNavigationProp<ParamListBase>;
   route: RouteProp<ParamListBase>;

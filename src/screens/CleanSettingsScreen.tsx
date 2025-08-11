@@ -80,7 +80,7 @@ export const CleanSettingsScreen: React.FC = () => {
       };
       setSettings(migratedSettings);
     } catch {
-      console.error('Failed to load settings:', error);
+      /* ignore */
     }
   };
 
@@ -91,7 +91,7 @@ export const CleanSettingsScreen: React.FC = () => {
         setAutoSave(savedAutoSave === 'true');
       }
     } catch {
-      console.error('Failed to load auto-save preference:', error);
+      /* ignore */
     }
   };
 
@@ -100,7 +100,7 @@ export const CleanSettingsScreen: React.FC = () => {
       await AsyncStorage.setItem('@voiceflow_autosave', value.toString());
       setAutoSave(value);
     } catch {
-      console.error('Failed to save auto-save preference:', error);
+      /* ignore */
     }
   };
 
@@ -108,7 +108,7 @@ export const CleanSettingsScreen: React.FC = () => {
     try {
       await StorageService.saveSettings(settings);
     } catch {
-      console.error('Auto-save failed:', error);
+      /* ignore */
     }
   };
 
@@ -129,7 +129,6 @@ export const CleanSettingsScreen: React.FC = () => {
       setSelectedLanguage(languageCode);
       await changeLanguage(languageCode);
     } catch {
-      console.error('Failed to change language:', error);
       setSelectedLanguage(i18n.language);
     }
   };

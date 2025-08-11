@@ -98,7 +98,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       };
       setSettings(migratedSettings);
     } catch {
-      console.error('Failed to load settings:', error);
+      /* ignore */
     }
   };
 
@@ -109,7 +109,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
         setAutoSave(savedAutoSave === 'true');
       }
     } catch {
-      console.error('Failed to load auto-save preference:', error);
+      /* ignore */
     }
   };
 
@@ -119,7 +119,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       setAutoSave(value);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {
-      console.error('Failed to save auto-save preference:', error);
+      /* ignore */
     }
   };
 
@@ -127,7 +127,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
     try {
       await StorageService.saveSettings(settings);
     } catch {
-      console.error('Auto-save failed:', error);
+      /* ignore */
     }
   };
 
@@ -151,7 +151,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
       await changeLanguage(languageCode);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {
-      console.error('Failed to change language:', error);
       setSelectedLanguage(i18n.language);
     }
   };

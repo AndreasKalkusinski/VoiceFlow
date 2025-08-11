@@ -44,7 +44,7 @@ export const SpeechToTextScreen: React.FC = () => {
         playsInSilentModeIOS: true,
       });
     } catch {
-      console.error('Failed to setup audio:', error);
+      /* ignore */
     }
   };
 

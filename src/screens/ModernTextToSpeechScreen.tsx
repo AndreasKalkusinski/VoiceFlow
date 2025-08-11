@@ -25,14 +25,7 @@ import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
-import {
-  wp,
-  hp,
-  spacing,
-  fontSizes,
-  componentHeights,
-  adaptiveSpacing,
-} from '../utils/responsive';
+import { wp, hp, spacing, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
 
 export const ModernTextToSpeechScreen: React.FC = () => {
@@ -84,7 +77,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         playThroughEarpieceAndroid: false,
       });
     } catch {
-      console.error('Failed to setup audio mode:', error);
+      /* ignore */
     }
   };
 
@@ -177,7 +170,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         loadedSettings?.openaiApiKey ? 'API key present' : 'No API key',
       );
     } catch {
-      console.error('Error loading settings:', error);
+      /* ignore */
     }
   };
 
@@ -386,7 +379,6 @@ export const ModernTextToSpeechScreen: React.FC = () => {
       showStatus(t('textToSpeech.status.downloaded'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
-      console.error('Download error:', error);
       showStatus(t('textToSpeech.status.downloadFailed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }

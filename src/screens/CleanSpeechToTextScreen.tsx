@@ -48,7 +48,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
     } catch {
-      console.error('Error loading settings:', error);
+      /* ignore */
     }
   };
 
@@ -60,7 +60,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
         playsInSilentModeIOS: true,
       });
     } catch {
-      console.error('Failed to setup audio:', error);
+      /* ignore */
     }
   };
 
