@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +19,7 @@ const Tab = createBottomTabNavigator();
 
 function ThemedApp() {
   const { isDark } = useTheme();
-  const { t, i18n } = useTranslation();
+  const { t, i18n, ready } = useTranslation();
 
   // Force re-render when language changes
   React.useEffect(() => {
@@ -32,6 +33,11 @@ function ThemedApp() {
       i18n.off('languageChanged', handleLanguageChange);
     };
   }, [i18n]);
+
+  // Wait for i18n to be ready
+  if (!ready) {
+    return <LoadingFallback />;
+  }
 
   return (
     <NavigationContainer>
@@ -69,18 +75,40 @@ function ThemedApp() {
   );
 }
 
+function LoadingFallback() {
+  return (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#007AFF" />
+    </View>
+  );
+}
+
 export default function App() {
   React.useEffect(() => {
-    console.log('App mounted successfully');
+    // Remove console.log for release builds
+    if (__DEV__) {
+      console.log('App mounted successfully');
+    }
   }, []);
 
   return (
     <ErrorBoundary>
       <SafeAreaProvider>
         <ThemeProvider>
-          <ThemedApp />
+          <Suspense fallback={<LoadingFallback />}>
+            <ThemedApp />
+          </Suspense>
         </ThemeProvider>
       </SafeAreaProvider>
     </ErrorBoundary>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000000',
+  },
+});

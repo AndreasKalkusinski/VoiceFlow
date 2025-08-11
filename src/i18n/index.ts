@@ -41,14 +41,15 @@ const getDeviceLanguage = () => {
 // Initialize i18n synchronously first
 i18n.use(initReactI18next).init({
   resources,
-  lng: 'en', // Default language initially
+  lng: getDeviceLanguage(), // Use device language immediately
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
   },
   react: {
-    useSuspense: false,
+    useSuspense: true, // Enable suspense for proper loading
   },
+  compatibilityJSON: 'v3', // Fix for React Native
 });
 
 // Then load saved language asynchronously
