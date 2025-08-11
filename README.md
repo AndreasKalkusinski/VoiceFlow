@@ -1,5 +1,6 @@
 # VoiceFlow 🎤🔊
 
+![CI/CD](https://github.com/AndreasKalkusinski/VoiceFlow/actions/workflows/ci.yml/badge.svg)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 [![React Native](https://img.shields.io/badge/React%20Native-0.79-blue.svg)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo-53-000.svg)](https://expo.dev/)
