@@ -6,6 +6,7 @@
 [![Expo](https://img.shields.io/badge/Expo-53-000.svg)](https://expo.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/AndreasKalkusinski/VoiceFlow/ci.yml)](https://github.com/AndreasKalkusinski/VoiceFlow/actions)
 
 A modern, open-source React Native app for Speech-to-Text and Text-to-Speech using OpenAI's Whisper and TTS APIs.
 
