@@ -168,5 +168,27 @@ export default {
     noTextMessage: 'No hay texto para copiar',
     settingsSavedTitle: 'Éxito',
     settingsSavedMessage: 'Ajustes guardados exitosamente',
+    error: 'Error',
+    success: 'Éxito',
+    clipboardEmpty: 'Portapapeles vacío',
+  },
+
+  history: {
+    title: 'Historial',
+    settings: 'Configuración del Historial',
+    enable: 'Activar Historial',
+    enableDescription: 'Guardar transcripciones automáticamente',
+    maxItems: 'Elementos Máximos',
+    unlimited: 'Ilimitado',
+    clearAll: 'Borrar Historial',
+    clearTitle: '¿Borrar Historial?',
+    clearMessage:
+      '¿Estás seguro de que quieres borrar todo el historial? Esta acción no se puede deshacer.',
+    cleared: 'Historial borrado',
+    deleteTitle: '¿Eliminar Elemento?',
+    deleteMessage: '¿Estás seguro de que quieres eliminar este elemento?',
+    searchPlaceholder: 'Buscar en el historial...',
+    empty: 'No hay elementos en el historial',
+    noResults: 'No se encontraron resultados',
   },
 };

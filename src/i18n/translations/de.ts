@@ -186,5 +186,27 @@ export default {
     noTextMessage: 'Es gibt keinen Text zum Kopieren',
     settingsSavedTitle: 'Erfolg',
     settingsSavedMessage: 'Einstellungen erfolgreich gespeichert',
+    error: 'Fehler',
+    success: 'Erfolg',
+    clipboardEmpty: 'Zwischenablage ist leer',
+  },
+
+  history: {
+    title: 'Verlauf',
+    settings: 'Verlauf-Einstellungen',
+    enable: 'Verlauf aktivieren',
+    enableDescription: 'Transkriptionen automatisch speichern',
+    maxItems: 'Maximale Einträge',
+    unlimited: 'Unbegrenzt',
+    clearAll: 'Verlauf löschen',
+    clearTitle: 'Verlauf löschen?',
+    clearMessage:
+      'Möchtest du wirklich den gesamten Verlauf löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+    cleared: 'Verlauf wurde gelöscht',
+    deleteTitle: 'Eintrag löschen?',
+    deleteMessage: 'Möchtest du diesen Eintrag wirklich löschen?',
+    searchPlaceholder: 'Verlauf durchsuchen...',
+    empty: 'Keine Einträge im Verlauf',
+    noResults: 'Keine Ergebnisse gefunden',
   },
 };

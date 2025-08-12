@@ -27,6 +27,124 @@ interface Props {
   onClose: () => void;
 }
 
+interface ItemProps {
+  item: TranscriptionHistoryItem;
+  onSelectItem: (item: TranscriptionHistoryItem) => void;
+  onDeleteItem: (id: string) => void;
+  colors: any;
+}
+
+// Separate component for list items to properly use hooks
+const HistoryItem: React.FC<ItemProps> = ({ item, onSelectItem, onDeleteItem, colors }) => {
+  const swipeAnim = useRef(new Animated.Value(0)).current;
+  const { t } = useTranslation();
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dx) > 20;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dx < 0) {
+          swipeAnim.setValue(Math.max(gestureState.dx, -100));
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx < -50) {
+          Animated.timing(swipeAnim, {
+            toValue: -100,
+            duration: 200,
+            useNativeDriver: false,
+          }).start();
+        } else {
+          Animated.timing(swipeAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: false,
+          }).start();
+        }
+      },
+    }),
+  ).current;
+
+  const handleDelete = () => {
+    Alert.alert(t('history.deleteTitle'), t('history.deleteMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.delete'),
+        style: 'destructive',
+        onPress: () => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          onDeleteItem(item.id);
+        },
+      },
+    ]);
+  };
+
+  const handleCopy = () => {
+    Clipboard.setStringAsync(item.text);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  return (
+    <View style={styles.itemContainer}>
+      <Animated.View
+        style={[
+          styles.deleteButton,
+          {
+            transform: [
+              {
+                translateX: swipeAnim.interpolate({
+                  inputRange: [-100, 0],
+                  outputRange: [0, 100],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <TouchableOpacity onPress={handleDelete} style={styles.deleteButtonInner}>
+          <Ionicons name="trash" size={24} color="#fff" />
+        </TouchableOpacity>
+      </Animated.View>
+
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={[
+          styles.itemContent,
+          {
+            backgroundColor: colors.surface,
+            transform: [{ translateX: swipeAnim }],
+          },
+        ]}
+      >
+        <TouchableOpacity onPress={() => onSelectItem(item)} style={styles.itemTouchable}>
+          <View style={styles.itemHeader}>
+            <Text style={[styles.itemDate, { color: colors.textSecondary }]}>
+              {item.date} • {new Date(item.timestamp).toLocaleTimeString()}
+            </Text>
+            {item.source === 'shared' && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>Shared</Text>
+              </View>
+            )}
+          </View>
+
+          <Text style={[styles.itemText, { color: colors.text }]} numberOfLines={3}>
+            {item.text}
+          </Text>
+
+          <View style={styles.itemActions}>
+            <TouchableOpacity onPress={handleCopy} style={styles.actionButton}>
+              <Ionicons name="copy-outline" size={18} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
+  );
+};
+
 export const TranscriptionHistory: React.FC<Props> = ({
   history,
   onSelectItem,
@@ -42,116 +160,14 @@ export const TranscriptionHistory: React.FC<Props> = ({
     item.text.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const renderItem = ({ item }: { item: TranscriptionHistoryItem }) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const swipeAnim = useRef(new Animated.Value(0)).current;
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const panResponder = useRef(
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gestureState) => {
-          return Math.abs(gestureState.dx) > 20;
-        },
-        onPanResponderMove: (_, gestureState) => {
-          if (gestureState.dx < 0) {
-            swipeAnim.setValue(Math.max(gestureState.dx, -100));
-          }
-        },
-        onPanResponderRelease: (_, gestureState) => {
-          if (gestureState.dx < -50) {
-            Animated.timing(swipeAnim, {
-              toValue: -100,
-              duration: 200,
-              useNativeDriver: false,
-            }).start();
-          } else {
-            Animated.timing(swipeAnim, {
-              toValue: 0,
-              duration: 200,
-              useNativeDriver: false,
-            }).start();
-          }
-        },
-      }),
-    ).current;
-
-    const handleDelete = () => {
-      Alert.alert(t('history.deleteTitle'), t('history.deleteMessage'), [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: () => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            onDeleteItem(item.id);
-          },
-        },
-      ]);
-    };
-
-    const handleCopy = () => {
-      Clipboard.setStringAsync(item.text);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    };
-
-    return (
-      <View style={styles.itemContainer}>
-        <Animated.View
-          style={[
-            styles.deleteButton,
-            {
-              transform: [
-                {
-                  translateX: swipeAnim.interpolate({
-                    inputRange: [-100, 0],
-                    outputRange: [0, 100],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          <TouchableOpacity onPress={handleDelete} style={styles.deleteButtonInner}>
-            <Ionicons name="trash" size={24} color="#fff" />
-          </TouchableOpacity>
-        </Animated.View>
-
-        <Animated.View
-          {...panResponder.panHandlers}
-          style={[
-            styles.itemContent,
-            {
-              backgroundColor: colors.surface,
-              transform: [{ translateX: swipeAnim }],
-            },
-          ]}
-        >
-          <TouchableOpacity onPress={() => onSelectItem(item)} style={styles.itemTouchable}>
-            <View style={styles.itemHeader}>
-              <Text style={[styles.itemDate, { color: colors.textSecondary }]}>
-                {item.date} • {new Date(item.timestamp).toLocaleTimeString()}
-              </Text>
-              {item.source === 'shared' && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>Shared</Text>
-                </View>
-              )}
-            </View>
-
-            <Text style={[styles.itemText, { color: colors.text }]} numberOfLines={3}>
-              {item.text}
-            </Text>
-
-            <View style={styles.itemActions}>
-              <TouchableOpacity onPress={handleCopy} style={styles.actionButton}>
-                <Ionicons name="copy-outline" size={18} color={colors.primary} />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    );
-  };
+  const renderItem = ({ item }: { item: TranscriptionHistoryItem }) => (
+    <HistoryItem
+      item={item}
+      onSelectItem={onSelectItem}
+      onDeleteItem={onDeleteItem}
+      colors={colors}
+    />
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
