@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from './ModernCard';
 import { ModernButton } from './ModernButton';
@@ -43,6 +44,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
 }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [apiKeyVisible, setApiKeyVisible] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [validationStatus, setValidationStatus] = useState<'valid' | 'invalid' | null>(null);
@@ -409,7 +411,20 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View
+      style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
+    >
+      {/* Modal Header with Close Button */}
+      <View style={styles.modalHeader}>
+        <View style={{ width: 40 }} />
+        <Text style={[styles.modalTitle, { color: colors.text }]}>
+          {type === 'stt' ? 'Speech-to-Text' : 'Text-to-Speech'}
+        </Text>
+        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <Ionicons name="close" size={24} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+
       {/* Progress Indicator */}
       <View style={styles.progressBar}>
         <View
@@ -434,11 +449,23 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: designTokens.radius.xl,
     borderTopRightRadius: designTokens.radius.xl,
   },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: designTokens.spacing.lg,
+    paddingVertical: designTokens.spacing.md,
+  },
+  modalTitle: {
+    ...designTokens.typography.headlineSmall,
+    fontWeight: '600',
+  },
+  closeButton: {
+    padding: designTokens.spacing.xs,
+  },
   progressBar: {
     height: 4,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    borderTopLeftRadius: designTokens.radius.xl,
-    borderTopRightRadius: designTokens.radius.xl,
   },
   progressFill: {
     height: '100%',
