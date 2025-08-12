@@ -443,9 +443,11 @@ export const Modern2025SettingsScreen: React.FC = () => {
   const renderProvidersTab = () => (
     <Animated.View style={{ opacity: fadeAnim }}>
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>AI Providers</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          {t('settings.aiProviders')}
+        </Text>
         <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
-          Configure your AI service providers and API keys
+          {t('settings.aiProvidersDescription')}
         </Text>
 
         {/* Speech-to-Text Provider */}
@@ -467,19 +469,23 @@ export const Modern2025SettingsScreen: React.FC = () => {
               (settings.sttProvider?.includes('google') && settings.apiKeys?.google) ? (
                 <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-                  <Text style={[styles.statusText, { color: colors.success }]}>Configured</Text>
+                  <Text style={[styles.statusText, { color: colors.success }]}>
+                    {t('settings.configured')}
+                  </Text>
                 </View>
               ) : (
                 <View style={[styles.statusBadge, { backgroundColor: colors.warning + '20' }]}>
                   <Ionicons name="warning" size={16} color={colors.warning} />
-                  <Text style={[styles.statusText, { color: colors.warning }]}>Setup Required</Text>
+                  <Text style={[styles.statusText, { color: colors.warning }]}>
+                    {t('settings.setupRequired')}
+                  </Text>
                 </View>
               )}
             </View>
           </View>
 
           <ModernButton
-            title="Configure"
+            title={t('settings.configure')}
             onPress={() => openProviderConfig('stt')}
             variant="glass"
             size="small"
@@ -510,19 +516,23 @@ export const Modern2025SettingsScreen: React.FC = () => {
               (settings.ttsProvider?.includes('elevenlabs') && settings.apiKeys?.elevenlabs) ? (
                 <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-                  <Text style={[styles.statusText, { color: colors.success }]}>Configured</Text>
+                  <Text style={[styles.statusText, { color: colors.success }]}>
+                    {t('settings.configured')}
+                  </Text>
                 </View>
               ) : (
                 <View style={[styles.statusBadge, { backgroundColor: colors.warning + '20' }]}>
                   <Ionicons name="warning" size={16} color={colors.warning} />
-                  <Text style={[styles.statusText, { color: colors.warning }]}>Setup Required</Text>
+                  <Text style={[styles.statusText, { color: colors.warning }]}>
+                    {t('settings.setupRequired')}
+                  </Text>
                 </View>
               )}
             </View>
           </View>
 
           <ModernButton
-            title="Configure"
+            title={t('settings.configure')}
             onPress={() => openProviderConfig('tts')}
             variant="glass"
             size="small"
@@ -551,7 +561,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
           </LinearGradient>
           <Text style={[styles.appName, { color: colors.text }]}>VoiceFlow</Text>
           <Text style={[styles.appVersion, { color: colors.textSecondary }]}>
-            Version {APP_VERSION} (Build {BUILD_NUMBER})
+            {t('settings.version')} {APP_VERSION} ({t('settings.build')} {BUILD_NUMBER})
           </Text>
         </View>
 
@@ -559,7 +569,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
         <ModernCard variant="glass" style={styles.card}>
           <TouchableOpacity style={styles.linkRow} onPress={() => openURL(GITHUB_URL)}>
             <Ionicons name="logo-github" size={22} color={colors.text} />
-            <Text style={[styles.linkText, { color: colors.text }]}>GitHub Repository</Text>
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.githubRepository')}
+            </Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
 
@@ -581,7 +593,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
             onPress={() => Alert.alert('Rate App', 'Thank you for your support!')}
           >
             <Ionicons name="star-outline" size={22} color={colors.text} />
-            <Text style={[styles.linkText, { color: colors.text }]}>Rate this App</Text>
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.rateThisApp')}
+            </Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </ModernCard>
@@ -590,7 +604,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
         <ModernCard variant="surface" style={styles.card}>
           <TouchableOpacity style={styles.linkRow} onPress={() => openURL(PRIVACY_URL)}>
             <Ionicons name="shield-checkmark-outline" size={22} color={colors.text} />
-            <Text style={[styles.linkText, { color: colors.text }]}>Privacy Policy</Text>
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.privacyPolicy')}
+            </Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
 
@@ -598,7 +614,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
           <TouchableOpacity style={styles.linkRow} onPress={() => openURL(TERMS_URL)}>
             <Ionicons name="document-text-outline" size={22} color={colors.text} />
-            <Text style={[styles.linkText, { color: colors.text }]}>Terms of Service</Text>
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.termsOfService')}
+            </Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </ModernCard>
@@ -606,7 +624,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* Developer */}
         <View style={styles.developerInfo}>
           <Text style={[styles.developerText, { color: colors.textSecondary }]}>
-            Made with ❤️ by Andreas Kalkusinski
+            {t('settings.madeWithLove')} Andreas Kalkusinski
           </Text>
           <Text style={[styles.copyrightText, { color: colors.textMuted }]}>
             © 2024 VoiceFlow. All rights reserved.
