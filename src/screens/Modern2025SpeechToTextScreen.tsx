@@ -19,6 +19,7 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ModernCard } from '../components/ModernCard';
 import { StorageService } from '../services/storage';
 import { OpenAIService } from '../services/openai';
@@ -29,6 +30,7 @@ import { designTokens } from '../utils/design-system';
 import { vh, vw } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSharedAudio } from '../contexts/SharedAudioContext';
 
 export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -43,6 +45,20 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
   const screenTheme = getScreenTheme('Speech to Text', isDark);
   const { t } = useTranslation();
+  const { sharedAudioUri, clearSharedAudio, hasSharedAudio } = useSharedAudio();
+
+  // Keep screen awake while recording
+  useEffect(() => {
+    if (isRecording) {
+      activateKeepAwakeAsync();
+    } else {
+      deactivateKeepAwake();
+    }
+
+    return () => {
+      deactivateKeepAwake();
+    };
+  }, [isRecording]);
 
   // Use useRef for Animated values to work in release builds
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -57,8 +73,46 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
-    }, []),
+
+      // Check if there's a shared audio file to process
+      if (hasSharedAudio && sharedAudioUri) {
+        processSharedAudio();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasSharedAudio, sharedAudioUri]),
   );
+
+  const processSharedAudio = async () => {
+    if (!sharedAudioUri || !settings) return;
+
+    try {
+      setIsProcessing(true);
+      showStatus(t('speechToText.status.transcribing'));
+
+      const openaiService = new OpenAIService(settings.apiKeys?.openai || settings.openaiApiKey);
+
+      // Transcribe the shared audio file
+      const text = await openaiService.transcribeAudio(
+        sharedAudioUri,
+        settings.providerSettings?.['openai-stt']?.model || settings.sttModel || 'whisper-1',
+      );
+
+      if (text) {
+        setTranscribedText(text);
+        showStatus(t('speechToText.status.complete'));
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+
+      // Clear the shared audio after processing
+      clearSharedAudio();
+    } catch (error) {
+      console.error('Error processing shared audio:', error);
+      showStatus(t('speechToText.status.failed'));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   useEffect(() => {
     if (isRecording) {
