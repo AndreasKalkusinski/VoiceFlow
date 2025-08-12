@@ -259,39 +259,61 @@ export const Modern2025SettingsScreen: React.FC = () => {
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             {t('settings.theme.title')}
           </Text>
-          <View style={styles.segmentedControl}>
+          <View style={styles.themeSelector}>
             {[
-              { id: 'auto', name: t('settings.theme.auto'), iconName: 'contrast-outline' },
-              { id: 'light', name: t('settings.theme.light'), iconName: 'sunny-outline' },
-              { id: 'dark', name: t('settings.theme.dark'), iconName: 'moon-outline' },
+              {
+                id: 'auto',
+                name: t('settings.theme.auto'),
+                iconName: 'contrast-outline',
+                gradient: ['#6366F1', '#8B5CF6'],
+              },
+              {
+                id: 'light',
+                name: t('settings.theme.light'),
+                iconName: 'sunny-outline',
+                gradient: ['#FCD34D', '#F59E0B'],
+              },
+              {
+                id: 'dark',
+                name: t('settings.theme.dark'),
+                iconName: 'moon-outline',
+                gradient: ['#4B5563', '#1F2937'],
+              },
             ].map((option) => (
               <TouchableOpacity
                 key={option.id}
-                style={[
-                  styles.segment,
-                  themeMode === option.id && [
-                    styles.segmentActive,
-                    { backgroundColor: colors.primary + '20' },
-                  ],
-                ]}
+                style={[styles.themeOption, themeMode === option.id && styles.themeOptionActive]}
                 onPress={() => {
                   setTheme(option.id as ThemeMode);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
               >
-                <Ionicons
-                  name={option.iconName as keyof typeof Ionicons.glyphMap}
-                  size={16}
-                  color={themeMode === option.id ? colors.primary : colors.text}
-                />
+                <LinearGradient
+                  colors={
+                    themeMode === option.id
+                      ? (option.gradient as [string, string])
+                      : ['#F3F4F6', '#E5E7EB']
+                  }
+                  style={styles.themeIconContainer}
+                >
+                  <Ionicons
+                    name={option.iconName as keyof typeof Ionicons.glyphMap}
+                    size={20}
+                    color={themeMode === option.id ? '#FFFFFF' : '#6B7280'}
+                  />
+                </LinearGradient>
                 <Text
                   style={[
-                    styles.segmentText,
+                    styles.themeText,
                     { color: themeMode === option.id ? colors.primary : colors.text },
+                    themeMode === option.id && { fontWeight: '600' },
                   ]}
                 >
                   {option.name}
                 </Text>
+                {themeMode === option.id && (
+                  <View style={[styles.activeIndicator, { backgroundColor: colors.primary }]} />
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -301,34 +323,39 @@ export const Modern2025SettingsScreen: React.FC = () => {
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             {t('settings.language')}
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.chipContainer}>
-              {availableLanguages.map((lang) => (
-                <TouchableOpacity
-                  key={lang.code}
+          <View style={styles.languageSelector}>
+            {availableLanguages.map((lang) => (
+              <TouchableOpacity
+                key={lang.code}
+                style={[
+                  styles.languageOption,
+                  selectedLanguage === lang.code && styles.languageOptionActive,
+                ]}
+                onPress={() => handleLanguageChange(lang.code)}
+              >
+                <View
                   style={[
-                    styles.chip,
-                    selectedLanguage === lang.code && [
-                      styles.chipActive,
-                      { backgroundColor: colors.primary },
-                    ],
+                    styles.languageIconContainer,
+                    selectedLanguage === lang.code && { backgroundColor: colors.primary + '20' },
                   ]}
-                  onPress={() => handleLanguageChange(lang.code)}
                 >
-                  <Text
-                    style={[
-                      styles.chipText,
-                      {
-                        color: selectedLanguage === lang.code ? colors.textOnPrimary : colors.text,
-                      },
-                    ]}
-                  >
-                    {lang.flag} {lang.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
+                  <Text style={styles.flagEmoji}>{lang.flag}</Text>
+                </View>
+                <Text
+                  style={[
+                    styles.languageText,
+                    { color: selectedLanguage === lang.code ? colors.primary : colors.text },
+                    selectedLanguage === lang.code && { fontWeight: '600' },
+                  ]}
+                >
+                  {lang.name}
+                </Text>
+                {selectedLanguage === lang.code && (
+                  <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
         </ModernCard>
       </View>
 
@@ -801,6 +828,7 @@ const styles = StyleSheet.create({
     marginTop: designTokens.spacing.xs,
     lineHeight: 18,
   },
+  // Old styles kept for history section
   segmentedControl: {
     flexDirection: 'row',
     backgroundColor: 'rgba(0, 0, 0, 0.02)',
@@ -817,29 +845,9 @@ const styles = StyleSheet.create({
     borderRadius: designTokens.radius.sm,
     gap: designTokens.spacing.xs,
   },
-  segmentActive: {
-    ...designTokens.elevation.sm,
-  },
   segmentText: {
     ...designTokens.typography.labelMedium,
     fontWeight: '600',
-  },
-  chipContainer: {
-    flexDirection: 'row',
-    gap: designTokens.spacing.sm,
-  },
-  chip: {
-    paddingVertical: designTokens.spacing.sm,
-    paddingHorizontal: designTokens.spacing.md,
-    borderRadius: designTokens.radius.full,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  chipActive: {
-    ...designTokens.elevation.sm,
-  },
-  chipText: {
-    ...designTokens.typography.labelMedium,
-    fontWeight: '500',
   },
   switchRow: {
     flexDirection: 'row',
@@ -964,5 +972,78 @@ const styles = StyleSheet.create({
   modal: {
     margin: 0,
     justifyContent: 'flex-end',
+  },
+
+  // Theme Selector Styles
+  themeSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: designTokens.spacing.sm,
+  },
+  themeOption: {
+    flex: 1,
+    alignItems: 'center',
+    padding: designTokens.spacing.md,
+    borderRadius: designTokens.radius.lg,
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  themeOptionActive: {
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    backgroundColor: 'rgba(99, 102, 241, 0.05)',
+  },
+  themeIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: designTokens.spacing.xs,
+  },
+  themeText: {
+    ...designTokens.typography.labelSmall,
+    marginTop: designTokens.spacing.xs,
+  },
+  activeIndicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: designTokens.spacing.xs,
+  },
+
+  // Language Selector Styles
+  languageSelector: {
+    gap: designTokens.spacing.sm,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: designTokens.spacing.md,
+    borderRadius: designTokens.radius.lg,
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+    borderWidth: 2,
+    borderColor: 'transparent',
+    marginBottom: designTokens.spacing.xs,
+  },
+  languageOptionActive: {
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    backgroundColor: 'rgba(99, 102, 241, 0.05)',
+  },
+  languageIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    marginRight: designTokens.spacing.md,
+  },
+  flagEmoji: {
+    fontSize: 20,
+  },
+  languageText: {
+    ...designTokens.typography.bodyMedium,
+    flex: 1,
   },
 });

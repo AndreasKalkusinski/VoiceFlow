@@ -142,6 +142,7 @@ export default {
     visitProvider: 'Besuche {provider} für deinen API-Schlüssel',
 
     theme: {
+      title: 'Design',
       auto: 'Auto',
       light: 'Hell',
       dark: 'Dunkel',

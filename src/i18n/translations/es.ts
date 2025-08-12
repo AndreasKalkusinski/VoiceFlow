@@ -124,6 +124,7 @@ export default {
     visitProvider: 'Visita {provider} para obtener tu clave API',
 
     theme: {
+      title: 'Tema',
       auto: 'Auto',
       light: 'Claro',
       dark: 'Oscuro',

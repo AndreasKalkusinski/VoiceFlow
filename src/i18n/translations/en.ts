@@ -141,6 +141,7 @@ export default {
     visitProvider: 'Visit {provider} to get your API key',
 
     theme: {
+      title: 'Theme',
       auto: 'Auto',
       light: 'Light',
       dark: 'Dark',
