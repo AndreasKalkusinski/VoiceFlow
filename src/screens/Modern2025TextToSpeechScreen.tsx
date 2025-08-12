@@ -100,10 +100,14 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         playsInSilentModeIOS: true,
-        staysActiveInBackground: false,
+        staysActiveInBackground: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+        interruptionModeIOS: 1, // Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX
+        interruptionModeAndroid: 1, // Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX
       });
-    } catch {
-      /* ignore */
+    } catch (error) {
+      console.error('Audio setup error:', error);
     }
   };
 
@@ -143,13 +147,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         currentSettings.ttsVoice ||
         'alloy';
 
-      console.log('TTS Settings:', {
-        apiKey: apiKey ? 'Set (hidden)' : 'Not set',
-        model: ttsModel,
-        voice: ttsVoice,
-        inputLength: inputText.length,
-        providerSettings: currentSettings.providerSettings?.['openai-tts'],
-      });
+      // TTS Settings logging disabled for production
 
       if (!apiKey) {
         throw new Error('API key is missing');
@@ -162,9 +160,17 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         await sound.unloadAsync();
       }
 
+      // Setup audio mode before creating sound
+      await setupAudio();
+
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: newAudioUri },
-        { shouldPlay: true },
+        {
+          shouldPlay: true,
+          volume: 1.0,
+          rate: 1.0,
+          isLooping: false,
+        },
       );
 
       setSound(newSound);
@@ -233,9 +239,17 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       // If no sound object but we have audio URI, recreate the sound
       if (audioUri) {
         try {
+          // Setup audio mode before creating sound
+          await setupAudio();
+
           const { sound: newSound } = await Audio.Sound.createAsync(
             { uri: audioUri },
-            { shouldPlay: true },
+            {
+              shouldPlay: true,
+              volume: 1.0,
+              rate: 1.0,
+              isLooping: false,
+            },
           );
 
           setSound(newSound);
