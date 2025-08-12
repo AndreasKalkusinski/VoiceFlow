@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { GlassCard } from './GlassCard';
@@ -27,6 +28,10 @@ interface ModelDropdownProps {
   onValueChange: (value: string) => void;
   loading?: boolean;
   placeholder?: string;
+  onRefresh?: () => Promise<void>;
+  lastRefresh?: Date | null;
+  error?: string | null;
+  refreshing?: boolean;
 }
 
 export const ModelDropdown: React.FC<ModelDropdownProps> = ({
@@ -36,6 +41,10 @@ export const ModelDropdown: React.FC<ModelDropdownProps> = ({
   onValueChange,
   loading = false,
   placeholder = 'Select a model',
+  onRefresh,
+  lastRefresh,
+  error,
+  refreshing = false,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { colors, isDark } = useTheme();
@@ -53,20 +62,64 @@ export const ModelDropdown: React.FC<ModelDropdownProps> = ({
     setModalVisible(true);
   };
 
+  const handleRefresh = async () => {
+    if (!onRefresh) return;
+
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      await onRefresh();
+    } catch {
+      Alert.alert(
+        'Refresh Failed',
+        'Failed to refresh models. Please check your API key and connection.',
+        [{ text: 'OK' }],
+      );
+    }
+  };
+
+  const formatLastRefresh = (date: Date | null): string => {
+    if (!date) return 'Never updated';
+
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 1) return 'Just updated';
+    if (diffMinutes < 60) return `Updated ${diffMinutes}m ago`;
+    if (diffHours < 24) return `Updated ${diffHours}h ago`;
+    return `Updated ${diffDays}d ago`;
+  };
+
   return (
     <View style={styles.container}>
       <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
 
-      <TouchableOpacity onPress={openModal} disabled={loading}>
+      <TouchableOpacity onPress={openModal} disabled={loading || refreshing}>
         <GlassCard style={styles.dropdownButton}>
           <View style={styles.dropdownContent}>
-            {loading ? (
-              <ActivityIndicator size="small" color={colors.primary} />
+            {loading || refreshing ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+                  {refreshing ? 'Refreshing models...' : 'Loading...'}
+                </Text>
+              </View>
             ) : (
               <>
-                <Text style={[styles.selectedText, { color: colors.text }]}>
-                  {selectedOption?.name || value || placeholder}
-                </Text>
+                <View style={styles.textContainer}>
+                  <Text
+                    style={[styles.selectedText, { color: error ? colors.error : colors.text }]}
+                  >
+                    {selectedOption?.name || value || placeholder}
+                  </Text>
+                  {error && (
+                    <Text style={[styles.errorText, { color: colors.error }]}>
+                      Failed to load models
+                    </Text>
+                  )}
+                </View>
                 <Text style={[styles.arrow, { color: colors.textSecondary }]}>▼</Text>
               </>
             )}
@@ -93,11 +146,39 @@ export const ModelDropdown: React.FC<ModelDropdownProps> = ({
             />
 
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>{label}</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Text style={[styles.closeButton, { color: colors.primary }]}>✕</Text>
-              </TouchableOpacity>
+              <View>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{label}</Text>
+                {lastRefresh && (
+                  <Text style={[styles.lastRefreshText, { color: colors.textSecondary }]}>
+                    {formatLastRefresh(lastRefresh)}
+                  </Text>
+                )}
+              </View>
+              <View style={styles.headerActions}>
+                {onRefresh && (
+                  <TouchableOpacity
+                    onPress={handleRefresh}
+                    disabled={refreshing}
+                    style={[styles.refreshButton, { marginRight: spacing.sm }]}
+                  >
+                    {refreshing ? (
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    ) : (
+                      <Text style={[styles.refreshIcon, { color: colors.primary }]}>↻</Text>
+                    )}
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Text style={[styles.closeButton, { color: colors.primary }]}>✕</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+
+            {error && (
+              <View style={[styles.errorContainer, { backgroundColor: colors.error + '20' }]}>
+                <Text style={[styles.errorMessage, { color: colors.error }]}>{error}</Text>
+              </View>
+            )}
 
             <FlatList
               data={options}
@@ -160,9 +241,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  loadingText: {
+    fontSize: fontSizes.small,
+    marginLeft: spacing.xs,
+  },
+  textContainer: {
+    flex: 1,
+  },
   selectedText: {
     fontSize: fontSizes.medium,
-    flex: 1,
+    marginBottom: 2,
+  },
+  errorText: {
+    fontSize: fontSizes.tiny,
   },
   arrow: {
     fontSize: fontSizes.small,
@@ -192,9 +288,34 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.large,
     fontWeight: '700',
   },
+  lastRefreshText: {
+    fontSize: fontSizes.tiny,
+    marginTop: 2,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  refreshButton: {
+    padding: spacing.xs,
+  },
+  refreshIcon: {
+    fontSize: fontSizes.large,
+    fontWeight: '600',
+  },
   closeButton: {
     fontSize: fontSizes.xl,
     fontWeight: '600',
+  },
+  errorContainer: {
+    padding: spacing.sm,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    borderRadius: 8,
+  },
+  errorMessage: {
+    fontSize: fontSizes.small,
+    textAlign: 'center',
   },
   optionsList: {
     paddingBottom: spacing.xl,

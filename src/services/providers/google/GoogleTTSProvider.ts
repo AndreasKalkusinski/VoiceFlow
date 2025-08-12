@@ -3,6 +3,7 @@ import * as FileSystem from 'expo-file-system';
 // Buffer import removed - not used
 import { BaseTTSProvider } from '../BaseProvider';
 import { TTSOptions, TTSModel, TTSVoice } from '../types';
+import { ModelService } from '../../ModelService';
 
 export class GoogleTTSProvider extends BaseTTSProvider {
   id = 'google-tts';
@@ -10,25 +11,21 @@ export class GoogleTTSProvider extends BaseTTSProvider {
   description = 'Natural voices powered by Google';
   requiresApiKey = true;
 
-  models: TTSModel[] = [
-    {
-      id: 'neural2',
-      name: 'Neural2',
-      description: 'Latest neural voices with best quality',
-    },
-    {
-      id: 'wavenet',
-      name: 'WaveNet',
-      description: 'High-quality voices',
-    },
-    {
-      id: 'standard',
-      name: 'Standard',
-      description: 'Basic quality, lower cost',
-    },
-  ];
+  private _models: TTSModel[] | null = null;
+  private _voices: TTSVoice[] | null = null;
+  private _isLoadingModels = false;
+  private _isLoadingVoices = false;
+  private modelService = ModelService.getInstance();
 
-  voices: TTSVoice[] = [
+  get models(): TTSModel[] {
+    return this._models || this.modelService.getFallbackGoogleModels();
+  }
+
+  get voices(): TTSVoice[] {
+    return this._voices || this.modelService.getFallbackGoogleVoices();
+  }
+
+  private fallbackVoices: TTSVoice[] = [
     // English voices
     {
       id: 'en-US-Neural2-A',
@@ -142,6 +139,66 @@ export class GoogleTTSProvider extends BaseTTSProvider {
   ];
 
   private baseURL = 'https://texttospeech.googleapis.com/v1';
+
+  /**
+   * Load models and voices from Google Cloud API
+   */
+  async loadModelsAndVoices(
+    apiKey: string,
+    forceRefresh: boolean = false,
+  ): Promise<{ models: TTSModel[]; voices: TTSVoice[] }> {
+    if ((this._isLoadingModels || this._isLoadingVoices) && !forceRefresh) {
+      return { models: this.models, voices: this.voices };
+    }
+
+    this._isLoadingModels = true;
+    this._isLoadingVoices = true;
+
+    try {
+      // Load models (static for Google)
+      const models = this.modelService.getFallbackGoogleModels();
+
+      // Load voices from API
+      const voices = await this.modelService.fetchGoogleVoices(apiKey, forceRefresh);
+
+      this._models = models;
+      this._voices = voices;
+
+      return { models, voices };
+    } catch (error) {
+      console.error('Failed to load Google models/voices, using fallback:', error);
+      const fallbackModels = this.modelService.getFallbackGoogleModels();
+      const fallbackVoices = this.modelService.getFallbackGoogleVoices();
+
+      if (!this._models) this._models = fallbackModels;
+      if (!this._voices) this._voices = fallbackVoices;
+
+      return { models: this._models, voices: this._voices };
+    } finally {
+      this._isLoadingModels = false;
+      this._isLoadingVoices = false;
+    }
+  }
+
+  /**
+   * Check if models/voices are currently being loaded
+   */
+  get isLoadingModels(): boolean {
+    return this._isLoadingModels;
+  }
+
+  get isLoadingVoices(): boolean {
+    return this._isLoadingVoices;
+  }
+
+  /**
+   * Refresh models and voices
+   */
+  async refreshModelsAndVoices(
+    apiKey: string,
+  ): Promise<{ models: TTSModel[]; voices: TTSVoice[] }> {
+    return this.loadModelsAndVoices(apiKey, true);
+  }
 
   async synthesize(text: string, options: TTSOptions): Promise<string> {
     if (!options.apiKey) {

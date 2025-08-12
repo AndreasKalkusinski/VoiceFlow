@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Animated,
   Platform,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,7 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
 import { ModernButton } from '../components/ModernButton';
-import { ProviderSettings } from '../components/ProviderSettings';
+import { ProviderConfigModal } from '../components/ProviderConfigModal';
 import { StorageService } from '../services/storage';
 import { Settings } from '../types';
 import { useTheme, ThemeMode } from '../hooks/useTheme';
@@ -26,8 +27,20 @@ import { designTokens } from '../utils/design-system';
 import { vh } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
 import * as Haptics from 'expo-haptics';
+import { HistoryStorage, HistorySettings } from '../services/historyStorage';
+import Modal from 'react-native-modal';
+
+type TabType = 'general' | 'providers' | 'about';
+
+// App Info
+const APP_VERSION = '1.1.0';
+const BUILD_NUMBER = '42';
+const GITHUB_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow';
+const PRIVACY_URL = 'https://example.com/privacy';
+const TERMS_URL = 'https://example.com/terms';
 
 export const Modern2025SettingsScreen: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<TabType>('general');
   const [settings, setSettings] = useState<Settings>({
     openaiApiKey: '',
     sttModel: 'whisper-1',
@@ -44,6 +57,13 @@ export const Modern2025SettingsScreen: React.FC = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [autoSave, setAutoSave] = useState(false);
+  const [historySettings, setHistorySettings] = useState<HistorySettings>({
+    enabled: true,
+    maxItems: 25,
+  });
+  const [showProviderModal, setShowProviderModal] = useState(false);
+  const [providerModalType, setProviderModalType] = useState<'stt' | 'tts'>('stt');
+
   const saveTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
@@ -56,6 +76,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
   useEffect(() => {
     loadSettings();
     loadAutoSavePreference();
+    loadHistorySettings();
 
     // Smooth fade in animation
     Animated.timing(fadeAnim, {
@@ -113,6 +134,36 @@ export const Modern2025SettingsScreen: React.FC = () => {
     }
   };
 
+  const loadHistorySettings = async () => {
+    try {
+      const settings = await HistoryStorage.getSettings();
+      setHistorySettings(settings);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const updateHistorySettings = async (newSettings: HistorySettings) => {
+    setHistorySettings(newSettings);
+    await HistoryStorage.saveSettings(newSettings);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const clearHistory = async () => {
+    Alert.alert(t('history.clearTitle'), t('history.clearMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.clear'),
+        style: 'destructive',
+        onPress: async () => {
+          await HistoryStorage.clearHistory();
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          Alert.alert(t('common.success'), t('history.cleared'));
+        },
+      },
+    ]);
+  };
+
   const toggleAutoSave = async (value: boolean) => {
     try {
       await AsyncStorage.setItem('@voiceflow_autosave', value.toString());
@@ -155,14 +206,433 @@ export const Modern2025SettingsScreen: React.FC = () => {
     }
   };
 
-  const voices = [
-    { id: 'alloy', name: t('settings.voices.alloy') },
-    { id: 'echo', name: t('settings.voices.echo') },
-    { id: 'fable', name: t('settings.voices.fable') },
-    { id: 'onyx', name: t('settings.voices.onyx') },
-    { id: 'nova', name: t('settings.voices.nova') },
-    { id: 'shimmer', name: t('settings.voices.shimmer') },
-  ];
+  const openProviderConfig = (type: 'stt' | 'tts') => {
+    setProviderModalType(type);
+    setShowProviderModal(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const openURL = async (url: string) => {
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert(t('common.error'), 'Could not open URL');
+    }
+  };
+
+  const renderTabButton = (tab: TabType, icon: string, label: string) => (
+    <TouchableOpacity
+      style={[
+        styles.tabButton,
+        activeTab === tab && [styles.tabButtonActive, { backgroundColor: colors.primary + '20' }],
+      ]}
+      onPress={() => {
+        setActiveTab(tab);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }}
+    >
+      <Ionicons
+        name={icon as keyof typeof Ionicons.glyphMap}
+        size={20}
+        color={activeTab === tab ? colors.primary : colors.textSecondary}
+      />
+      <Text
+        style={[
+          styles.tabButtonText,
+          { color: activeTab === tab ? colors.primary : colors.textSecondary },
+        ]}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const renderGeneralTab = () => (
+    <Animated.View style={{ opacity: fadeAnim }}>
+      {/* Appearance Section */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          {t('settings.appearance')}
+        </Text>
+
+        <ModernCard variant="glass" style={styles.card}>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>
+            {t('settings.theme.title')}
+          </Text>
+          <View style={styles.segmentedControl}>
+            {[
+              { id: 'auto', name: t('settings.theme.auto'), iconName: 'contrast-outline' },
+              { id: 'light', name: t('settings.theme.light'), iconName: 'sunny-outline' },
+              { id: 'dark', name: t('settings.theme.dark'), iconName: 'moon-outline' },
+            ].map((option) => (
+              <TouchableOpacity
+                key={option.id}
+                style={[
+                  styles.segment,
+                  themeMode === option.id && [
+                    styles.segmentActive,
+                    { backgroundColor: colors.primary + '20' },
+                  ],
+                ]}
+                onPress={() => {
+                  setTheme(option.id as ThemeMode);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+              >
+                <Ionicons
+                  name={option.iconName as keyof typeof Ionicons.glyphMap}
+                  size={16}
+                  color={themeMode === option.id ? colors.primary : colors.text}
+                />
+                <Text
+                  style={[
+                    styles.segmentText,
+                    { color: themeMode === option.id ? colors.primary : colors.text },
+                  ]}
+                >
+                  {option.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ModernCard>
+
+        <ModernCard variant="glass" style={styles.card}>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>
+            {t('settings.language')}
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.chipContainer}>
+              {availableLanguages.map((lang) => (
+                <TouchableOpacity
+                  key={lang.code}
+                  style={[
+                    styles.chip,
+                    selectedLanguage === lang.code && [
+                      styles.chipActive,
+                      { backgroundColor: colors.primary },
+                    ],
+                  ]}
+                  onPress={() => handleLanguageChange(lang.code)}
+                >
+                  <Text
+                    style={[
+                      styles.chipText,
+                      {
+                        color: selectedLanguage === lang.code ? colors.textOnPrimary : colors.text,
+                      },
+                    ]}
+                  >
+                    {lang.flag} {lang.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </ModernCard>
+      </View>
+
+      {/* Data & Privacy Section */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Data & Privacy</Text>
+
+        {/* Auto-Save */}
+        <ModernCard variant="surface" style={styles.card}>
+          <View style={styles.switchRow}>
+            <View style={styles.switchContent}>
+              <View style={styles.switchTextContainer}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('settings.autoSave')}</Text>
+                <Text style={[styles.description, { color: colors.textSecondary }]}>
+                  {t('settings.autoSaveDescription')}
+                </Text>
+              </View>
+              <View style={styles.switchContainer}>
+                <Switch
+                  value={autoSave}
+                  onValueChange={toggleAutoSave}
+                  trackColor={{
+                    false: colors.border,
+                    true: colors.primary + '40',
+                  }}
+                  thumbColor={autoSave ? colors.primary : '#f4f3f4'}
+                  ios_backgroundColor={colors.border}
+                />
+              </View>
+            </View>
+          </View>
+        </ModernCard>
+
+        {/* History Settings */}
+        <ModernCard variant="surface" style={styles.card}>
+          <View style={styles.switchRow}>
+            <View style={styles.switchContent}>
+              <View style={styles.switchTextContainer}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('history.enable')}</Text>
+                <Text style={[styles.description, { color: colors.textSecondary }]}>
+                  {t('history.enableDescription')}
+                </Text>
+              </View>
+              <Switch
+                value={historySettings.enabled}
+                onValueChange={(value) =>
+                  updateHistorySettings({ ...historySettings, enabled: value })
+                }
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={historySettings.enabled ? colors.primaryDark : colors.surface}
+                ios_backgroundColor={colors.border}
+              />
+            </View>
+          </View>
+
+          {historySettings.enabled && (
+            <View style={styles.historyOptions}>
+              <Text style={[styles.label, { color: colors.textSecondary, marginTop: 16 }]}>
+                {t('history.maxItems')}
+              </Text>
+
+              <View style={styles.segmentedControl}>
+                {[10, 25, 50, 'unlimited'].map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={[
+                      styles.segment,
+                      {
+                        backgroundColor:
+                          historySettings.maxItems === option ? colors.primary : colors.surface,
+                        borderColor: colors.border,
+                      },
+                    ]}
+                    onPress={() => {
+                      updateHistorySettings({
+                        ...historySettings,
+                        maxItems: option as number | 'unlimited',
+                      });
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.segmentText,
+                        {
+                          color:
+                            historySettings.maxItems === option ? colors.background : colors.text,
+                        },
+                      ]}
+                    >
+                      {option === 'unlimited' ? t('history.unlimited') : option}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity
+                style={[styles.dangerButton, { backgroundColor: colors.error + '20' }]}
+                onPress={clearHistory}
+              >
+                <Ionicons name="trash-outline" size={20} color={colors.error} />
+                <Text style={[styles.dangerButtonText, { color: colors.error }]}>
+                  {t('history.clearAll')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </ModernCard>
+      </View>
+    </Animated.View>
+  );
+
+  const renderProvidersTab = () => (
+    <Animated.View style={{ opacity: fadeAnim }}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          {t('settings.aiProviders')}
+        </Text>
+        <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
+          {t('settings.aiProvidersDescription')}
+        </Text>
+
+        {/* Speech-to-Text Provider */}
+        <ModernCard variant="elevated" style={styles.card}>
+          <View style={styles.providerHeader}>
+            <View>
+              <Text style={[styles.label, { color: colors.text }]}>Speech-to-Text</Text>
+              <Text style={[styles.providerName, { color: colors.textSecondary }]}>
+                {settings.sttProvider === 'openai-stt'
+                  ? 'OpenAI Whisper'
+                  : settings.sttProvider === 'google-stt'
+                    ? 'Google Cloud'
+                    : settings.sttProvider}
+              </Text>
+            </View>
+            <View style={styles.providerStatus}>
+              {(settings.sttProvider?.includes('openai') &&
+                (settings.apiKeys?.openai || settings.openaiApiKey)) ||
+              (settings.sttProvider?.includes('google') && settings.apiKeys?.google) ? (
+                <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
+                  <Ionicons name="checkmark-circle" size={16} color={colors.success} />
+                  <Text style={[styles.statusText, { color: colors.success }]}>
+                    {t('settings.configured')}
+                  </Text>
+                </View>
+              ) : (
+                <View style={[styles.statusBadge, { backgroundColor: colors.warning + '20' }]}>
+                  <Ionicons name="warning" size={16} color={colors.warning} />
+                  <Text style={[styles.statusText, { color: colors.warning }]}>
+                    {t('settings.setupRequired')}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          <ModernButton
+            title={t('settings.configure')}
+            onPress={() => openProviderConfig('stt')}
+            variant="glass"
+            size="small"
+            fullWidth
+            icon={<Ionicons name="settings-outline" size={18} color={colors.text} />}
+          />
+        </ModernCard>
+
+        {/* Text-to-Speech Provider */}
+        <ModernCard variant="elevated" style={styles.card}>
+          <View style={styles.providerHeader}>
+            <View>
+              <Text style={[styles.label, { color: colors.text }]}>Text-to-Speech</Text>
+              <Text style={[styles.providerName, { color: colors.textSecondary }]}>
+                {settings.ttsProvider === 'openai-tts'
+                  ? 'OpenAI TTS'
+                  : settings.ttsProvider === 'google-tts'
+                    ? 'Google Cloud'
+                    : settings.ttsProvider === 'elevenlabs'
+                      ? 'ElevenLabs'
+                      : settings.ttsProvider}
+              </Text>
+            </View>
+            <View style={styles.providerStatus}>
+              {(settings.ttsProvider?.includes('openai') &&
+                (settings.apiKeys?.openai || settings.openaiApiKey)) ||
+              (settings.ttsProvider?.includes('google') && settings.apiKeys?.google) ||
+              (settings.ttsProvider?.includes('elevenlabs') && settings.apiKeys?.elevenlabs) ? (
+                <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
+                  <Ionicons name="checkmark-circle" size={16} color={colors.success} />
+                  <Text style={[styles.statusText, { color: colors.success }]}>
+                    {t('settings.configured')}
+                  </Text>
+                </View>
+              ) : (
+                <View style={[styles.statusBadge, { backgroundColor: colors.warning + '20' }]}>
+                  <Ionicons name="warning" size={16} color={colors.warning} />
+                  <Text style={[styles.statusText, { color: colors.warning }]}>
+                    {t('settings.setupRequired')}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          <ModernButton
+            title={t('settings.configure')}
+            onPress={() => openProviderConfig('tts')}
+            variant="glass"
+            size="small"
+            fullWidth
+            icon={<Ionicons name="settings-outline" size={18} color={colors.text} />}
+          />
+        </ModernCard>
+
+        <View style={styles.infoBox}>
+          <Ionicons name="information-circle-outline" size={20} color={colors.accent} />
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+            API keys are stored locally on your device and never sent to our servers.
+          </Text>
+        </View>
+      </View>
+    </Animated.View>
+  );
+
+  const renderAboutTab = () => (
+    <Animated.View style={{ opacity: fadeAnim }}>
+      <View style={styles.section}>
+        {/* App Info */}
+        <View style={styles.appInfoContainer}>
+          <LinearGradient colors={[colors.primary, colors.accent]} style={styles.appIcon}>
+            <Ionicons name="mic" size={40} color="#fff" />
+          </LinearGradient>
+          <Text style={[styles.appName, { color: colors.text }]}>VoiceFlow</Text>
+          <Text style={[styles.appVersion, { color: colors.textSecondary }]}>
+            {t('settings.version')} {APP_VERSION} ({t('settings.build')} {BUILD_NUMBER})
+          </Text>
+        </View>
+
+        {/* Links */}
+        <ModernCard variant="glass" style={styles.card}>
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(GITHUB_URL)}>
+            <Ionicons name="logo-github" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.githubRepository')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity
+            style={styles.linkRow}
+            onPress={() => Alert.alert('Report Issue', 'Feature coming soon!')}
+          >
+            <Ionicons name="bug-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>Report an Issue</Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity
+            style={styles.linkRow}
+            onPress={() => Alert.alert('Rate App', 'Thank you for your support!')}
+          >
+            <Ionicons name="star-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.rateThisApp')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </ModernCard>
+
+        {/* Legal */}
+        <ModernCard variant="surface" style={styles.card}>
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(PRIVACY_URL)}>
+            <Ionicons name="shield-checkmark-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.privacyPolicy')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(TERMS_URL)}>
+            <Ionicons name="document-text-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.termsOfService')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </ModernCard>
+
+        {/* Developer */}
+        <View style={styles.developerInfo}>
+          <Text style={[styles.developerText, { color: colors.textSecondary }]}>
+            {t('settings.madeWithLove')} Andreas Kalkusinski
+          </Text>
+          <Text style={[styles.copyrightText, { color: colors.textMuted }]}>
+            © 2024 VoiceFlow. All rights reserved.
+          </Text>
+        </View>
+      </View>
+    </Animated.View>
+  );
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
@@ -176,266 +646,86 @@ export const Modern2025SettingsScreen: React.FC = () => {
         style={StyleSheet.absoluteFillObject}
       />
 
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={[styles.screenTitle, { color: colors.text }]}>{t('settings.title')}</Text>
+      </View>
+
+      {/* Tab Bar */}
+      <View style={[styles.tabBar, { backgroundColor: colors.surface + '80' }]}>
+        {renderTabButton('general', 'options-outline', 'General')}
+        {renderTabButton('providers', 'cloud-outline', 'Providers')}
+        {renderTabButton('about', 'information-circle-outline', 'About')}
+      </View>
+
+      {/* Content */}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-          {/* Header with gradient text effect */}
-          <View style={styles.header}>
-            <Text style={[styles.screenTitle, { color: colors.text }]}>{t('settings.title')}</Text>
-            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-              {t('settings.subtitle')}
-            </Text>
+        {activeTab === 'general' && renderGeneralTab()}
+        {activeTab === 'providers' && renderProvidersTab()}
+        {activeTab === 'about' && renderAboutTab()}
+
+        {/* Save Button (visible when auto-save is off and on general tab) */}
+        {!autoSave && activeTab === 'general' && (
+          <View style={styles.saveSection}>
+            <ModernButton
+              title={t('settings.saveSettings')}
+              onPress={saveSettings}
+              variant="glass"
+              size="large"
+              loading={isSaving}
+              fullWidth
+              icon={<Ionicons name="save-outline" size={20} color={colors.text} />}
+            />
           </View>
-
-          {/* Appearance Section with modern cards */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              {t('settings.appearance')}
-            </Text>
-
-            <ModernCard variant="glass" style={styles.card}>
-              <Text style={[styles.label, { color: colors.textSecondary }]}>
-                {t('settings.theme.title')}
-              </Text>
-              <View style={styles.segmentedControl}>
-                {[
-                  { id: 'auto', name: t('settings.theme.auto'), iconName: 'contrast-outline' },
-                  { id: 'light', name: t('settings.theme.light'), iconName: 'sunny-outline' },
-                  { id: 'dark', name: t('settings.theme.dark'), iconName: 'moon-outline' },
-                ].map((option) => (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={[
-                      styles.segment,
-                      themeMode === option.id && [
-                        styles.segmentActive,
-                        { backgroundColor: colors.primary + '20' },
-                      ],
-                    ]}
-                    onPress={() => {
-                      setTheme(option.id as ThemeMode);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                  >
-                    <Ionicons
-                      name={option.iconName as keyof typeof Ionicons.glyphMap}
-                      size={16}
-                      color={themeMode === option.id ? colors.primary : colors.text}
-                    />
-                    <Text
-                      style={[
-                        styles.segmentText,
-                        { color: themeMode === option.id ? colors.primary : colors.text },
-                      ]}
-                    >
-                      {option.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ModernCard>
-
-            <ModernCard variant="glass" style={styles.card}>
-              <Text style={[styles.label, { color: colors.textSecondary }]}>
-                {t('settings.language')}
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={styles.chipContainer}>
-                  {availableLanguages.map((lang) => (
-                    <TouchableOpacity
-                      key={lang.code}
-                      style={[
-                        styles.chip,
-                        selectedLanguage === lang.code && [
-                          styles.chipActive,
-                          { backgroundColor: colors.primary },
-                        ],
-                      ]}
-                      onPress={() => handleLanguageChange(lang.code)}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          {
-                            color:
-                              selectedLanguage === lang.code ? colors.textOnPrimary : colors.text,
-                          },
-                        ]}
-                      >
-                        {lang.flag} {lang.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </ModernCard>
-          </View>
-
-          {/* Providers Section with modern styling */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                {t('settings.providers')}
-              </Text>
-              <View style={[styles.badge, { backgroundColor: colors.success + '20' }]}>
-                <Text style={[styles.badgeText, { color: colors.success }]}>2 Active</Text>
-              </View>
-            </View>
-
-            <ModernCard variant="elevated" style={styles.card}>
-              <ProviderSettings
-                type="stt"
-                selectedProvider={settings.sttProvider || 'openai-stt'}
-                apiKeys={settings.apiKeys || {}}
-                providerSettings={settings.providerSettings || {}}
-                onProviderChange={(providerId) =>
-                  setSettings({ ...settings, sttProvider: providerId })
-                }
-                onApiKeyChange={(provider, key) =>
-                  setSettings({
-                    ...settings,
-                    apiKeys: { ...settings.apiKeys, [provider]: key },
-                    openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
-                  })
-                }
-                onSettingChange={(providerId, setting, value) =>
-                  setSettings({
-                    ...settings,
-                    providerSettings: {
-                      ...settings.providerSettings,
-                      [providerId]: {
-                        ...settings.providerSettings?.[providerId],
-                        [setting]: value,
-                      },
-                    },
-                  })
-                }
-              />
-            </ModernCard>
-
-            <ModernCard variant="elevated" style={styles.card}>
-              <ProviderSettings
-                type="tts"
-                selectedProvider={settings.ttsProvider || 'openai-tts'}
-                apiKeys={settings.apiKeys || {}}
-                providerSettings={settings.providerSettings || {}}
-                onProviderChange={(providerId) =>
-                  setSettings({ ...settings, ttsProvider: providerId })
-                }
-                onApiKeyChange={(provider, key) =>
-                  setSettings({
-                    ...settings,
-                    apiKeys: { ...settings.apiKeys, [provider]: key },
-                    openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
-                  })
-                }
-                onSettingChange={(providerId, setting, value) =>
-                  setSettings({
-                    ...settings,
-                    providerSettings: {
-                      ...settings.providerSettings,
-                      [providerId]: {
-                        ...settings.providerSettings?.[providerId],
-                        [setting]: value,
-                      },
-                    },
-                  })
-                }
-              />
-            </ModernCard>
-          </View>
-
-          {/* Voice Selection with modern grid */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              {t('settings.voiceSelection')}
-            </Text>
-
-            <ModernCard variant="gradient" style={styles.card}>
-              <View style={styles.voiceGrid}>
-                {voices.map((voice) => (
-                  <TouchableOpacity
-                    key={voice.id}
-                    style={[
-                      styles.voiceCard,
-                      settings.ttsVoice === voice.id && [
-                        styles.voiceCardActive,
-                        {
-                          borderColor: colors.primary,
-                          backgroundColor: colors.primary + '10',
-                        },
-                      ],
-                    ]}
-                    onPress={() => {
-                      setSettings({ ...settings, ttsVoice: voice.id });
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.voiceIndicator,
-                        settings.ttsVoice === voice.id && { backgroundColor: colors.primary },
-                      ]}
-                    />
-                    <Text
-                      style={[
-                        styles.voiceName,
-                        { color: settings.ttsVoice === voice.id ? colors.primary : colors.text },
-                      ]}
-                    >
-                      {voice.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ModernCard>
-          </View>
-
-          {/* Auto-Save with modern toggle */}
-          <View style={styles.section}>
-            <ModernCard variant="surface" style={styles.card}>
-              <View style={styles.switchRow}>
-                <View style={styles.switchContent}>
-                  <View style={styles.switchTextContainer}>
-                    <Text style={[styles.label, { color: colors.text }]}>
-                      {t('settings.autoSave')}
-                    </Text>
-                    <Text style={[styles.description, { color: colors.textSecondary }]}>
-                      {t('settings.autoSaveDescription')}
-                    </Text>
-                  </View>
-                  <View style={styles.switchContainer}>
-                    <Switch
-                      value={autoSave}
-                      onValueChange={toggleAutoSave}
-                      trackColor={{
-                        false: colors.border,
-                        true: colors.primary + '40',
-                      }}
-                      thumbColor={autoSave ? colors.primary : '#f4f3f4'}
-                      ios_backgroundColor={colors.border}
-                    />
-                  </View>
-                </View>
-              </View>
-            </ModernCard>
-          </View>
-
-          {/* Save Button with gradient */}
-          {!autoSave && (
-            <View style={styles.saveSection}>
-              <ModernButton
-                title={t('settings.saveSettings')}
-                onPress={saveSettings}
-                variant="glass"
-                size="large"
-                loading={isSaving}
-                fullWidth
-                icon={<Ionicons name="save-outline" size={20} color={colors.text} />}
-              />
-            </View>
-          )}
-        </Animated.View>
+        )}
       </ScrollView>
+
+      {/* Provider Configuration Modal */}
+      <Modal
+        isVisible={showProviderModal}
+        onBackdropPress={() => setShowProviderModal(false)}
+        style={styles.modal}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        backdropOpacity={0.5}
+      >
+        <ProviderConfigModal
+          type={providerModalType}
+          selectedProvider={
+            providerModalType === 'stt'
+              ? settings.sttProvider || 'openai-stt'
+              : settings.ttsProvider || 'openai-tts'
+          }
+          apiKeys={settings.apiKeys || {}}
+          providerSettings={settings.providerSettings || {}}
+          onProviderChange={(providerId) =>
+            setSettings({
+              ...settings,
+              [providerModalType === 'stt' ? 'sttProvider' : 'ttsProvider']: providerId,
+            })
+          }
+          onApiKeyChange={(provider, key) =>
+            setSettings({
+              ...settings,
+              apiKeys: { ...settings.apiKeys, [provider]: key },
+              openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
+            })
+          }
+          onSettingChange={(providerId, setting, value) =>
+            setSettings({
+              ...settings,
+              providerSettings: {
+                ...settings.providerSettings,
+                [providerId]: {
+                  ...settings.providerSettings?.[providerId],
+                  [setting]: value,
+                },
+              },
+            })
+          }
+          onClose={() => setShowProviderModal(false)}
+        />
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -449,46 +739,55 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  content: {
-    paddingHorizontal: designTokens.spacing.lg,
-    paddingTop: designTokens.spacing.xl,
-    paddingBottom: vh(12), // Space for tab bar
-  },
   header: {
-    marginBottom: designTokens.spacing.xl,
+    paddingHorizontal: designTokens.spacing.lg,
+    paddingTop: designTokens.spacing.md,
+    paddingBottom: designTokens.spacing.sm,
   },
   screenTitle: {
     ...designTokens.typography.displaySmall,
     fontWeight: '700',
-    marginBottom: designTokens.spacing.xs,
   },
-  subtitle: {
-    ...designTokens.typography.bodyLarge,
+  tabBar: {
+    flexDirection: 'row',
+    marginHorizontal: designTokens.spacing.lg,
+    marginBottom: designTokens.spacing.md,
+    borderRadius: designTokens.radius.lg,
+    padding: designTokens.spacing.xs,
+    ...designTokens.elevation.sm,
+  },
+  tabButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: designTokens.spacing.sm,
+    borderRadius: designTokens.radius.md,
+    gap: designTokens.spacing.xs,
+  },
+  tabButtonActive: {
+    ...designTokens.elevation.sm,
+  },
+  tabButtonText: {
+    ...designTokens.typography.labelMedium,
+    fontWeight: '600',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: designTokens.spacing.lg,
+    paddingBottom: vh(12),
   },
   section: {
     marginBottom: designTokens.spacing.xl,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: designTokens.spacing.md,
-  },
   sectionTitle: {
     ...designTokens.typography.headlineSmall,
     fontWeight: '600',
+    marginBottom: designTokens.spacing.sm,
   },
-  badge: {
-    paddingHorizontal: designTokens.spacing.sm,
-    paddingVertical: designTokens.spacing.xs,
-    borderRadius: designTokens.radius.full,
-  },
-  badgeText: {
-    ...designTokens.typography.labelSmall,
-    fontWeight: '600',
+  sectionSubtitle: {
+    ...designTokens.typography.bodyMedium,
+    marginBottom: designTokens.spacing.md,
   },
   card: {
     marginBottom: designTokens.spacing.md,
@@ -516,6 +815,7 @@ const styles = StyleSheet.create({
     paddingVertical: designTokens.spacing.sm,
     paddingHorizontal: designTokens.spacing.md,
     borderRadius: designTokens.radius.sm,
+    gap: designTokens.spacing.xs,
   },
   segmentActive: {
     ...designTokens.elevation.sm,
@@ -541,35 +841,6 @@ const styles = StyleSheet.create({
     ...designTokens.typography.labelMedium,
     fontWeight: '500',
   },
-  voiceGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: designTokens.spacing.sm,
-  },
-  voiceCard: {
-    paddingVertical: designTokens.spacing.sm,
-    paddingHorizontal: designTokens.spacing.md,
-    borderRadius: designTokens.radius.md,
-    borderWidth: 2,
-    borderColor: 'transparent',
-    backgroundColor: 'rgba(0, 0, 0, 0.02)',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  voiceCardActive: {
-    borderWidth: 2,
-  },
-  voiceIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    marginRight: designTokens.spacing.sm,
-  },
-  voiceName: {
-    ...designTokens.typography.labelLarge,
-    fontWeight: '500',
-  },
   switchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -587,7 +858,111 @@ const styles = StyleSheet.create({
   switchContainer: {
     alignItems: 'flex-end',
   },
+  historyOptions: {
+    marginTop: designTokens.spacing.sm,
+  },
+  dangerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: designTokens.spacing.md,
+    borderRadius: designTokens.radius.lg,
+    marginTop: designTokens.spacing.lg,
+    gap: designTokens.spacing.sm,
+  },
+  dangerButtonText: {
+    ...designTokens.typography.bodyMedium,
+    fontWeight: '600',
+  },
+  providerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: designTokens.spacing.md,
+  },
+  providerName: {
+    ...designTokens.typography.bodySmall,
+    marginTop: designTokens.spacing.xs,
+  },
+  providerStatus: {
+    alignItems: 'flex-end',
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: designTokens.spacing.sm,
+    paddingVertical: designTokens.spacing.xs,
+    borderRadius: designTokens.radius.full,
+    gap: designTokens.spacing.xs,
+  },
+  statusText: {
+    ...designTokens.typography.labelSmall,
+    fontWeight: '600',
+  },
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: designTokens.spacing.md,
+    backgroundColor: 'rgba(0, 123, 255, 0.05)',
+    borderRadius: designTokens.radius.md,
+    gap: designTokens.spacing.sm,
+    marginTop: designTokens.spacing.md,
+  },
+  infoText: {
+    ...designTokens.typography.bodySmall,
+    flex: 1,
+    lineHeight: 18,
+  },
+  appInfoContainer: {
+    alignItems: 'center',
+    marginBottom: designTokens.spacing.xl,
+  },
+  appIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: designTokens.spacing.md,
+  },
+  appName: {
+    ...designTokens.typography.headlineMedium,
+    fontWeight: '700',
+  },
+  appVersion: {
+    ...designTokens.typography.bodyMedium,
+    marginTop: designTokens.spacing.xs,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: designTokens.spacing.md,
+    gap: designTokens.spacing.md,
+  },
+  linkText: {
+    ...designTokens.typography.bodyMedium,
+    flex: 1,
+  },
+  divider: {
+    height: 1,
+    opacity: 0.2,
+  },
+  developerInfo: {
+    alignItems: 'center',
+    marginTop: designTokens.spacing.xl,
+  },
+  developerText: {
+    ...designTokens.typography.bodyMedium,
+  },
+  copyrightText: {
+    ...designTokens.typography.bodySmall,
+    marginTop: designTokens.spacing.xs,
+  },
   saveSection: {
     marginTop: designTokens.spacing.lg,
+  },
+  modal: {
+    margin: 0,
+    justifyContent: 'flex-end',
   },
 });

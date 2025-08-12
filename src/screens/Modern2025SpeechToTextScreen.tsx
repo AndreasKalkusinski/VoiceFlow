@@ -31,6 +31,9 @@ import { vh, vw } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSharedAudio } from '../contexts/SharedAudioContext';
+import { HistoryStorage, TranscriptionHistoryItem } from '../services/historyStorage';
+import { TranscriptionHistory } from '../components/TranscriptionHistory';
+import Modal from 'react-native-modal';
 
 export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -40,6 +43,8 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<TranscriptionHistoryItem[]>([]);
 
   const { isDark } = useTheme();
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
@@ -99,6 +104,15 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
 
       if (text) {
         setTranscribedText(text);
+
+        // Save to history
+        await HistoryStorage.addItem({
+          text,
+          timestamp: Date.now(),
+          audioUri: sharedAudioUri,
+          source: 'shared',
+        });
+
         showStatus(t('speechToText.status.complete'));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
@@ -162,6 +176,26 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     } catch {
       /* ignore */
     }
+  };
+
+  const loadHistory = async () => {
+    try {
+      const loadedHistory = await HistoryStorage.getHistory();
+      setHistory(loadedHistory);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const handleSelectHistoryItem = (item: TranscriptionHistoryItem) => {
+    setTranscribedText(item.text);
+    setShowHistory(false);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handleDeleteHistoryItem = async (id: string) => {
+    await HistoryStorage.deleteItem(id);
+    await loadHistory();
   };
 
   const setupAudio = async () => {
@@ -234,11 +268,16 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
         const openaiService = new OpenAIService(settings.openaiApiKey);
         const text = await openaiService.transcribeAudio(uri, settings.sttModel);
 
-        if (transcribedText) {
-          setTranscribedText(transcribedText + ' ' + text);
-        } else {
-          setTranscribedText(text);
-        }
+        const fullText = transcribedText ? transcribedText + ' ' + text : text;
+        setTranscribedText(fullText);
+
+        // Save to history
+        await HistoryStorage.addItem({
+          text: fullText,
+          timestamp: Date.now(),
+          audioUri: uri,
+          source: 'recording',
+        });
 
         showStatus(t('speechToText.status.complete'));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -420,6 +459,19 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                     >
                       <Ionicons name="trash-outline" size={22} color={colors.text} />
                     </TouchableOpacity>
+
+                    <View style={[styles.footerDivider, { backgroundColor: colors.border }]} />
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        loadHistory();
+                        setShowHistory(true);
+                      }}
+                      style={styles.footerAction}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="time-outline" size={22} color={colors.text} />
+                    </TouchableOpacity>
                   </View>
                 </View>
               </ModernCard>
@@ -488,7 +540,22 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* FAB removed - using integrated button instead */}
+      {/* History Modal */}
+      <Modal
+        isVisible={showHistory}
+        onBackdropPress={() => setShowHistory(false)}
+        style={styles.modal}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        backdropOpacity={0.5}
+      >
+        <TranscriptionHistory
+          history={history}
+          onSelectItem={handleSelectHistoryItem}
+          onDeleteItem={handleDeleteHistoryItem}
+          onClose={() => setShowHistory(false)}
+        />
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -666,5 +733,9 @@ const styles = StyleSheet.create({
   recordingTextNew: {
     ...designTokens.typography.labelMedium,
     fontWeight: '600',
+  },
+  modal: {
+    margin: 0,
+    justifyContent: 'flex-end',
   },
 });

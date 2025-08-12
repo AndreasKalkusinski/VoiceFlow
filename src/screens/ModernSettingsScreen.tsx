@@ -210,7 +210,7 @@ export const ModernSettingsScreen: React.FC = () => {
       }
 
       if (!silent) {
-        showStatus('Models loaded', 2000);
+        showStatus(t('settings.status.loaded'), 2000);
       }
     } catch {
       // Set default models on error
