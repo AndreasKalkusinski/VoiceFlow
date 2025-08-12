@@ -21,6 +21,7 @@ import * as FileSystem from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ModernCard } from '../components/ModernCard';
 import { StorageService } from '../services/storage';
 import { OpenAIService } from '../services/openai';
@@ -48,6 +49,19 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
   const screenTheme = getScreenTheme('Text to Speech', isDark);
   const { t } = useTranslation();
+
+  // Keep screen awake while generating or playing audio
+  useEffect(() => {
+    if (isGenerating || isPlaying) {
+      activateKeepAwakeAsync();
+    } else {
+      deactivateKeepAwake();
+    }
+
+    return () => {
+      deactivateKeepAwake();
+    };
+  }, [isGenerating, isPlaying]);
 
   // Use useRef for Animated values to work in release builds
   const fadeAnim = useRef(new Animated.Value(0)).current;
