@@ -37,7 +37,7 @@ function ThemedApp() {
     <NavigationContainer>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Tab.Navigator
-        tabBar={(props) => <LiquidTabBar {...props} />}
+        tabBar={(props: any) => <LiquidTabBar {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarStyle: { display: 'none' }, // Hide the default tab bar

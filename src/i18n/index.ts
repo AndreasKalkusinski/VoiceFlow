@@ -49,7 +49,7 @@ i18n.use(initReactI18next).init({
   react: {
     useSuspense: false, // Disable suspense for React Native
   },
-  compatibilityJSON: 'v3', // Fix for React Native
+  compatibilityJSON: 'v4' as any, // Fix for React Native
 });
 
 // Then load saved language asynchronously
