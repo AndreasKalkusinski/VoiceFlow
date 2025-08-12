@@ -114,14 +114,18 @@ export default {
     getApiKey: 'Obtener clave API',
     chooseProvider: 'Elegir Proveedor',
     backToProviders: 'Volver a Proveedores',
-    configureSettings: 'Configurar ajustes de {provider}',
+    configureSettings: 'Configurar ajustes de {{provider}}',
     valid: 'Válido',
     invalid: 'Inválido',
     validating: 'Validando...',
     validateKey: 'Validar Clave',
     done: 'Hecho',
-    enterApiKey: 'Ingresa tu clave API de {provider}',
-    visitProvider: 'Visita {provider} para obtener tu clave API',
+    enterApiKey: 'Ingresa tu clave API de {{provider}}',
+    visitProvider: 'Visita {{provider}} para obtener tu clave API',
+    selectSTTService: 'Selecciona tu servicio de voz a texto preferido',
+    selectTTSService: 'Selecciona tu servicio de texto a voz preferido',
+    apiKeysInfo:
+      'Las claves API se almacenan localmente en tu dispositivo y nunca se envían a nuestros servidores',
 
     theme: {
       title: 'Tema',

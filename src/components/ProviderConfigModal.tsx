@@ -174,9 +174,11 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
   const renderProviderSelection = () => (
     <View style={styles.stepContainer}>
       <View style={styles.stepHeader}>
-        <Text style={[styles.stepTitle, { color: colors.text }]}>Choose Provider</Text>
+        <Text style={[styles.stepTitle, { color: colors.text }]}>
+          {t('settings.chooseProvider')}
+        </Text>
         <Text style={[styles.stepSubtitle, { color: colors.textSecondary }]}>
-          Select your preferred {type === 'stt' ? 'speech-to-text' : 'text-to-speech'} service
+          {type === 'stt' ? t('settings.selectSTTService') : t('settings.selectTTSService')}
         </Text>
       </View>
 
@@ -196,13 +198,15 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
       >
         <TouchableOpacity style={styles.backButton} onPress={() => setCurrentStep('provider')}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
-          <Text style={[styles.backText, { color: colors.text }]}>Back to Providers</Text>
+          <Text style={[styles.backText, { color: colors.text }]}>
+            {t('settings.backToProviders')}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.stepHeader}>
           <Text style={[styles.stepTitle, { color: colors.text }]}>{currentProvider.name}</Text>
           <Text style={[styles.stepSubtitle, { color: colors.textSecondary }]}>
-            Configure your {currentProvider.name} settings
+            {t('settings.configureSettings', { provider: currentProvider.name })}
           </Text>
         </View>
 
@@ -212,7 +216,9 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
             <ModernCard variant="surface" style={styles.configCard}>
               <View style={styles.configHeader}>
                 <Ionicons name="key-outline" size={20} color={colors.primary} />
-                <Text style={[styles.configTitle, { color: colors.text }]}>API Key</Text>
+                <Text style={[styles.configTitle, { color: colors.text }]}>
+                  {t('settings.apiKey')}
+                </Text>
                 {validationStatus && (
                   <View
                     style={[
@@ -236,7 +242,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
                         { color: validationStatus === 'valid' ? colors.success : colors.error },
                       ]}
                     >
-                      {validationStatus === 'valid' ? 'Valid' : 'Invalid'}
+                      {validationStatus === 'valid' ? t('settings.valid') : t('settings.invalid')}
                     </Text>
                   </View>
                 )}
@@ -247,7 +253,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
                   style={[styles.input, { color: colors.text, borderColor: colors.border }]}
                   value={getApiKeyForProvider(currentProvider.id)}
                   onChangeText={(text) => handleApiKeyChange(currentProvider.id, text)}
-                  placeholder={`Enter your ${currentProvider.name} API key`}
+                  placeholder={t('settings.enterApiKey', { provider: currentProvider.name })}
                   placeholderTextColor={colors.textMuted}
                   secureTextEntry={!apiKeyVisible}
                   autoCapitalize="none"
@@ -267,7 +273,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
 
               <View style={styles.apiKeyActions}>
                 <ModernButton
-                  title={isValidating ? 'Validating...' : 'Validate Key'}
+                  title={isValidating ? t('settings.validating') : t('settings.validateKey')}
                   onPress={validateApiKey}
                   variant="glass"
                   size="small"
@@ -284,11 +290,16 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
                 <TouchableOpacity
                   style={styles.helpLink}
                   onPress={() =>
-                    Alert.alert('Get API Key', `Visit ${currentProvider.name} to get your API key`)
+                    Alert.alert(
+                      t('settings.getApiKey'),
+                      t('settings.visitProvider', { provider: currentProvider.name }),
+                    )
                   }
                 >
                   <Ionicons name="help-circle-outline" size={16} color={colors.primary} />
-                  <Text style={[styles.helpText, { color: colors.primary }]}>Where to get it?</Text>
+                  <Text style={[styles.helpText, { color: colors.primary }]}>
+                    {t('settings.whereToGetIt')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </ModernCard>
@@ -299,7 +310,9 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
             <ModernCard variant="surface" style={styles.configCard}>
               <View style={styles.configHeader}>
                 <Ionicons name="cube-outline" size={20} color={colors.primary} />
-                <Text style={[styles.configTitle, { color: colors.text }]}>Model</Text>
+                <Text style={[styles.configTitle, { color: colors.text }]}>
+                  {t('settings.model')}
+                </Text>
               </View>
 
               <View style={styles.optionsGrid}>
@@ -346,7 +359,9 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
             <ModernCard variant="surface" style={styles.configCard}>
               <View style={styles.configHeader}>
                 <Ionicons name="mic-outline" size={20} color={colors.primary} />
-                <Text style={[styles.configTitle, { color: colors.text }]}>Voice</Text>
+                <Text style={[styles.configTitle, { color: colors.text }]}>
+                  {t('settings.voice')}
+                </Text>
               </View>
 
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -398,7 +413,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
 
         <View style={styles.footer}>
           <ModernButton
-            title="Done"
+            title={t('settings.done')}
             onPress={onClose}
             variant="primary"
             size="large"
@@ -418,7 +433,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
       <View style={styles.modalHeader}>
         <View style={{ width: 40 }} />
         <Text style={[styles.modalTitle, { color: colors.text }]}>
-          {type === 'stt' ? 'Speech-to-Text' : 'Text-to-Speech'}
+          {type === 'stt' ? t('settings.speechToTextProvider') : t('settings.textToSpeechProvider')}
         </Text>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color={colors.text} />

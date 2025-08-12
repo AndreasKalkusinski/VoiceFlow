@@ -361,7 +361,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
       {/* Data & Privacy Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Data & Privacy</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          {t('settings.dataPrivacy')}
+        </Text>
 
         {/* Auto-Save */}
         <ModernCard variant="surface" style={styles.card}>
@@ -378,11 +380,11 @@ export const Modern2025SettingsScreen: React.FC = () => {
                   value={autoSave}
                   onValueChange={toggleAutoSave}
                   trackColor={{
-                    false: colors.border,
-                    true: colors.primary + '40',
+                    false: '#E5E7EB',
+                    true: colors.primary + '60',
                   }}
-                  thumbColor={autoSave ? colors.primary : '#f4f3f4'}
-                  ios_backgroundColor={colors.border}
+                  thumbColor={autoSave ? colors.primary : '#FFFFFF'}
+                  ios_backgroundColor="#E5E7EB"
                 />
               </View>
             </View>
@@ -404,9 +406,12 @@ export const Modern2025SettingsScreen: React.FC = () => {
                 onValueChange={(value) =>
                   updateHistorySettings({ ...historySettings, enabled: value })
                 }
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={historySettings.enabled ? colors.primaryDark : colors.surface}
-                ios_backgroundColor={colors.border}
+                trackColor={{
+                  false: '#E5E7EB',
+                  true: colors.primary + '60',
+                }}
+                thumbColor={historySettings.enabled ? colors.primary : '#FFFFFF'}
+                ios_backgroundColor="#E5E7EB"
               />
             </View>
           </View>
@@ -481,7 +486,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
             <View>
-              <Text style={[styles.label, { color: colors.text }]}>Speech-to-Text</Text>
+              <Text style={[styles.label, { color: colors.text }]}>
+                {t('settings.speechToTextProvider')}
+              </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
                 {settings.sttProvider === 'openai-stt'
                   ? 'OpenAI Whisper'
@@ -525,7 +532,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
             <View>
-              <Text style={[styles.label, { color: colors.text }]}>Text-to-Speech</Text>
+              <Text style={[styles.label, { color: colors.text }]}>
+                {t('settings.textToSpeechProvider')}
+              </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
                 {settings.ttsProvider === 'openai-tts'
                   ? 'OpenAI TTS'
@@ -571,7 +580,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
         <View style={styles.infoBox}>
           <Ionicons name="information-circle-outline" size={20} color={colors.accent} />
           <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            API keys are stored locally on your device and never sent to our servers.
+            {t('settings.apiKeysInfo')}
           </Text>
         </View>
       </View>
@@ -680,9 +689,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
       {/* Tab Bar */}
       <View style={[styles.tabBar, { backgroundColor: colors.surface + '80' }]}>
-        {renderTabButton('general', 'options-outline', 'General')}
-        {renderTabButton('providers', 'cloud-outline', 'Providers')}
-        {renderTabButton('about', 'information-circle-outline', 'About')}
+        {renderTabButton('general', 'options-outline', t('settings.general'))}
+        {renderTabButton('providers', 'cloud-outline', t('settings.providers'))}
+        {renderTabButton('about', 'information-circle-outline', t('settings.about'))}
       </View>
 
       {/* Content */}
@@ -780,7 +789,7 @@ const styles = StyleSheet.create({
     marginHorizontal: designTokens.spacing.lg,
     marginBottom: designTokens.spacing.md,
     borderRadius: designTokens.radius.lg,
-    padding: designTokens.spacing.xs,
+    padding: designTokens.spacing.sm,
     ...designTokens.elevation.sm,
   },
   tabButton: {
@@ -788,7 +797,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: designTokens.spacing.sm,
+    paddingVertical: designTokens.spacing.md,
     borderRadius: designTokens.radius.md,
     gap: designTokens.spacing.xs,
   },

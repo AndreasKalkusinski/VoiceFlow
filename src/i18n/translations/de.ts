@@ -132,14 +132,18 @@ export default {
     getApiKey: 'API-Schlüssel erhalten',
     chooseProvider: 'Anbieter wählen',
     backToProviders: 'Zurück zu Anbietern',
-    configureSettings: '{provider} Einstellungen konfigurieren',
+    configureSettings: '{{provider}} Einstellungen konfigurieren',
     valid: 'Gültig',
     invalid: 'Ungültig',
     validating: 'Prüfung...',
     validateKey: 'Schlüssel prüfen',
     done: 'Fertig',
-    enterApiKey: 'Gib deinen {provider} API-Schlüssel ein',
-    visitProvider: 'Besuche {provider} für deinen API-Schlüssel',
+    enterApiKey: 'Gib deinen {{provider}} API-Schlüssel ein',
+    visitProvider: 'Besuche {{provider}} für deinen API-Schlüssel',
+    selectSTTService: 'Wähle deinen bevorzugten Sprache-zu-Text Dienst',
+    selectTTSService: 'Wähle deinen bevorzugten Text-zu-Sprache Dienst',
+    apiKeysInfo:
+      'API-Schlüssel werden lokal auf deinem Gerät gespeichert und niemals an unsere Server gesendet',
 
     theme: {
       title: 'Design',

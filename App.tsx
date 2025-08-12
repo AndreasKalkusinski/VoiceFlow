@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
@@ -15,6 +15,7 @@ import { Modern2025TextToSpeechScreen } from './src/screens/Modern2025TextToSpee
 import { Modern2025SettingsScreen } from './src/screens/Modern2025SettingsScreen';
 import { LiquidTabBar } from './src/components/LiquidTabBar';
 import { SharedAudioProvider, useSharedAudio } from './src/contexts/SharedAudioContext';
+import { SplashScreen } from './src/screens/SplashScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,6 +24,7 @@ function ThemedApp() {
   const { t, i18n } = useTranslation();
   const { setSharedAudioUri } = useSharedAudio();
   const navigationRef = React.useRef<any>(null);
+  const [showSplash, setShowSplash] = useState(true);
 
   // Handle incoming URLs (shared audio files)
   React.useEffect(() => {
@@ -69,6 +71,10 @@ function ThemedApp() {
       i18n.off('languageChanged', handleLanguageChange);
     };
   }, [i18n]);
+
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
 
   return (
     <NavigationContainer ref={navigationRef}>
