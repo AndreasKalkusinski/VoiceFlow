@@ -26,6 +26,7 @@ import { designTokens } from '../utils/design-system';
 import { vh } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
 import * as Haptics from 'expo-haptics';
+import { HistoryStorage, HistorySettings } from '../services/historyStorage';
 
 export const Modern2025SettingsScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings>({
@@ -44,6 +45,10 @@ export const Modern2025SettingsScreen: React.FC = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [autoSave, setAutoSave] = useState(false);
+  const [historySettings, setHistorySettings] = useState<HistorySettings>({
+    enabled: true,
+    maxItems: 25,
+  });
   const saveTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
@@ -56,6 +61,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
   useEffect(() => {
     loadSettings();
     loadAutoSavePreference();
+    loadHistorySettings();
 
     // Smooth fade in animation
     Animated.timing(fadeAnim, {
@@ -111,6 +117,36 @@ export const Modern2025SettingsScreen: React.FC = () => {
     } catch {
       /* ignore */
     }
+  };
+
+  const loadHistorySettings = async () => {
+    try {
+      const settings = await HistoryStorage.getSettings();
+      setHistorySettings(settings);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const updateHistorySettings = async (newSettings: HistorySettings) => {
+    setHistorySettings(newSettings);
+    await HistoryStorage.saveSettings(newSettings);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const clearHistory = async () => {
+    Alert.alert(t('history.clearTitle'), t('history.clearMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.clear'),
+        style: 'destructive',
+        onPress: async () => {
+          await HistoryStorage.clearHistory();
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          Alert.alert(t('common.success'), t('history.cleared'));
+        },
+      },
+    ]);
   };
 
   const toggleAutoSave = async (value: boolean) => {
@@ -420,6 +456,91 @@ export const Modern2025SettingsScreen: React.FC = () => {
             </ModernCard>
           </View>
 
+          {/* History Settings */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              {t('history.settings')}
+            </Text>
+
+            <ModernCard variant="surface" style={styles.card}>
+              <View style={styles.switchRow}>
+                <View style={styles.switchContent}>
+                  <View style={styles.switchTextContainer}>
+                    <Text style={[styles.label, { color: colors.text }]}>
+                      {t('history.enable')}
+                    </Text>
+                    <Text style={[styles.description, { color: colors.textSecondary }]}>
+                      {t('history.enableDescription')}
+                    </Text>
+                  </View>
+                  <Switch
+                    value={historySettings.enabled}
+                    onValueChange={(value) =>
+                      updateHistorySettings({ ...historySettings, enabled: value })
+                    }
+                    trackColor={{ false: colors.border, true: colors.primary }}
+                    thumbColor={historySettings.enabled ? colors.primaryDark : colors.surface}
+                    ios_backgroundColor={colors.border}
+                  />
+                </View>
+              </View>
+
+              {historySettings.enabled && (
+                <View style={styles.historyOptions}>
+                  <Text style={[styles.label, { color: colors.textSecondary, marginTop: 16 }]}>
+                    {t('history.maxItems')}
+                  </Text>
+
+                  <View style={styles.segmentedControl}>
+                    {[10, 25, 50, 'unlimited'].map((option) => (
+                      <TouchableOpacity
+                        key={option}
+                        style={[
+                          styles.segment,
+                          {
+                            backgroundColor:
+                              historySettings.maxItems === option ? colors.primary : colors.surface,
+                            borderColor: colors.border,
+                          },
+                        ]}
+                        onPress={() => {
+                          updateHistorySettings({
+                            ...historySettings,
+                            maxItems: option as number | 'unlimited',
+                          });
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.segmentText,
+                            {
+                              color:
+                                historySettings.maxItems === option
+                                  ? colors.background
+                                  : colors.text,
+                            },
+                          ]}
+                        >
+                          {option === 'unlimited' ? t('history.unlimited') : option}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.dangerButton, { backgroundColor: colors.error + '20' }]}
+                    onPress={clearHistory}
+                  >
+                    <Ionicons name="trash-outline" size={20} color={colors.error} />
+                    <Text style={[styles.dangerButtonText, { color: colors.error }]}>
+                      {t('history.clearAll')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </ModernCard>
+          </View>
+
           {/* Save Button with gradient */}
           {!autoSave && (
             <View style={styles.saveSection}>
@@ -589,5 +710,21 @@ const styles = StyleSheet.create({
   },
   saveSection: {
     marginTop: designTokens.spacing.lg,
+  },
+  historyOptions: {
+    marginTop: designTokens.spacing.sm,
+  },
+  dangerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: designTokens.spacing.md,
+    borderRadius: designTokens.radius.lg,
+    marginTop: designTokens.spacing.lg,
+    gap: designTokens.spacing.sm,
+  },
+  dangerButtonText: {
+    ...designTokens.typography.bodyMedium,
+    fontWeight: '600',
   },
 });
