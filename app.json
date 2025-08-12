@@ -3,21 +3,16 @@
     "name": "VoiceFlow",
     "slug": "voiceflow",
     "owner": "andreaskalkusinski",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "description": "Modern Speech-to-Text and Text-to-Speech app with OpenAI integration",
     "githubUrl": "https://github.com/andreaskalkusinski/VoiceFlow",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#3B82F6"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "de.jeantools.voiceflow",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "This app needs access to microphone for speech to text functionality."
       }
@@ -39,10 +34,6 @@
       "eas": {
         "projectId": "1a2d211f-749d-450b-b560-80433d745457"
       }
-    },
-    "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/1a2d211f-749d-450b-b560-80433d745457"
     }
   }
 }

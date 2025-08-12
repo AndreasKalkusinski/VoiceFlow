@@ -37,7 +37,7 @@ function ThemedApp() {
     <NavigationContainer>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Tab.Navigator
-        tabBar={(props) => <LiquidTabBar {...(props as any)} />}
+        tabBar={(props: any) => <LiquidTabBar {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarStyle: { display: 'none' }, // Hide the default tab bar
@@ -71,7 +71,7 @@ function ThemedApp() {
 
 export default function App() {
   React.useEffect(() => {
-    console.log('App mounted successfully');
+    // App mounted successfully
   }, []);
 
   return (
