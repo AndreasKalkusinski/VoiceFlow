@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ModernCard } from '../components/ModernCard';
 import { StorageService } from '../services/storage';
 import { OpenAIService } from '../services/openai';
@@ -29,6 +30,10 @@ import { designTokens } from '../utils/design-system';
 import { vh, vw } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSharedAudio } from '../contexts/SharedAudioContext';
+import { HistoryStorage, TranscriptionHistoryItem } from '../services/historyStorage';
+import { TranscriptionHistory } from '../components/TranscriptionHistory';
+import Modal from 'react-native-modal';
 
 export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -38,16 +43,32 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<TranscriptionHistoryItem[]>([]);
 
   const { isDark } = useTheme();
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
   const screenTheme = getScreenTheme('Speech to Text', isDark);
   const { t } = useTranslation();
+  const { sharedAudioUri, clearSharedAudio, hasSharedAudio } = useSharedAudio();
 
-  // Use useState for Animated values to avoid freezing issues
-  const [fadeAnim] = useState(() => new Animated.Value(0));
-  const [slideAnim] = useState(() => new Animated.Value(30));
-  const [pulseAnim] = useState(() => new Animated.Value(1));
+  // Keep screen awake while recording
+  useEffect(() => {
+    if (isRecording) {
+      activateKeepAwakeAsync();
+    } else {
+      deactivateKeepAwake();
+    }
+
+    return () => {
+      deactivateKeepAwake();
+    };
+  }, [isRecording]);
+
+  // Use useRef for Animated values to work in release builds
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     setupAudio();
@@ -57,8 +78,55 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
-    }, []),
+
+      // Check if there's a shared audio file to process
+      if (hasSharedAudio && sharedAudioUri) {
+        processSharedAudio();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasSharedAudio, sharedAudioUri]),
   );
+
+  const processSharedAudio = async () => {
+    if (!sharedAudioUri || !settings) return;
+
+    try {
+      setIsProcessing(true);
+      showStatus(t('speechToText.status.transcribing'));
+
+      const openaiService = new OpenAIService(settings.apiKeys?.openai || settings.openaiApiKey);
+
+      // Transcribe the shared audio file
+      const text = await openaiService.transcribeAudio(
+        sharedAudioUri,
+        settings.providerSettings?.['openai-stt']?.model || settings.sttModel || 'whisper-1',
+      );
+
+      if (text) {
+        setTranscribedText(text);
+
+        // Save to history
+        await HistoryStorage.addItem({
+          text,
+          timestamp: Date.now(),
+          audioUri: sharedAudioUri,
+          source: 'shared',
+        });
+
+        showStatus(t('speechToText.status.complete'));
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+
+      // Clear the shared audio after processing
+      clearSharedAudio();
+    } catch (error) {
+      console.error('Error processing shared audio:', error);
+      showStatus(t('speechToText.status.failed'));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   useEffect(() => {
     if (isRecording) {
@@ -108,6 +176,26 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     } catch {
       /* ignore */
     }
+  };
+
+  const loadHistory = async () => {
+    try {
+      const loadedHistory = await HistoryStorage.getHistory();
+      setHistory(loadedHistory);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const handleSelectHistoryItem = (item: TranscriptionHistoryItem) => {
+    setTranscribedText(item.text);
+    setShowHistory(false);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handleDeleteHistoryItem = async (id: string) => {
+    await HistoryStorage.deleteItem(id);
+    await loadHistory();
   };
 
   const setupAudio = async () => {
@@ -180,11 +268,16 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
         const openaiService = new OpenAIService(settings.openaiApiKey);
         const text = await openaiService.transcribeAudio(uri, settings.sttModel);
 
-        if (transcribedText) {
-          setTranscribedText(transcribedText + ' ' + text);
-        } else {
-          setTranscribedText(text);
-        }
+        const fullText = transcribedText ? transcribedText + ' ' + text : text;
+        setTranscribedText(fullText);
+
+        // Save to history
+        await HistoryStorage.addItem({
+          text: fullText,
+          timestamp: Date.now(),
+          audioUri: uri,
+          source: 'recording',
+        });
 
         showStatus(t('speechToText.status.complete'));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -366,6 +459,19 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                     >
                       <Ionicons name="trash-outline" size={22} color={colors.text} />
                     </TouchableOpacity>
+
+                    <View style={[styles.footerDivider, { backgroundColor: colors.border }]} />
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        loadHistory();
+                        setShowHistory(true);
+                      }}
+                      style={styles.footerAction}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="time-outline" size={22} color={colors.text} />
+                    </TouchableOpacity>
                   </View>
                 </View>
               </ModernCard>
@@ -434,7 +540,22 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* FAB removed - using integrated button instead */}
+      {/* History Modal */}
+      <Modal
+        isVisible={showHistory}
+        onBackdropPress={() => setShowHistory(false)}
+        style={styles.modal}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        backdropOpacity={0.5}
+      >
+        <TranscriptionHistory
+          history={history}
+          onSelectItem={handleSelectHistoryItem}
+          onDeleteItem={handleDeleteHistoryItem}
+          onClose={() => setShowHistory(false)}
+        />
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -612,5 +733,9 @@ const styles = StyleSheet.create({
   recordingTextNew: {
     ...designTokens.typography.labelMedium,
     fontWeight: '600',
+  },
+  modal: {
+    margin: 0,
+    justifyContent: 'flex-end',
   },
 });

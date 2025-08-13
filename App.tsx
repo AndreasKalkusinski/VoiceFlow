@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
+import { Linking } from 'react-native';
 import './src/i18n';
 
 // Import screens
@@ -13,12 +14,48 @@ import { Modern2025SpeechToTextScreen } from './src/screens/Modern2025SpeechToTe
 import { Modern2025TextToSpeechScreen } from './src/screens/Modern2025TextToSpeechScreen';
 import { Modern2025SettingsScreen } from './src/screens/Modern2025SettingsScreen';
 import { LiquidTabBar } from './src/components/LiquidTabBar';
+import { SharedAudioProvider, useSharedAudio } from './src/contexts/SharedAudioContext';
 
 const Tab = createBottomTabNavigator();
 
 function ThemedApp() {
   const { isDark } = useTheme();
   const { t, i18n } = useTranslation();
+  const { setSharedAudioUri } = useSharedAudio();
+  const navigationRef = React.useRef<any>(null);
+
+  // Handle incoming URLs (shared audio files)
+  React.useEffect(() => {
+    const handleUrl = async (url: string) => {
+      if (
+        url &&
+        (url.includes('.m4a') ||
+          url.includes('.mp3') ||
+          url.includes('.wav') ||
+          url.includes('.aac'))
+      ) {
+        // Store the audio URI and navigate to Speech to Text screen
+        setSharedAudioUri(url);
+        if (navigationRef.current) {
+          navigationRef.current.navigate('Speech to Text');
+        }
+      }
+    };
+
+    // Handle initial URL
+    Linking.getInitialURL().then((url) => {
+      if (url) handleUrl(url);
+    });
+
+    // Handle URL changes while app is open
+    const subscription = Linking.addEventListener('url', (event) => {
+      handleUrl(event.url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [setSharedAudioUri]);
 
   // Force re-render when language changes
   React.useEffect(() => {
@@ -34,10 +71,10 @@ function ThemedApp() {
   }, [i18n]);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Tab.Navigator
-        tabBar={(props) => <LiquidTabBar {...(props as any)} />}
+        tabBar={(props: any) => <LiquidTabBar {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarStyle: { display: 'none' }, // Hide the default tab bar
@@ -71,14 +108,16 @@ function ThemedApp() {
 
 export default function App() {
   React.useEffect(() => {
-    console.log('App mounted successfully');
+    // App mounted successfully
   }, []);
 
   return (
     <ErrorBoundary>
       <SafeAreaProvider>
         <ThemeProvider>
-          <ThemedApp />
+          <SharedAudioProvider>
+            <ThemedApp />
+          </SharedAudioProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </ErrorBoundary>

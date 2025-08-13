@@ -8,6 +8,9 @@ export interface STTProvider {
   models?: STTModel[];
   transcribe(audioUri: string, options: STTOptions): Promise<string>;
   validateConfig?(config: any): Promise<boolean>;
+  loadModels?(apiKey: string, forceRefresh?: boolean): Promise<STTModel[]>;
+  refreshModels?(apiKey: string): Promise<STTModel[]>;
+  isLoadingModels?: boolean;
 }
 
 export interface TTSProvider {
@@ -20,6 +23,13 @@ export interface TTSProvider {
   models?: TTSModel[];
   synthesize(text: string, options: TTSOptions): Promise<string>;
   validateConfig?(config: any): Promise<boolean>;
+  loadModelsAndVoices?(
+    apiKey: string,
+    forceRefresh?: boolean,
+  ): Promise<{ models: TTSModel[]; voices: TTSVoice[] }>;
+  refreshModelsAndVoices?(apiKey: string): Promise<{ models: TTSModel[]; voices: TTSVoice[] }>;
+  isLoadingModels?: boolean;
+  isLoadingVoices?: boolean;
 }
 
 export interface STTModel {

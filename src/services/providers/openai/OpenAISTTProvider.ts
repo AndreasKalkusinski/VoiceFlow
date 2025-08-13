@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { BaseSTTProvider } from '../BaseProvider';
 import { STTOptions, STTModel } from '../types';
+import { ModelService } from '../../ModelService';
 
 export class OpenAISTTProvider extends BaseSTTProvider {
   id = 'openai-stt';
@@ -8,14 +9,13 @@ export class OpenAISTTProvider extends BaseSTTProvider {
   description = 'Fast and accurate speech recognition by OpenAI';
   requiresApiKey = true;
 
-  models: STTModel[] = [
-    {
-      id: 'whisper-1',
-      name: 'Whisper v1',
-      description: 'Latest Whisper model with excellent accuracy',
-      languages: ['en', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'zh', 'ja', 'ko'],
-    },
-  ];
+  private _models: STTModel[] | null = null;
+  private _isLoadingModels = false;
+  private modelService = ModelService.getInstance();
+
+  get models(): STTModel[] {
+    return this._models || this.modelService.getFallbackOpenAIModels();
+  }
 
   supportedLanguages = [
     'en',
@@ -41,6 +41,47 @@ export class OpenAISTTProvider extends BaseSTTProvider {
   ];
 
   private baseURL = 'https://api.openai.com/v1';
+
+  /**
+   * Load models from OpenAI API
+   */
+  async loadModels(apiKey: string, forceRefresh: boolean = false): Promise<STTModel[]> {
+    if (this._isLoadingModels && !forceRefresh) {
+      // Return current models if already loading
+      return this.models;
+    }
+
+    this._isLoadingModels = true;
+
+    try {
+      const fetchedModels = await this.modelService.fetchOpenAIModels(apiKey, forceRefresh);
+      this._models = fetchedModels;
+      return fetchedModels;
+    } catch (error) {
+      console.error('Failed to load OpenAI models, using fallback:', error);
+      const fallbackModels = this.modelService.getFallbackOpenAIModels();
+      if (!this._models) {
+        this._models = fallbackModels;
+      }
+      return this._models;
+    } finally {
+      this._isLoadingModels = false;
+    }
+  }
+
+  /**
+   * Check if models are currently being loaded
+   */
+  get isLoadingModels(): boolean {
+    return this._isLoadingModels;
+  }
+
+  /**
+   * Refresh models from API
+   */
+  async refreshModels(apiKey: string): Promise<STTModel[]> {
+    return this.loadModels(apiKey, true);
+  }
 
   async transcribe(audioUri: string, options: STTOptions): Promise<string> {
     if (!options.apiKey) {
