@@ -33,8 +33,8 @@ import Modal from 'react-native-modal';
 type TabType = 'general' | 'providers' | 'about';
 
 // App Info
-const APP_VERSION = '1.1.0';
-const BUILD_NUMBER = '42';
+const APP_VERSION = '2.1.0';
+const BUILD_NUMBER = '43';
 const GITHUB_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow';
 const PRIVACY_URL = 'https://example.com/privacy';
 const TERMS_URL = 'https://example.com/terms';

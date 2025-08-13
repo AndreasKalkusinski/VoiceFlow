@@ -43,9 +43,7 @@ describe('ModernButton', () => {
     );
 
     const button = getByTestId('styled-button');
-    expect(button.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining(customStyle)]),
-    );
+    expect(button.props.style).toEqual(expect.objectContaining(customStyle));
   });
 
   it('shows loading state', () => {
