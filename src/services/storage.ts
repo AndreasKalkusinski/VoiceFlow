@@ -47,9 +47,14 @@ export const StorageService = {
   },
 
   async setApiKey(apiKey: string): Promise<void> {
-    const settings = await this.getSettings();
-    settings.openaiApiKey = apiKey;
-    await this.saveSettings(settings);
+    try {
+      const settings = await this.getSettings();
+      settings.openaiApiKey = apiKey;
+      await this.saveSettings(settings);
+    } catch (e) {
+      console.error('Error setting API key:', e);
+      throw e;
+    }
   },
 
   async getSelectedModel(): Promise<string> {
