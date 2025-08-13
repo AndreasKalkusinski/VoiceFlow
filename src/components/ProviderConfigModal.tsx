@@ -21,6 +21,7 @@ import { designTokens } from '../utils/design-system';
 import * as Haptics from 'expo-haptics';
 import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { LLMProviderRegistry } from '../services/providers/LLMProviderRegistry';
+import { BaseLLMProvider } from '../services/providers/llm/BaseLLMProvider';
 
 interface ProviderConfigModalProps {
   type: 'stt' | 'tts' | 'llm';
@@ -62,6 +63,9 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
         : LLMProviderRegistry.getAllProviders();
 
   const currentProvider = providers.find((p: any) => p.id === selectedProvider);
+  const isLLMProvider = (provider: any): provider is BaseLLMProvider => {
+    return type === 'llm' && provider && 'loadModels' in provider;
+  };
 
   useEffect(() => {
     // Reset validation status when provider changes
@@ -69,7 +73,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
     setLoadedModels([]);
 
     // Load models for LLM providers if API key exists
-    if (type === 'llm' && currentProvider && currentProvider.loadModels) {
+    if (isLLMProvider(currentProvider)) {
       const apiKey = getApiKeyForProvider(currentProvider.id);
       if (apiKey) {
         loadModelsForProvider(apiKey);
@@ -80,12 +84,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
 
   // Load models when entering config step
   useEffect(() => {
-    if (
-      currentStep === 'config' &&
-      type === 'llm' &&
-      currentProvider &&
-      currentProvider.loadModels
-    ) {
+    if (currentStep === 'config' && isLLMProvider(currentProvider)) {
       const apiKey = getApiKeyForProvider(currentProvider.id);
       if (apiKey && loadedModels.length === 0) {
         loadModelsForProvider(apiKey);
@@ -95,7 +94,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
   }, [currentStep]);
 
   const loadModelsForProvider = async (apiKey: string) => {
-    if (!currentProvider || !currentProvider.loadModels) return;
+    if (!isLLMProvider(currentProvider)) return;
 
     setIsLoadingModels(true);
     try {
@@ -130,7 +129,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
       setValidationStatus(null); // Reset validation when key changes
 
       // Load models for LLM providers when API key changes
-      if (type === 'llm' && value && currentProvider && currentProvider.loadModels) {
+      if (value && isLLMProvider(currentProvider)) {
         loadModelsForProvider(value);
       }
     }
@@ -173,18 +172,18 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
     // Load models when selecting an LLM provider
     if (type === 'llm') {
       const provider = providers.find((p: any) => p.id === providerId);
-      if (provider && provider.loadModels) {
+      if (provider && 'loadModels' in provider) {
         const apiKey = getApiKeyForProvider(providerId);
         if (apiKey) {
           setIsLoadingModels(true);
-          provider
+          (provider as BaseLLMProvider)
             .loadModels(apiKey)
             .then((models: any) => {
               setLoadedModels(models);
               setIsLoadingModels(false);
             })
             .catch(() => {
-              setLoadedModels(provider.models || []);
+              setLoadedModels((provider as BaseLLMProvider).models || []);
               setIsLoadingModels(false);
             });
         }

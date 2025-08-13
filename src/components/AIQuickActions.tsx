@@ -27,7 +27,7 @@ interface AIAction {
   id: string;
   icon: string;
   title: string;
-  gradient: string[];
+  gradient: [string, string];
   prompt?: string;
 }
 

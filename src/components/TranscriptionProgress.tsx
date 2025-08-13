@@ -122,7 +122,10 @@ export const TranscriptionProgress: React.FC<TranscriptionProgressProps> = ({
         <View style={[styles.content, { backgroundColor: colors.background + 'F0' }]}>
           {/* Animated Icon */}
           <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-            <LinearGradient colors={[colors.primary, colors.accent]} style={styles.iconContainer}>
+            <LinearGradient
+              colors={[colors.primary, colors.secondary]}
+              style={styles.iconContainer}
+            >
               <Ionicons name="mic-outline" size={32} color="white" />
             </LinearGradient>
           </Animated.View>

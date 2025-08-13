@@ -215,7 +215,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
 
               {/* Transcription Progress Indicator */}
               {isProcessing && recordingDuration > 0 && (
-                <TranscriptionProgress duration={recordingDuration} />
+                <TranscriptionProgress isVisible={isProcessing} duration={recordingDuration} />
               )}
 
               {/* AI Quick Actions */}
