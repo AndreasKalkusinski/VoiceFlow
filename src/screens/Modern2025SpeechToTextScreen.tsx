@@ -11,13 +11,13 @@ import {
   Animated,
   TouchableOpacity,
   RefreshControl,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Audio } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ModernCard } from '../components/ModernCard';
@@ -27,13 +27,15 @@ import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { designTokens } from '../utils/design-system';
-import { vh, vw } from '../utils/responsive-dimensions';
+import { vh } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSharedAudio } from '../contexts/SharedAudioContext';
 import { HistoryStorage, TranscriptionHistoryItem } from '../services/historyStorage';
 import { TranscriptionHistory } from '../components/TranscriptionHistory';
 import Modal from 'react-native-modal';
+import { TranscriptionProgress } from '../components/TranscriptionProgress';
+import { AIQuickActions } from '../components/AIQuickActions';
 
 export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -45,6 +47,8 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<TranscriptionHistoryItem[]>([]);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const recordingStartTime = useRef<number | null>(null);
 
   const { isDark } = useTheme();
   const colors = isDark ? designTokens.colors.dark : designTokens.colors.light;
@@ -69,10 +73,39 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const buttonBottomAnim = useRef(new Animated.Value(140)).current;
 
   useEffect(() => {
     setupAudio();
     animateEntry();
+
+    // Keyboard listeners
+    const keyboardWillShow = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        Animated.spring(buttonBottomAnim, {
+          toValue: e.endCoordinates.height + 20,
+          useNativeDriver: false,
+          friction: 8,
+        }).start();
+      },
+    );
+
+    const keyboardWillHide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        Animated.spring(buttonBottomAnim, {
+          toValue: 140,
+          useNativeDriver: false,
+          friction: 8,
+        }).start();
+      },
+    );
+
+    return () => {
+      keyboardWillShow.remove();
+      keyboardWillHide.remove();
+    };
   }, []);
 
   useFocusEffect(
@@ -245,6 +278,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
 
       setRecording(recording);
       setIsRecording(true);
+      recordingStartTime.current = Date.now();
       showStatus(t('speechToText.status.recording'));
     } catch {
       showStatus(t('speechToText.status.failed'));
@@ -257,6 +291,14 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setIsRecording(false);
+
+      // Calculate recording duration
+      const duration = recordingStartTime.current
+        ? Math.floor((Date.now() - recordingStartTime.current) / 1000)
+        : 0;
+      setRecordingDuration(duration);
+      recordingStartTime.current = null;
+
       setIsProcessing(true);
       showStatus(t('speechToText.status.processing'));
 
@@ -412,6 +454,19 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                   textAlignVertical="top"
                 />
 
+                {/* Transcription Progress Indicator */}
+                {isProcessing && recordingDuration > 0 && (
+                  <TranscriptionProgress duration={recordingDuration} />
+                )}
+
+                {/* AI Quick Actions */}
+                {transcribedText && !isProcessing && !isRecording && (
+                  <AIQuickActions
+                    text={transcribedText}
+                    onResult={(result) => setTranscribedText(result)}
+                  />
+                )}
+
                 {/* Modern recording indicator */}
                 {isRecording && (
                   <View style={styles.recordingIndicator}>
@@ -476,66 +531,6 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                 </View>
               </ModernCard>
             </Animated.View>
-
-            {/* Modern Record Button */}
-            <View style={styles.recordButtonContainer}>
-              <TouchableOpacity
-                onPress={isRecording ? stopRecording : startRecording}
-                disabled={isProcessing}
-                activeOpacity={0.8}
-                style={styles.recordButtonWrapper}
-              >
-                <Animated.View
-                  style={[
-                    styles.recordButton,
-                    {
-                      transform: [{ scale: pulseAnim }],
-                      borderColor: isRecording ? colors.error : colors.primary,
-                    },
-                  ]}
-                >
-                  <BlurView
-                    intensity={70}
-                    tint={isDark ? 'dark' : 'light'}
-                    style={StyleSheet.absoluteFillObject}
-                  />
-                  <LinearGradient
-                    colors={
-                      isRecording
-                        ? [colors.error + '20', colors.error + '10']
-                        : isDark
-                          ? ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.05)']
-                          : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)']
-                    }
-                    style={StyleSheet.absoluteFillObject}
-                  />
-                  <Ionicons
-                    name={isProcessing ? 'hourglass-outline' : isRecording ? 'stop' : 'mic'}
-                    size={vw(7)}
-                    color={isRecording ? colors.error : colors.primary}
-                  />
-                </Animated.View>
-              </TouchableOpacity>
-
-              {/* Tips below button */}
-              {!transcribedText && !isRecording && (
-                <View style={styles.tipsContainer}>
-                  <Ionicons name="bulb-outline" size={16} color={colors.accent} />
-                  <Text style={[styles.tipsTextSmall, { color: colors.textSecondary }]}>
-                    {t('speechToText.tips.description')}
-                  </Text>
-                </View>
-              )}
-
-              {isRecording && (
-                <Animated.View style={[styles.recordingIndicatorNew, { opacity: pulseAnim }]}>
-                  <View style={[styles.recordingDotNew, { backgroundColor: colors.error }]} />
-                  <Text style={[styles.recordingTextNew, { color: colors.text }]}>
-                    {t('speechToText.recording')}
-                  </Text>
-                </Animated.View>
-              )}
-            </View>
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -556,6 +551,57 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
           onClose={() => setShowHistory(false)}
         />
       </Modal>
+
+      {/* Floating Record Button */}
+      <Animated.View
+        style={[
+          styles.floatingRecordButton,
+          {
+            bottom: buttonBottomAnim,
+          },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={isRecording ? stopRecording : startRecording}
+          disabled={isProcessing}
+          activeOpacity={0.9}
+          style={[
+            styles.floatingRecordButtonInner,
+            {
+              backgroundColor: isRecording ? colors.error : colors.primary,
+              shadowColor: isRecording ? colors.error : colors.primary,
+            },
+          ]}
+        >
+          <Animated.View
+            style={[
+              styles.floatingButtonContent,
+              {
+                transform: [{ scale: pulseAnim }],
+              },
+            ]}
+          >
+            <Ionicons
+              name={isProcessing ? 'hourglass-outline' : isRecording ? 'stop' : 'mic'}
+              size={28}
+              color="white"
+            />
+          </Animated.View>
+
+          {/* Recording indicator dot */}
+          {isRecording && (
+            <Animated.View
+              style={[
+                styles.floatingRecordingDot,
+                {
+                  backgroundColor: colors.error,
+                  opacity: pulseAnim,
+                },
+              ]}
+            />
+          )}
+        </TouchableOpacity>
+      </Animated.View>
     </SafeAreaView>
   );
 };
@@ -686,56 +732,35 @@ const styles = StyleSheet.create({
     height: 20,
     opacity: 0.3,
   },
-  tipsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: designTokens.spacing.md,
-    paddingHorizontal: designTokens.spacing.lg,
-    gap: designTokens.spacing.sm,
-    maxWidth: '80%',
-  },
-  tipsTextSmall: {
-    ...designTokens.typography.bodySmall,
-    fontSize: 12,
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-  recordButtonContainer: {
-    alignItems: 'center',
-    marginTop: designTokens.spacing.lg,
-    marginBottom: designTokens.spacing.sm,
-  },
-  recordButtonWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  recordButton: {
-    width: vw(18),
-    height: vw(18),
-    borderRadius: vw(9),
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    overflow: 'hidden',
-    ...designTokens.elevation.lg,
-  },
-  recordingIndicatorNew: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: designTokens.spacing.md,
-    gap: designTokens.spacing.sm,
-  },
-  recordingDotNew: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  recordingTextNew: {
-    ...designTokens.typography.labelMedium,
-    fontWeight: '600',
-  },
   modal: {
     margin: 0,
     justifyContent: 'flex-end',
+  },
+  floatingRecordButton: {
+    position: 'absolute',
+    right: 20,
+  },
+  floatingRecordButtonInner: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  floatingButtonContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  floatingRecordingDot: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
 });

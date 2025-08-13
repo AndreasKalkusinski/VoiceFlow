@@ -12,7 +12,6 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
@@ -55,16 +54,13 @@ export const Modern2025SettingsScreen: React.FC = () => {
     },
     providerSettings: {},
   });
-  const [isSaving, setIsSaving] = useState(false);
-  const [autoSave, setAutoSave] = useState(false);
   const [historySettings, setHistorySettings] = useState<HistorySettings>({
     enabled: true,
     maxItems: 25,
   });
   const [showProviderModal, setShowProviderModal] = useState(false);
-  const [providerModalType, setProviderModalType] = useState<'stt' | 'tts'>('stt');
+  const [providerModalType, setProviderModalType] = useState<'stt' | 'tts' | 'llm'>('stt');
 
-  const saveTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
   const { isDark, themeMode, setTheme } = useTheme();
@@ -75,7 +71,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
   useEffect(() => {
     loadSettings();
-    loadAutoSavePreference();
     loadHistorySettings();
 
     // Smooth fade in animation
@@ -84,24 +79,18 @@ export const Modern2025SettingsScreen: React.FC = () => {
       duration: designTokens.animation.normal,
       useNativeDriver: true,
     }).start();
-
-    return () => {
-      if (saveTimeout.current) {
-        clearTimeout(saveTimeout.current);
-      }
-    };
   }, []);
 
+  // Auto-save settings whenever they change
   useEffect(() => {
-    if (autoSave && settings.openaiApiKey) {
-      if (saveTimeout.current) {
-        clearTimeout(saveTimeout.current);
-      }
-      saveTimeout.current = setTimeout(() => {
+    const saveTimer = setTimeout(() => {
+      if (settings.openaiApiKey || settings.apiKeys?.openai) {
         saveSettingsSilently();
-      }, 1000);
-    }
-  }, [settings, autoSave]);
+      }
+    }, 1000);
+
+    return () => clearTimeout(saveTimer);
+  }, [settings]);
 
   const loadSettings = async () => {
     try {
@@ -118,17 +107,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
         providerSettings: loadedSettings.providerSettings || {},
       };
       setSettings(migratedSettings);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const loadAutoSavePreference = async () => {
-    try {
-      const savedAutoSave = await AsyncStorage.getItem('@voiceflow_autosave');
-      if (savedAutoSave !== null) {
-        setAutoSave(savedAutoSave === 'true');
-      }
     } catch {
       /* ignore */
     }
@@ -164,35 +142,11 @@ export const Modern2025SettingsScreen: React.FC = () => {
     ]);
   };
 
-  const toggleAutoSave = async (value: boolean) => {
-    try {
-      await AsyncStorage.setItem('@voiceflow_autosave', value.toString());
-      setAutoSave(value);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {
-      /* ignore */
-    }
-  };
-
   const saveSettingsSilently = async () => {
     try {
       await StorageService.saveSettings(settings);
     } catch {
       /* ignore */
-    }
-  };
-
-  const saveSettings = async () => {
-    setIsSaving(true);
-    try {
-      await StorageService.saveSettings(settings);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('alerts.settingsSavedTitle'), t('alerts.settingsSavedMessage'));
-    } catch {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common.error'), t('settings.status.failed'));
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -206,7 +160,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
     }
   };
 
-  const openProviderConfig = (type: 'stt' | 'tts') => {
+  const openProviderConfig = (type: 'stt' | 'tts' | 'llm') => {
     setProviderModalType(type);
     setShowProviderModal(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -364,32 +318,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           {t('settings.dataPrivacy')}
         </Text>
-
-        {/* Auto-Save */}
-        <ModernCard variant="surface" style={styles.card}>
-          <View style={styles.switchRow}>
-            <View style={styles.switchContent}>
-              <View style={styles.switchTextContainer}>
-                <Text style={[styles.label, { color: colors.text }]}>{t('settings.autoSave')}</Text>
-                <Text style={[styles.description, { color: colors.textSecondary }]}>
-                  {t('settings.autoSaveDescription')}
-                </Text>
-              </View>
-              <View style={styles.switchContainer}>
-                <Switch
-                  value={autoSave}
-                  onValueChange={toggleAutoSave}
-                  trackColor={{
-                    false: '#E5E7EB',
-                    true: colors.primary + '60',
-                  }}
-                  thumbColor={autoSave ? colors.primary : '#FFFFFF'}
-                  ios_backgroundColor="#E5E7EB"
-                />
-              </View>
-            </View>
-          </View>
-        </ModernCard>
 
         {/* History Settings */}
         <ModernCard variant="surface" style={styles.card}>
@@ -577,6 +505,54 @@ export const Modern2025SettingsScreen: React.FC = () => {
           />
         </ModernCard>
 
+        {/* AI Assistant Provider */}
+        <ModernCard variant="elevated" style={styles.card}>
+          <View style={styles.providerHeader}>
+            <View>
+              <Text style={[styles.label, { color: colors.text }]}>
+                {t('settings.llmProvider')}
+              </Text>
+              <Text style={[styles.providerName, { color: colors.textSecondary }]}>
+                {settings.llmProvider === 'openai-llm'
+                  ? 'OpenAI GPT'
+                  : settings.llmProvider === 'anthropic-llm'
+                    ? 'Anthropic Claude'
+                    : settings.llmProvider === 'google-gemini'
+                      ? 'Google Gemini'
+                      : 'OpenAI GPT'}
+              </Text>
+            </View>
+            <View style={styles.providerStatus}>
+              {(settings.llmProvider?.includes('openai') &&
+                (settings.apiKeys?.openai || settings.openaiApiKey)) ||
+              (settings.llmProvider?.includes('anthropic') && settings.apiKeys?.anthropic) ||
+              (settings.llmProvider?.includes('google') && settings.apiKeys?.google) ? (
+                <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
+                  <Ionicons name="checkmark-circle" size={16} color={colors.success} />
+                  <Text style={[styles.statusText, { color: colors.success }]}>
+                    {t('settings.configured')}
+                  </Text>
+                </View>
+              ) : (
+                <View style={[styles.statusBadge, { backgroundColor: colors.warning + '20' }]}>
+                  <Ionicons name="alert-circle" size={16} color={colors.warning} />
+                  <Text style={[styles.statusText, { color: colors.warning }]}>
+                    {t('settings.setupRequired')}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+          <ModernButton
+            title={t('settings.configure')}
+            onPress={() => openProviderConfig('llm')}
+            variant="glass"
+            size="small"
+            fullWidth
+            icon={<Ionicons name="settings-outline" size={18} color={colors.text} />}
+          />
+        </ModernCard>
+
         <View style={styles.infoBox}>
           <Ionicons name="information-circle-outline" size={20} color={colors.accent} />
           <Text style={[styles.infoText, { color: colors.textSecondary }]}>
@@ -699,21 +675,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {activeTab === 'general' && renderGeneralTab()}
         {activeTab === 'providers' && renderProvidersTab()}
         {activeTab === 'about' && renderAboutTab()}
-
-        {/* Save Button (visible when auto-save is off and on general tab) */}
-        {!autoSave && activeTab === 'general' && (
-          <View style={styles.saveSection}>
-            <ModernButton
-              title={t('settings.saveSettings')}
-              onPress={saveSettings}
-              variant="glass"
-              size="large"
-              loading={isSaving}
-              fullWidth
-              icon={<Ionicons name="save-outline" size={20} color={colors.text} />}
-            />
-          </View>
-        )}
       </ScrollView>
 
       {/* Provider Configuration Modal */}
@@ -730,14 +691,20 @@ export const Modern2025SettingsScreen: React.FC = () => {
           selectedProvider={
             providerModalType === 'stt'
               ? settings.sttProvider || 'openai-stt'
-              : settings.ttsProvider || 'openai-tts'
+              : providerModalType === 'tts'
+                ? settings.ttsProvider || 'openai-tts'
+                : settings.llmProvider || 'openai-llm'
           }
           apiKeys={settings.apiKeys || {}}
           providerSettings={settings.providerSettings || {}}
           onProviderChange={(providerId) =>
             setSettings({
               ...settings,
-              [providerModalType === 'stt' ? 'sttProvider' : 'ttsProvider']: providerId,
+              [providerModalType === 'stt'
+                ? 'sttProvider'
+                : providerModalType === 'tts'
+                  ? 'ttsProvider'
+                  : 'llmProvider']: providerId,
             })
           }
           onApiKeyChange={(provider, key) =>
@@ -759,7 +726,11 @@ export const Modern2025SettingsScreen: React.FC = () => {
               },
             })
           }
-          onClose={() => setShowProviderModal(false)}
+          onClose={() => {
+            setShowProviderModal(false);
+            // Reload settings to refresh status
+            loadSettings();
+          }}
         />
       </Modal>
     </SafeAreaView>
@@ -872,9 +843,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: designTokens.spacing.md,
   },
-  switchContainer: {
-    alignItems: 'flex-end',
-  },
   historyOptions: {
     marginTop: designTokens.spacing.sm,
   },
@@ -903,18 +871,23 @@ const styles = StyleSheet.create({
   },
   providerStatus: {
     alignItems: 'flex-end',
+    flex: 0,
+    marginLeft: 'auto',
+    minWidth: 120,
   },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: designTokens.spacing.sm,
-    paddingVertical: designTokens.spacing.xs,
+    justifyContent: 'flex-end',
+    paddingHorizontal: designTokens.spacing.xs,
+    paddingVertical: 4,
     borderRadius: designTokens.radius.full,
-    gap: designTokens.spacing.xs,
+    gap: 4,
   },
   statusText: {
     ...designTokens.typography.labelSmall,
     fontWeight: '600',
+    fontSize: 11,
   },
   infoBox: {
     flexDirection: 'row',
@@ -974,9 +947,6 @@ const styles = StyleSheet.create({
   copyrightText: {
     ...designTokens.typography.bodySmall,
     marginTop: designTokens.spacing.xs,
-  },
-  saveSection: {
-    marginTop: designTokens.spacing.lg,
   },
   modal: {
     margin: 0,

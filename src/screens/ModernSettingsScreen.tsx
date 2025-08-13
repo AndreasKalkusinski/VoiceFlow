@@ -4,13 +4,10 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
-  Switch,
   Animated,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlassCard } from '../components/GlassCard';
@@ -40,11 +37,8 @@ export const ModernSettingsScreen: React.FC = () => {
     },
     providerSettings: {},
   });
-  const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  const [autoSave, setAutoSave] = useState(false);
   const modelRefreshInterval = useRef<NodeJS.Timeout | null>(null);
-  const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const { colors, isDark, themeMode, setTheme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -54,29 +48,24 @@ export const ModernSettingsScreen: React.FC = () => {
 
   useEffect(() => {
     loadSettings();
-    loadAutoSavePreference();
     animateEntry();
     return () => {
       if (modelRefreshInterval.current) {
         clearInterval(modelRefreshInterval.current);
-      }
-      if (saveTimeout.current) {
-        clearTimeout(saveTimeout.current);
       }
     };
   }, []);
 
   // Auto-save when settings change
   useEffect(() => {
-    if (autoSave && settings.openaiApiKey) {
-      if (saveTimeout.current) {
-        clearTimeout(saveTimeout.current);
-      }
-      saveTimeout.current = setTimeout(() => {
+    const saveTimer = setTimeout(() => {
+      if (settings.openaiApiKey || settings.apiKeys?.openai) {
         saveSettingsSilently();
-      }, 1000); // Save after 1 second of inactivity
-    }
-  }, [settings, autoSave]);
+      }
+    }, 1000);
+
+    return () => clearTimeout(saveTimer);
+  }, [settings]);
 
   // Fetch models when screen is focused and API key is available
   useFocusEffect(
@@ -142,32 +131,6 @@ export const ModernSettingsScreen: React.FC = () => {
     }
   };
 
-  const loadAutoSavePreference = async () => {
-    try {
-      const savedAutoSave = await AsyncStorage.getItem('@voiceflow_autosave');
-      if (savedAutoSave !== null) {
-        setAutoSave(savedAutoSave === 'true');
-      }
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const toggleAutoSave = async (value: boolean) => {
-    try {
-      await AsyncStorage.setItem('@voiceflow_autosave', value.toString());
-      setAutoSave(value);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      if (value) {
-        showStatus(t('settings.autoSaveEnabled'), 2000);
-      } else {
-        showStatus(t('settings.autoSaveDisabled'), 2000);
-      }
-    } catch {
-      /* ignore */
-    }
-  };
-
   const saveSettingsSilently = async () => {
     try {
       await StorageService.saveSettings(settings);
@@ -222,25 +185,6 @@ export const ModernSettingsScreen: React.FC = () => {
   const showStatus = (message: string, duration: number = 3000) => {
     setStatusMessage(message);
     setTimeout(() => setStatusMessage(''), duration);
-  };
-
-  const saveSettings = async () => {
-    setIsSaving(true);
-    showStatus(t('settings.status.saving'));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
-    try {
-      await StorageService.saveSettings(settings);
-      showStatus(t('settings.status.saved'));
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('alerts.settingsSavedTitle'), t('alerts.settingsSavedMessage'));
-    } catch {
-      showStatus(t('settings.status.failed'));
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common.error'), t('settings.status.failed'));
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   const handleLanguageChange = async (languageCode: string) => {
@@ -393,42 +337,6 @@ export const ModernSettingsScreen: React.FC = () => {
               }
             />
 
-            {/* Auto-Save Toggle */}
-            <GlassCard style={styles.section}>
-              <View style={styles.autoSaveContainer}>
-                <View style={styles.autoSaveText}>
-                  <Text
-                    style={[styles.sectionTitle, { color: colors.text, marginBottom: spacing.xs }]}
-                  >
-                    {t('settings.autoSave')}
-                  </Text>
-                  <Text style={[styles.autoSaveDescription, { color: colors.textSecondary }]}>
-                    {t('settings.autoSaveDescription')}
-                  </Text>
-                </View>
-                <Switch
-                  value={autoSave}
-                  onValueChange={toggleAutoSave}
-                  trackColor={{ false: colors.border, true: colors.primary }}
-                  thumbColor={autoSave ? '#ffffff' : '#f4f3f4'}
-                  ios_backgroundColor={colors.border}
-                />
-              </View>
-            </GlassCard>
-
-            {/* Save Button (visible when auto-save is off) */}
-            {!autoSave && (
-              <View style={styles.saveButtonContainer}>
-                <AnimatedButton
-                  title={t('settings.saveSettings')}
-                  onPress={saveSettings}
-                  variant="primary"
-                  size="large"
-                  disabled={isSaving}
-                  icon={<Text>💾</Text>}
-                />
-              </View>
-            )}
           </Animated.View>
         </ScrollView>
       </LinearGradient>
@@ -503,21 +411,5 @@ const styles = StyleSheet.create({
   languageButton: {
     flex: 1,
     marginHorizontal: spacing.xs / 2,
-  },
-  saveButtonContainer: {
-    marginBottom: spacing.md,
-  },
-  autoSaveContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  autoSaveText: {
-    flex: 1,
-    marginRight: spacing.md,
-  },
-  autoSaveDescription: {
-    fontSize: fontSizes.small,
-    lineHeight: fontSizes.small * 1.4,
   },
 });

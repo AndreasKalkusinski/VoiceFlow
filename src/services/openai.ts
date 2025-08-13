@@ -103,6 +103,11 @@ export class OpenAIService {
     }
   }
 
+  static async transcribe(audioUri: string, apiKey: string, model: string = 'whisper-1'): Promise<string> {
+    const service = new OpenAIService(apiKey);
+    return service.transcribeAudio(audioUri, model);
+  }
+
   async textToSpeech(
     text: string,
     model: string = 'tts-1',

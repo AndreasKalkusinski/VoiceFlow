@@ -48,7 +48,10 @@ export default {
       ready: 'Ready when you are!',
       recording: 'Listening... Go ahead!',
       processing: 'Working on your speech...',
+      processingMedium: 'Processing your recording... This may take a moment.',
+      processingLong: 'Processing long recording... Please be patient.',
       transcribing: 'Converting to text with AI magic...',
+      estimatedTime: 'Estimated time',
       complete: 'Perfect! All done! ✨',
       failed: 'Oops, something went wrong',
       microphoneDenied: 'We need your microphone permission',
@@ -113,7 +116,7 @@ export default {
     aiProviders: 'AI Providers',
     aiProvidersDescription: 'Configure your AI service providers and API keys',
     configured: 'Configured',
-    setupRequired: 'Setup Required',
+    setupRequired: 'Setup',
     configure: 'Configure',
     appInfo: 'App Info',
     version: 'Version',
@@ -131,16 +134,17 @@ export default {
     getApiKey: 'Get API Key',
     chooseProvider: 'Choose Provider',
     backToProviders: 'Back to Providers',
-    configureSettings: 'Configure your {{provider}} settings',
+    configureSettings: 'Configure {{provider}}',
     valid: 'Valid',
     invalid: 'Invalid',
     validating: 'Validating...',
     validateKey: 'Validate Key',
     done: 'Done',
-    enterApiKey: 'Enter your {{provider}} API key',
+    enterApiKey: 'Enter {{provider}} API key',
     visitProvider: 'Visit {{provider}} to get your API key',
     selectSTTService: 'Select your preferred speech-to-text service',
     selectTTSService: 'Select your preferred text-to-speech service',
+    selectLLMService: 'Select your preferred AI assistant',
     apiKeysInfo: 'API keys are stored locally on your device and never sent to our servers',
 
     theme: {
@@ -157,8 +161,10 @@ export default {
     hideApiKey: 'Hide',
     speechToTextProvider: 'Speech-to-Text Provider',
     textToSpeechProvider: 'Text-to-Speech Provider',
+    llmProvider: 'AI Assistant Provider',
     model: 'Model',
     voice: 'Voice',
+    searchModels: 'Search models...',
 
     models: {
       speechToText: 'Speech-to-Text Model',
@@ -183,8 +189,6 @@ export default {
       },
     },
 
-    saveSettings: 'Save Settings',
-
     status: {
       loading: 'Loading settings...',
       loaded: 'Settings loaded',
@@ -196,10 +200,6 @@ export default {
       failed: 'Failed to save settings',
       autoSaved: 'Auto-saved 💾',
     },
-    autoSave: 'Auto-save',
-    autoSaveDescription: 'Changes are saved automatically after 1 second',
-    autoSaveEnabled: 'Auto-save enabled',
-    autoSaveDisabled: 'Auto-save disabled',
   },
 
   errors: {
@@ -208,6 +208,7 @@ export default {
     noAudio: 'Please generate speech first',
     clipboardEmpty: 'No text found in clipboard',
     microphoneRequired: 'This app needs microphone access for speech to text functionality',
+    noLLMProvider: 'Please configure an AI assistant provider in Settings',
   },
 
   alerts: {
@@ -224,6 +225,56 @@ export default {
     error: 'Error',
     success: 'Success',
     clipboardEmpty: 'Clipboard is empty',
+  },
+
+  ai: {
+    quickActions: 'AI Quick Actions',
+    quickActionsSubtitle: 'Process your text with AI',
+    result: 'AI Result',
+    processingError: 'Failed to process with AI',
+    magicQuill: 'Magic Quill',
+    magicQuillDescription: 'Enter your custom AI instruction',
+    magicQuillPlaceholder: 'e.g., "Make it more friendly" or "Translate to Spanish"',
+    process: 'Process',
+    customPromptHint: 'Enter custom instruction',
+    actions: {
+      summarize: {
+        title: 'Summarize',
+        subtitle: 'Get key points',
+      },
+      todos: {
+        title: 'Extract To-Dos',
+        subtitle: 'Find action items',
+      },
+      improve: {
+        title: 'Improve Text',
+        subtitle: 'Make it better',
+      },
+      translate: {
+        title: 'Translate',
+        subtitle: 'Change language',
+      },
+      keypoints: {
+        title: 'Key Points',
+        subtitle: 'Main takeaways',
+      },
+      formal: {
+        title: 'Make Formal',
+        subtitle: 'Professional tone',
+      },
+      rewrite: {
+        title: 'Rewrite',
+        subtitle: 'Better structure',
+      },
+      friendly: {
+        title: 'Friendly',
+        subtitle: 'Warm tone',
+      },
+      simplify: {
+        title: 'Simplify',
+        subtitle: 'Easier to read',
+      },
+    },
   },
 
   history: {

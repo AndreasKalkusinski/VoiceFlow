@@ -40,7 +40,10 @@ export default {
       ready: '¡Listo cuando tú lo estés!',
       recording: 'Escuchando... ¡Adelante!',
       processing: 'Trabajando en tu voz...',
+      processingMedium: 'Procesando tu grabación... Esto puede tomar un momento.',
+      processingLong: 'Procesando grabación larga... Por favor ten paciencia.',
       transcribing: 'Convirtiendo a texto con magia IA...',
+      estimatedTime: 'Tiempo estimado',
       complete: '¡Perfecto! ¡Terminado! ✨',
       failed: 'Ups, algo salió mal',
       microphoneDenied: 'Necesitamos permiso del micrófono',
@@ -96,7 +99,7 @@ export default {
     aiProviders: 'Proveedores de IA',
     aiProvidersDescription: 'Configura tus proveedores de servicios de IA y claves API',
     configured: 'Configurado',
-    setupRequired: 'Configuración requerida',
+    setupRequired: 'Configurar',
     configure: 'Configurar',
     appInfo: 'Información de la App',
     version: 'Versión',
@@ -114,16 +117,17 @@ export default {
     getApiKey: 'Obtener clave API',
     chooseProvider: 'Elegir Proveedor',
     backToProviders: 'Volver a Proveedores',
-    configureSettings: 'Configurar ajustes de {{provider}}',
+    configureSettings: 'Configurar {{provider}}',
     valid: 'Válido',
     invalid: 'Inválido',
     validating: 'Validando...',
     validateKey: 'Validar Clave',
     done: 'Hecho',
-    enterApiKey: 'Ingresa tu clave API de {{provider}}',
+    enterApiKey: 'Clave API de {{provider}}',
     visitProvider: 'Visita {{provider}} para obtener tu clave API',
     selectSTTService: 'Selecciona tu servicio de voz a texto preferido',
     selectTTSService: 'Selecciona tu servicio de texto a voz preferido',
+    selectLLMService: 'Selecciona tu asistente IA preferido',
     apiKeysInfo:
       'Las claves API se almacenan localmente en tu dispositivo y nunca se envían a nuestros servidores',
 
@@ -141,8 +145,10 @@ export default {
     hideApiKey: 'Ocultar',
     speechToTextProvider: 'Proveedor de Voz a Texto',
     textToSpeechProvider: 'Proveedor de Texto a Voz',
+    llmProvider: 'Proveedor de Asistente IA',
     model: 'Modelo',
     voice: 'Voz',
+    searchModels: 'Buscar modelos...',
 
     models: {
       speechToText: 'Modelo Voz-a-Texto',
@@ -167,8 +173,6 @@ export default {
       },
     },
 
-    saveSettings: 'Guardar Ajustes',
-
     status: {
       loading: 'Cargando ajustes...',
       loaded: 'Ajustes cargados',
@@ -180,10 +184,6 @@ export default {
       failed: 'Error al guardar ajustes',
       autoSaved: 'Guardado automático 💾',
     },
-    autoSave: 'Guardado automático',
-    autoSaveDescription: 'Los cambios se guardan automáticamente después de 1 segundo',
-    autoSaveEnabled: 'Guardado automático activado',
-    autoSaveDisabled: 'Guardado automático desactivado',
   },
 
   errors: {
@@ -193,6 +193,7 @@ export default {
     clipboardEmpty: 'No se encontró texto en el portapapeles',
     microphoneRequired:
       'Esta aplicación necesita acceso al micrófono para la función de voz a texto',
+    noLLMProvider: 'Por favor configura un proveedor de asistente IA en Ajustes',
   },
 
   alerts: {
@@ -209,6 +210,56 @@ export default {
     error: 'Error',
     success: 'Éxito',
     clipboardEmpty: 'Portapapeles vacío',
+  },
+
+  ai: {
+    quickActions: 'Acciones Rápidas IA',
+    quickActionsSubtitle: 'Procesa tu texto con IA',
+    result: 'Resultado IA',
+    processingError: 'Error al procesar con IA',
+    magicQuill: 'Pluma Mágica',
+    magicQuillDescription: 'Ingresa tu instrucción personalizada de IA',
+    magicQuillPlaceholder: 'ej. "Hazlo más amigable" o "Traduce al español"',
+    process: 'Procesar',
+    customPromptHint: 'Ingresa instrucción personalizada',
+    actions: {
+      summarize: {
+        title: 'Resumir',
+        subtitle: 'Obtener puntos clave',
+      },
+      todos: {
+        title: 'Extraer Tareas',
+        subtitle: 'Encontrar acciones',
+      },
+      improve: {
+        title: 'Mejorar Texto',
+        subtitle: 'Hacerlo mejor',
+      },
+      translate: {
+        title: 'Traducir',
+        subtitle: 'Cambiar idioma',
+      },
+      keypoints: {
+        title: 'Puntos Clave',
+        subtitle: 'Ideas principales',
+      },
+      formal: {
+        title: 'Formalizar',
+        subtitle: 'Tono profesional',
+      },
+      rewrite: {
+        title: 'Reescribir',
+        subtitle: 'Mejor estructura',
+      },
+      friendly: {
+        title: 'Amigable',
+        subtitle: 'Tono cálido',
+      },
+      simplify: {
+        title: 'Simplificar',
+        subtitle: 'Más fácil de leer',
+      },
+    },
   },
 
   history: {

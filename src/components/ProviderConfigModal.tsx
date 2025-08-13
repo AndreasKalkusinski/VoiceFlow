@@ -20,9 +20,10 @@ import { useTranslation } from 'react-i18next';
 import { designTokens } from '../utils/design-system';
 import * as Haptics from 'expo-haptics';
 import { ProviderRegistry } from '../services/providers/ProviderRegistry';
+import { LLMProviderRegistry } from '../services/providers/LLMProviderRegistry';
 
 interface ProviderConfigModalProps {
-  type: 'stt' | 'tts';
+  type: 'stt' | 'tts' | 'llm';
   selectedProvider: string;
   apiKeys: Record<string, string>;
   providerSettings: Record<string, any>;
@@ -49,21 +50,71 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
   const [isValidating, setIsValidating] = useState(false);
   const [validationStatus, setValidationStatus] = useState<'valid' | 'invalid' | null>(null);
   const [currentStep, setCurrentStep] = useState<'provider' | 'config'>('provider');
+  const [loadedModels, setLoadedModels] = useState<any[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [modelSearchQuery, setModelSearchQuery] = useState('');
 
   const providers =
-    type === 'stt' ? ProviderRegistry.getAllSTTProviders() : ProviderRegistry.getAllTTSProviders();
+    type === 'stt'
+      ? ProviderRegistry.getAllSTTProviders()
+      : type === 'tts'
+        ? ProviderRegistry.getAllTTSProviders()
+        : LLMProviderRegistry.getAllProviders();
 
-  const currentProvider = providers.find((p) => p.id === selectedProvider);
+  const currentProvider = providers.find((p: any) => p.id === selectedProvider);
 
   useEffect(() => {
     // Reset validation status when provider changes
     setValidationStatus(null);
-  }, [selectedProvider]);
+    setLoadedModels([]);
+
+    // Load models for LLM providers if API key exists
+    if (type === 'llm' && currentProvider && currentProvider.loadModels) {
+      const apiKey = getApiKeyForProvider(currentProvider.id);
+      if (apiKey) {
+        loadModelsForProvider(apiKey);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProvider, type]);
+
+  // Load models when entering config step
+  useEffect(() => {
+    if (
+      currentStep === 'config' &&
+      type === 'llm' &&
+      currentProvider &&
+      currentProvider.loadModels
+    ) {
+      const apiKey = getApiKeyForProvider(currentProvider.id);
+      if (apiKey && loadedModels.length === 0) {
+        loadModelsForProvider(apiKey);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
+
+  const loadModelsForProvider = async (apiKey: string) => {
+    if (!currentProvider || !currentProvider.loadModels) return;
+
+    setIsLoadingModels(true);
+    try {
+      const models = await currentProvider.loadModels(apiKey);
+      setLoadedModels(models);
+    } catch (error) {
+      console.error('Failed to load models:', error);
+      // Fall back to default models
+      setLoadedModels(currentProvider.models || []);
+    } finally {
+      setIsLoadingModels(false);
+    }
+  };
 
   const getApiKeyForProvider = (providerId: string): string => {
     if (providerId.startsWith('openai')) return apiKeys.openai || '';
     if (providerId.startsWith('google')) return apiKeys.google || '';
     if (providerId.startsWith('elevenlabs')) return apiKeys.elevenlabs || '';
+    if (providerId.startsWith('anthropic')) return apiKeys.anthropic || '';
     return '';
   };
 
@@ -72,10 +123,16 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
     if (providerId.startsWith('openai')) keyName = 'openai';
     else if (providerId.startsWith('google')) keyName = 'google';
     else if (providerId.startsWith('elevenlabs')) keyName = 'elevenlabs';
+    else if (providerId.startsWith('anthropic')) keyName = 'anthropic';
 
     if (keyName) {
       onApiKeyChange(keyName, value);
       setValidationStatus(null); // Reset validation when key changes
+
+      // Load models for LLM providers when API key changes
+      if (type === 'llm' && value && currentProvider && currentProvider.loadModels) {
+        loadModelsForProvider(value);
+      }
     }
   };
 
@@ -112,6 +169,27 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
     onProviderChange(providerId);
     setCurrentStep('config');
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Load models when selecting an LLM provider
+    if (type === 'llm') {
+      const provider = providers.find((p: any) => p.id === providerId);
+      if (provider && provider.loadModels) {
+        const apiKey = getApiKeyForProvider(providerId);
+        if (apiKey) {
+          setIsLoadingModels(true);
+          provider
+            .loadModels(apiKey)
+            .then((models: any) => {
+              setLoadedModels(models);
+              setIsLoadingModels(false);
+            })
+            .catch(() => {
+              setLoadedModels(provider.models || []);
+              setIsLoadingModels(false);
+            });
+        }
+      }
+    }
   };
 
   const renderProviderOption = (provider: any) => {
@@ -178,7 +256,11 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
           {t('settings.chooseProvider')}
         </Text>
         <Text style={[styles.stepSubtitle, { color: colors.textSecondary }]}>
-          {type === 'stt' ? t('settings.selectSTTService') : t('settings.selectTTSService')}
+          {type === 'stt'
+            ? t('settings.selectSTTService')
+            : type === 'tts'
+              ? t('settings.selectTTSService')
+              : t('settings.selectLLMService')}
         </Text>
       </View>
 
@@ -313,44 +395,89 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
                 <Text style={[styles.configTitle, { color: colors.text }]}>
                   {t('settings.model')}
                 </Text>
+                {isLoadingModels && <ActivityIndicator size="small" color={colors.primary} />}
               </View>
 
-              <View style={styles.optionsGrid}>
-                {currentProvider.models.map((model: any) => {
-                  const isSelected =
-                    providerSettings[currentProvider.id]?.model === model.id ||
-                    (!providerSettings[currentProvider.id]?.model &&
-                      currentProvider.models?.[0]?.id === model.id);
-
-                  return (
+              {/* Search Bar for Models */}
+              {(loadedModels.length > 5 || currentProvider.models.length > 5) && (
+                <View style={styles.searchContainer}>
+                  <Ionicons name="search-outline" size={18} color={colors.textMuted} />
+                  <TextInput
+                    style={[styles.searchInput, { color: colors.text }]}
+                    placeholder={t('settings.searchModels') || 'Search models...'}
+                    placeholderTextColor={colors.textMuted}
+                    value={modelSearchQuery}
+                    onChangeText={setModelSearchQuery}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  {modelSearchQuery.length > 0 && (
                     <TouchableOpacity
-                      key={model.id}
-                      style={[
-                        styles.optionCard,
-                        isSelected && [styles.optionCardSelected, { borderColor: colors.primary }],
-                      ]}
-                      onPress={() => {
-                        onSettingChange(currentProvider.id, 'model', model.id);
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      }}
+                      onPress={() => setModelSearchQuery('')}
+                      style={styles.clearButton}
                     >
-                      <Text style={[styles.optionName, { color: colors.text }]}>{model.name}</Text>
-                      {model.description && (
-                        <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
-                          {model.description}
-                        </Text>
-                      )}
-                      {isSelected && (
-                        <View
-                          style={[styles.selectedIndicator, { backgroundColor: colors.primary }]}
-                        >
-                          <Ionicons name="checkmark" size={12} color="#fff" />
-                        </View>
-                      )}
+                      <Ionicons name="close-circle" size={18} color={colors.textMuted} />
                     </TouchableOpacity>
-                  );
-                })}
-              </View>
+                  )}
+                </View>
+              )}
+
+              <ScrollView style={styles.modelsList} showsVerticalScrollIndicator={false}>
+                <View style={styles.optionsGrid}>
+                  {(loadedModels.length > 0 ? loadedModels : currentProvider.models)
+                    .filter(
+                      (model: any) =>
+                        model.id.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
+                        model.name.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
+                        (model.description &&
+                          model.description.toLowerCase().includes(modelSearchQuery.toLowerCase())),
+                    )
+                    .map((model: any) => {
+                      const isSelected =
+                        providerSettings[currentProvider.id]?.model === model.id ||
+                        (!providerSettings[currentProvider.id]?.model &&
+                          currentProvider.models?.[0]?.id === model.id);
+
+                      return (
+                        <TouchableOpacity
+                          key={model.id}
+                          style={[
+                            styles.optionCard,
+                            isSelected && [
+                              styles.optionCardSelected,
+                              { borderColor: colors.primary },
+                            ],
+                          ]}
+                          onPress={() => {
+                            onSettingChange(currentProvider.id, 'model', model.id);
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          }}
+                        >
+                          <Text style={[styles.optionName, { color: colors.text }]}>
+                            {model.name}
+                          </Text>
+                          {model.description && (
+                            <Text
+                              style={[styles.optionDescription, { color: colors.textSecondary }]}
+                            >
+                              {model.description}
+                            </Text>
+                          )}
+                          {isSelected && (
+                            <View
+                              style={[
+                                styles.selectedIndicator,
+                                { backgroundColor: colors.primary },
+                              ]}
+                            >
+                              <Ionicons name="checkmark" size={12} color="#fff" />
+                            </View>
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
+                </View>
+              </ScrollView>
             </ModernCard>
           )}
 
@@ -433,7 +560,11 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
       <View style={styles.modalHeader}>
         <View style={{ width: 40 }} />
         <Text style={[styles.modalTitle, { color: colors.text }]}>
-          {type === 'stt' ? t('settings.speechToTextProvider') : t('settings.textToSpeechProvider')}
+          {type === 'stt'
+            ? t('settings.speechToTextProvider')
+            : type === 'tts'
+              ? t('settings.textToSpeechProvider')
+              : t('settings.llmProvider')}
         </Text>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color={colors.text} />
@@ -630,6 +761,27 @@ const styles = StyleSheet.create({
   helpText: {
     ...designTokens.typography.bodySmall,
     fontWeight: '500',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+    borderRadius: designTokens.radius.md,
+    paddingHorizontal: designTokens.spacing.md,
+    paddingVertical: designTokens.spacing.sm,
+    marginBottom: designTokens.spacing.md,
+    gap: designTokens.spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    ...designTokens.typography.bodyMedium,
+    padding: 0,
+  },
+  clearButton: {
+    padding: designTokens.spacing.xs,
+  },
+  modelsList: {
+    maxHeight: 300,
   },
   optionsGrid: {
     gap: designTokens.spacing.sm,
