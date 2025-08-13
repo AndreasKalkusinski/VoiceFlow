@@ -21,6 +21,9 @@ import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
+import { TranscriptionProgress } from '../components/TranscriptionProgress';
+import { AIQuickActions } from '../components/AIQuickActions';
+import { useRef } from 'react';
 
 export const CleanSpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -29,6 +32,8 @@ export const CleanSpeechToTextScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const recordingStartTime = useRef<number | null>(null);
 
   const { colors } = useTheme();
   const { t } = useTranslation();
@@ -98,6 +103,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
 
       setRecording(recording);
       setIsRecording(true);
+      recordingStartTime.current = Date.now();
       showStatus(t('speechToText.status.recording'));
     } catch {
       showStatus(t('speechToText.status.failed'));
@@ -109,6 +115,14 @@ export const CleanSpeechToTextScreen: React.FC = () => {
 
     try {
       setIsRecording(false);
+
+      // Calculate recording duration
+      const duration = recordingStartTime.current
+        ? Math.floor((Date.now() - recordingStartTime.current) / 1000)
+        : 0;
+      setRecordingDuration(duration);
+      recordingStartTime.current = null;
+
       setIsProcessing(true);
       showStatus(t('speechToText.status.processing'));
 
@@ -198,6 +212,19 @@ export const CleanSpeechToTextScreen: React.FC = () => {
                 placeholderTextColor={colors.textMuted}
                 textAlignVertical="top"
               />
+
+              {/* Transcription Progress Indicator */}
+              {isProcessing && recordingDuration > 0 && (
+                <TranscriptionProgress isVisible={isProcessing} duration={recordingDuration} />
+              )}
+
+              {/* AI Quick Actions */}
+              {transcribedText && !isProcessing && !isRecording && (
+                <AIQuickActions
+                  text={transcribedText}
+                  onResult={(result) => setTranscribedText(result)}
+                />
+              )}
             </MinimalCard>
 
             {/* Recording Status */}

@@ -12,7 +12,6 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
@@ -33,8 +32,8 @@ import Modal from 'react-native-modal';
 type TabType = 'general' | 'providers' | 'about';
 
 // App Info
-const APP_VERSION = '1.1.0';
-const BUILD_NUMBER = '42';
+const APP_VERSION = '2.1.1';
+const BUILD_NUMBER = '44';
 const GITHUB_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow';
 const PRIVACY_URL = 'https://example.com/privacy';
 const TERMS_URL = 'https://example.com/terms';
@@ -55,16 +54,13 @@ export const Modern2025SettingsScreen: React.FC = () => {
     },
     providerSettings: {},
   });
-  const [isSaving, setIsSaving] = useState(false);
-  const [autoSave, setAutoSave] = useState(false);
   const [historySettings, setHistorySettings] = useState<HistorySettings>({
     enabled: true,
     maxItems: 25,
   });
   const [showProviderModal, setShowProviderModal] = useState(false);
-  const [providerModalType, setProviderModalType] = useState<'stt' | 'tts'>('stt');
+  const [providerModalType, setProviderModalType] = useState<'stt' | 'tts' | 'llm'>('stt');
 
-  const saveTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
   const { isDark, themeMode, setTheme } = useTheme();
@@ -75,7 +71,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
   useEffect(() => {
     loadSettings();
-    loadAutoSavePreference();
     loadHistorySettings();
 
     // Smooth fade in animation
@@ -84,24 +79,18 @@ export const Modern2025SettingsScreen: React.FC = () => {
       duration: designTokens.animation.normal,
       useNativeDriver: true,
     }).start();
-
-    return () => {
-      if (saveTimeout.current) {
-        clearTimeout(saveTimeout.current);
-      }
-    };
   }, []);
 
+  // Auto-save settings whenever they change
   useEffect(() => {
-    if (autoSave && settings.openaiApiKey) {
-      if (saveTimeout.current) {
-        clearTimeout(saveTimeout.current);
-      }
-      saveTimeout.current = setTimeout(() => {
+    const saveTimer = setTimeout(() => {
+      if (settings.openaiApiKey || settings.apiKeys?.openai) {
         saveSettingsSilently();
-      }, 1000);
-    }
-  }, [settings, autoSave]);
+      }
+    }, 1000);
+
+    return () => clearTimeout(saveTimer);
+  }, [settings]);
 
   const loadSettings = async () => {
     try {
@@ -118,17 +107,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
         providerSettings: loadedSettings.providerSettings || {},
       };
       setSettings(migratedSettings);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const loadAutoSavePreference = async () => {
-    try {
-      const savedAutoSave = await AsyncStorage.getItem('@voiceflow_autosave');
-      if (savedAutoSave !== null) {
-        setAutoSave(savedAutoSave === 'true');
-      }
     } catch {
       /* ignore */
     }
@@ -164,35 +142,11 @@ export const Modern2025SettingsScreen: React.FC = () => {
     ]);
   };
 
-  const toggleAutoSave = async (value: boolean) => {
-    try {
-      await AsyncStorage.setItem('@voiceflow_autosave', value.toString());
-      setAutoSave(value);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {
-      /* ignore */
-    }
-  };
-
   const saveSettingsSilently = async () => {
     try {
       await StorageService.saveSettings(settings);
     } catch {
       /* ignore */
-    }
-  };
-
-  const saveSettings = async () => {
-    setIsSaving(true);
-    try {
-      await StorageService.saveSettings(settings);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('alerts.settingsSavedTitle'), t('alerts.settingsSavedMessage'));
-    } catch {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common.error'), t('settings.status.failed'));
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -206,7 +160,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
     }
   };
 
-  const openProviderConfig = (type: 'stt' | 'tts') => {
+  const openProviderConfig = (type: 'stt' | 'tts' | 'llm') => {
     setProviderModalType(type);
     setShowProviderModal(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -259,39 +213,61 @@ export const Modern2025SettingsScreen: React.FC = () => {
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             {t('settings.theme.title')}
           </Text>
-          <View style={styles.segmentedControl}>
+          <View style={styles.themeSelector}>
             {[
-              { id: 'auto', name: t('settings.theme.auto'), iconName: 'contrast-outline' },
-              { id: 'light', name: t('settings.theme.light'), iconName: 'sunny-outline' },
-              { id: 'dark', name: t('settings.theme.dark'), iconName: 'moon-outline' },
+              {
+                id: 'auto',
+                name: t('settings.theme.auto'),
+                iconName: 'contrast-outline',
+                gradient: ['#6366F1', '#8B5CF6'],
+              },
+              {
+                id: 'light',
+                name: t('settings.theme.light'),
+                iconName: 'sunny-outline',
+                gradient: ['#FCD34D', '#F59E0B'],
+              },
+              {
+                id: 'dark',
+                name: t('settings.theme.dark'),
+                iconName: 'moon-outline',
+                gradient: ['#4B5563', '#1F2937'],
+              },
             ].map((option) => (
               <TouchableOpacity
                 key={option.id}
-                style={[
-                  styles.segment,
-                  themeMode === option.id && [
-                    styles.segmentActive,
-                    { backgroundColor: colors.primary + '20' },
-                  ],
-                ]}
+                style={[styles.themeOption, themeMode === option.id && styles.themeOptionActive]}
                 onPress={() => {
                   setTheme(option.id as ThemeMode);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
               >
-                <Ionicons
-                  name={option.iconName as keyof typeof Ionicons.glyphMap}
-                  size={16}
-                  color={themeMode === option.id ? colors.primary : colors.text}
-                />
+                <LinearGradient
+                  colors={
+                    themeMode === option.id
+                      ? (option.gradient as [string, string])
+                      : ['#F3F4F6', '#E5E7EB']
+                  }
+                  style={styles.themeIconContainer}
+                >
+                  <Ionicons
+                    name={option.iconName as keyof typeof Ionicons.glyphMap}
+                    size={20}
+                    color={themeMode === option.id ? '#FFFFFF' : '#6B7280'}
+                  />
+                </LinearGradient>
                 <Text
                   style={[
-                    styles.segmentText,
+                    styles.themeText,
                     { color: themeMode === option.id ? colors.primary : colors.text },
+                    themeMode === option.id && { fontWeight: '600' },
                   ]}
                 >
                   {option.name}
                 </Text>
+                {themeMode === option.id && (
+                  <View style={[styles.activeIndicator, { backgroundColor: colors.primary }]} />
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -301,66 +277,47 @@ export const Modern2025SettingsScreen: React.FC = () => {
           <Text style={[styles.label, { color: colors.textSecondary }]}>
             {t('settings.language')}
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.chipContainer}>
-              {availableLanguages.map((lang) => (
-                <TouchableOpacity
-                  key={lang.code}
+          <View style={styles.languageSelector}>
+            {availableLanguages.map((lang) => (
+              <TouchableOpacity
+                key={lang.code}
+                style={[
+                  styles.languageOption,
+                  selectedLanguage === lang.code && styles.languageOptionActive,
+                ]}
+                onPress={() => handleLanguageChange(lang.code)}
+              >
+                <View
                   style={[
-                    styles.chip,
-                    selectedLanguage === lang.code && [
-                      styles.chipActive,
-                      { backgroundColor: colors.primary },
-                    ],
+                    styles.languageIconContainer,
+                    selectedLanguage === lang.code && { backgroundColor: colors.primary + '20' },
                   ]}
-                  onPress={() => handleLanguageChange(lang.code)}
                 >
-                  <Text
-                    style={[
-                      styles.chipText,
-                      {
-                        color: selectedLanguage === lang.code ? colors.textOnPrimary : colors.text,
-                      },
-                    ]}
-                  >
-                    {lang.flag} {lang.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
+                  <Text style={styles.flagEmoji}>{lang.flag}</Text>
+                </View>
+                <Text
+                  style={[
+                    styles.languageText,
+                    { color: selectedLanguage === lang.code ? colors.primary : colors.text },
+                    selectedLanguage === lang.code && { fontWeight: '600' },
+                  ]}
+                >
+                  {lang.name}
+                </Text>
+                {selectedLanguage === lang.code && (
+                  <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
         </ModernCard>
       </View>
 
       {/* Data & Privacy Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Data & Privacy</Text>
-
-        {/* Auto-Save */}
-        <ModernCard variant="surface" style={styles.card}>
-          <View style={styles.switchRow}>
-            <View style={styles.switchContent}>
-              <View style={styles.switchTextContainer}>
-                <Text style={[styles.label, { color: colors.text }]}>{t('settings.autoSave')}</Text>
-                <Text style={[styles.description, { color: colors.textSecondary }]}>
-                  {t('settings.autoSaveDescription')}
-                </Text>
-              </View>
-              <View style={styles.switchContainer}>
-                <Switch
-                  value={autoSave}
-                  onValueChange={toggleAutoSave}
-                  trackColor={{
-                    false: colors.border,
-                    true: colors.primary + '40',
-                  }}
-                  thumbColor={autoSave ? colors.primary : '#f4f3f4'}
-                  ios_backgroundColor={colors.border}
-                />
-              </View>
-            </View>
-          </View>
-        </ModernCard>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          {t('settings.dataPrivacy')}
+        </Text>
 
         {/* History Settings */}
         <ModernCard variant="surface" style={styles.card}>
@@ -377,9 +334,12 @@ export const Modern2025SettingsScreen: React.FC = () => {
                 onValueChange={(value) =>
                   updateHistorySettings({ ...historySettings, enabled: value })
                 }
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={historySettings.enabled ? colors.primaryDark : colors.surface}
-                ios_backgroundColor={colors.border}
+                trackColor={{
+                  false: '#E5E7EB',
+                  true: colors.primary + '60',
+                }}
+                thumbColor={historySettings.enabled ? colors.primary : '#FFFFFF'}
+                ios_backgroundColor="#E5E7EB"
               />
             </View>
           </View>
@@ -454,7 +414,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
             <View>
-              <Text style={[styles.label, { color: colors.text }]}>Speech-to-Text</Text>
+              <Text style={[styles.label, { color: colors.text }]}>
+                {t('settings.speechToTextProvider')}
+              </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
                 {settings.sttProvider === 'openai-stt'
                   ? 'OpenAI Whisper'
@@ -498,7 +460,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
             <View>
-              <Text style={[styles.label, { color: colors.text }]}>Text-to-Speech</Text>
+              <Text style={[styles.label, { color: colors.text }]}>
+                {t('settings.textToSpeechProvider')}
+              </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
                 {settings.ttsProvider === 'openai-tts'
                   ? 'OpenAI TTS'
@@ -541,10 +505,58 @@ export const Modern2025SettingsScreen: React.FC = () => {
           />
         </ModernCard>
 
+        {/* AI Assistant Provider */}
+        <ModernCard variant="elevated" style={styles.card}>
+          <View style={styles.providerHeader}>
+            <View>
+              <Text style={[styles.label, { color: colors.text }]}>
+                {t('settings.llmProvider')}
+              </Text>
+              <Text style={[styles.providerName, { color: colors.textSecondary }]}>
+                {settings.llmProvider === 'openai-llm'
+                  ? 'OpenAI GPT'
+                  : settings.llmProvider === 'anthropic-llm'
+                    ? 'Anthropic Claude'
+                    : settings.llmProvider === 'google-gemini'
+                      ? 'Google Gemini'
+                      : 'OpenAI GPT'}
+              </Text>
+            </View>
+            <View style={styles.providerStatus}>
+              {(settings.llmProvider?.includes('openai') &&
+                (settings.apiKeys?.openai || settings.openaiApiKey)) ||
+              (settings.llmProvider?.includes('anthropic') && settings.apiKeys?.anthropic) ||
+              (settings.llmProvider?.includes('google') && settings.apiKeys?.google) ? (
+                <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
+                  <Ionicons name="checkmark-circle" size={16} color={colors.success} />
+                  <Text style={[styles.statusText, { color: colors.success }]}>
+                    {t('settings.configured')}
+                  </Text>
+                </View>
+              ) : (
+                <View style={[styles.statusBadge, { backgroundColor: colors.warning + '20' }]}>
+                  <Ionicons name="alert-circle" size={16} color={colors.warning} />
+                  <Text style={[styles.statusText, { color: colors.warning }]}>
+                    {t('settings.setupRequired')}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+          <ModernButton
+            title={t('settings.configure')}
+            onPress={() => openProviderConfig('llm')}
+            variant="glass"
+            size="small"
+            fullWidth
+            icon={<Ionicons name="settings-outline" size={18} color={colors.text} />}
+          />
+        </ModernCard>
+
         <View style={styles.infoBox}>
           <Ionicons name="information-circle-outline" size={20} color={colors.accent} />
           <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            API keys are stored locally on your device and never sent to our servers.
+            {t('settings.apiKeysInfo')}
           </Text>
         </View>
       </View>
@@ -653,9 +665,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
       {/* Tab Bar */}
       <View style={[styles.tabBar, { backgroundColor: colors.surface + '80' }]}>
-        {renderTabButton('general', 'options-outline', 'General')}
-        {renderTabButton('providers', 'cloud-outline', 'Providers')}
-        {renderTabButton('about', 'information-circle-outline', 'About')}
+        {renderTabButton('general', 'options-outline', t('settings.general'))}
+        {renderTabButton('providers', 'cloud-outline', t('settings.providers'))}
+        {renderTabButton('about', 'information-circle-outline', t('settings.about'))}
       </View>
 
       {/* Content */}
@@ -663,21 +675,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {activeTab === 'general' && renderGeneralTab()}
         {activeTab === 'providers' && renderProvidersTab()}
         {activeTab === 'about' && renderAboutTab()}
-
-        {/* Save Button (visible when auto-save is off and on general tab) */}
-        {!autoSave && activeTab === 'general' && (
-          <View style={styles.saveSection}>
-            <ModernButton
-              title={t('settings.saveSettings')}
-              onPress={saveSettings}
-              variant="glass"
-              size="large"
-              loading={isSaving}
-              fullWidth
-              icon={<Ionicons name="save-outline" size={20} color={colors.text} />}
-            />
-          </View>
-        )}
       </ScrollView>
 
       {/* Provider Configuration Modal */}
@@ -694,14 +691,20 @@ export const Modern2025SettingsScreen: React.FC = () => {
           selectedProvider={
             providerModalType === 'stt'
               ? settings.sttProvider || 'openai-stt'
-              : settings.ttsProvider || 'openai-tts'
+              : providerModalType === 'tts'
+                ? settings.ttsProvider || 'openai-tts'
+                : settings.llmProvider || 'openai-llm'
           }
           apiKeys={settings.apiKeys || {}}
           providerSettings={settings.providerSettings || {}}
           onProviderChange={(providerId) =>
             setSettings({
               ...settings,
-              [providerModalType === 'stt' ? 'sttProvider' : 'ttsProvider']: providerId,
+              [providerModalType === 'stt'
+                ? 'sttProvider'
+                : providerModalType === 'tts'
+                  ? 'ttsProvider'
+                  : 'llmProvider']: providerId,
             })
           }
           onApiKeyChange={(provider, key) =>
@@ -723,7 +726,11 @@ export const Modern2025SettingsScreen: React.FC = () => {
               },
             })
           }
-          onClose={() => setShowProviderModal(false)}
+          onClose={() => {
+            setShowProviderModal(false);
+            // Reload settings to refresh status
+            loadSettings();
+          }}
         />
       </Modal>
     </SafeAreaView>
@@ -753,7 +760,7 @@ const styles = StyleSheet.create({
     marginHorizontal: designTokens.spacing.lg,
     marginBottom: designTokens.spacing.md,
     borderRadius: designTokens.radius.lg,
-    padding: designTokens.spacing.xs,
+    padding: designTokens.spacing.sm,
     ...designTokens.elevation.sm,
   },
   tabButton: {
@@ -761,7 +768,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: designTokens.spacing.sm,
+    paddingVertical: designTokens.spacing.md,
     borderRadius: designTokens.radius.md,
     gap: designTokens.spacing.xs,
   },
@@ -801,6 +808,7 @@ const styles = StyleSheet.create({
     marginTop: designTokens.spacing.xs,
     lineHeight: 18,
   },
+  // Old styles kept for history section
   segmentedControl: {
     flexDirection: 'row',
     backgroundColor: 'rgba(0, 0, 0, 0.02)',
@@ -817,29 +825,9 @@ const styles = StyleSheet.create({
     borderRadius: designTokens.radius.sm,
     gap: designTokens.spacing.xs,
   },
-  segmentActive: {
-    ...designTokens.elevation.sm,
-  },
   segmentText: {
     ...designTokens.typography.labelMedium,
     fontWeight: '600',
-  },
-  chipContainer: {
-    flexDirection: 'row',
-    gap: designTokens.spacing.sm,
-  },
-  chip: {
-    paddingVertical: designTokens.spacing.sm,
-    paddingHorizontal: designTokens.spacing.md,
-    borderRadius: designTokens.radius.full,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  chipActive: {
-    ...designTokens.elevation.sm,
-  },
-  chipText: {
-    ...designTokens.typography.labelMedium,
-    fontWeight: '500',
   },
   switchRow: {
     flexDirection: 'row',
@@ -854,9 +842,6 @@ const styles = StyleSheet.create({
   switchTextContainer: {
     flex: 1,
     marginRight: designTokens.spacing.md,
-  },
-  switchContainer: {
-    alignItems: 'flex-end',
   },
   historyOptions: {
     marginTop: designTokens.spacing.sm,
@@ -886,18 +871,23 @@ const styles = StyleSheet.create({
   },
   providerStatus: {
     alignItems: 'flex-end',
+    flex: 0,
+    marginLeft: 'auto',
+    minWidth: 120,
   },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: designTokens.spacing.sm,
-    paddingVertical: designTokens.spacing.xs,
+    justifyContent: 'flex-end',
+    paddingHorizontal: designTokens.spacing.xs,
+    paddingVertical: 4,
     borderRadius: designTokens.radius.full,
-    gap: designTokens.spacing.xs,
+    gap: 4,
   },
   statusText: {
     ...designTokens.typography.labelSmall,
     fontWeight: '600',
+    fontSize: 11,
   },
   infoBox: {
     flexDirection: 'row',
@@ -958,11 +948,81 @@ const styles = StyleSheet.create({
     ...designTokens.typography.bodySmall,
     marginTop: designTokens.spacing.xs,
   },
-  saveSection: {
-    marginTop: designTokens.spacing.lg,
-  },
   modal: {
     margin: 0,
     justifyContent: 'flex-end',
+  },
+
+  // Theme Selector Styles
+  themeSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: designTokens.spacing.sm,
+  },
+  themeOption: {
+    flex: 1,
+    alignItems: 'center',
+    padding: designTokens.spacing.md,
+    borderRadius: designTokens.radius.lg,
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  themeOptionActive: {
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    backgroundColor: 'rgba(99, 102, 241, 0.05)',
+  },
+  themeIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: designTokens.spacing.xs,
+  },
+  themeText: {
+    ...designTokens.typography.labelSmall,
+    marginTop: designTokens.spacing.xs,
+  },
+  activeIndicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: designTokens.spacing.xs,
+  },
+
+  // Language Selector Styles
+  languageSelector: {
+    gap: designTokens.spacing.sm,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: designTokens.spacing.md,
+    borderRadius: designTokens.radius.lg,
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+    borderWidth: 2,
+    borderColor: 'transparent',
+    marginBottom: designTokens.spacing.xs,
+  },
+  languageOptionActive: {
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    backgroundColor: 'rgba(99, 102, 241, 0.05)',
+  },
+  languageIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    marginRight: designTokens.spacing.md,
+  },
+  flagEmoji: {
+    fontSize: 20,
+  },
+  languageText: {
+    ...designTokens.typography.bodyMedium,
+    flex: 1,
   },
 });

@@ -25,6 +25,8 @@ import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { wp, hp, spacing, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
+import { TranscriptionProgress } from '../components/TranscriptionProgress';
+import { AIQuickActions } from '../components/AIQuickActions';
 
 export const ModernSpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -33,6 +35,8 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const recordingStartTime = useRef<number | null>(null);
 
   const { colors, isDark } = useTheme();
   const { t } = useTranslation();
@@ -172,6 +176,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
 
       setRecording(recording);
       setIsRecording(true);
+      recordingStartTime.current = Date.now();
       showStatus(t('speechToText.status.recording'));
     } catch {
       showStatus(t('speechToText.status.failed'));
@@ -184,6 +189,14 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setIsRecording(false);
+
+      // Calculate recording duration
+      const duration = recordingStartTime.current
+        ? Math.floor((Date.now() - recordingStartTime.current) / 1000)
+        : 0;
+      setRecordingDuration(duration);
+      recordingStartTime.current = null;
+
       setIsProcessing(true);
       showStatus(t('speechToText.status.processing'));
 
@@ -286,6 +299,19 @@ export const ModernSpeechToTextScreen: React.FC = () => {
                   placeholder={t('speechToText.placeholder')}
                   placeholderTextColor={colors.textMuted}
                 />
+
+                {/* Transcription Progress Indicator */}
+                {isProcessing && recordingDuration > 0 && (
+                  <TranscriptionProgress isVisible={isProcessing} duration={recordingDuration} />
+                )}
+
+                {/* AI Quick Actions */}
+                {transcribedText && !isProcessing && !isRecording && (
+                  <AIQuickActions
+                    text={transcribedText}
+                    onResult={(result) => setTranscribedText(result)}
+                  />
+                )}
               </GlassCard>
 
               {/* Recording Visualization */}

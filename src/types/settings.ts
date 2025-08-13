@@ -8,6 +8,7 @@ export interface Settings {
   // New provider-based settings
   sttProvider?: string;
   ttsProvider?: string;
+  llmProvider?: string;
 
   // Provider-specific API keys
   apiKeys?: {
@@ -18,6 +19,7 @@ export interface Settings {
     aws?: string;
     deepgram?: string;
     assemblyai?: string;
+    anthropic?: string;
   };
 
   // Provider-specific settings

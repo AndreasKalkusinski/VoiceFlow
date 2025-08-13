@@ -48,7 +48,10 @@ export default {
       ready: 'Bereit zur Aufnahme',
       recording: 'Aufnahme... Sprich jetzt',
       processing: 'Verarbeite deine Sprache...',
+      processingMedium: 'Verarbeite deine Aufnahme... Das kann einen Moment dauern.',
+      processingLong: 'Verarbeite lange Aufnahme... Bitte hab Geduld.',
       transcribing: 'Transkribiere mit KI...',
+      estimatedTime: 'Geschätzte Zeit',
       complete: 'Transkription abgeschlossen!',
       failed: 'Transkription fehlgeschlagen',
       microphoneDenied: 'Mikrofonzugriff verweigert',
@@ -114,7 +117,7 @@ export default {
     aiProviders: 'KI-Anbieter',
     aiProvidersDescription: 'Konfiguriere deine KI-Dienstanbieter und API-Schlüssel',
     configured: 'Konfiguriert',
-    setupRequired: 'Einrichtung erforderlich',
+    setupRequired: 'Einrichten',
     configure: 'Konfigurieren',
     appInfo: 'App-Info',
     version: 'Version',
@@ -132,16 +135,22 @@ export default {
     getApiKey: 'API-Schlüssel erhalten',
     chooseProvider: 'Anbieter wählen',
     backToProviders: 'Zurück zu Anbietern',
-    configureSettings: '{provider} Einstellungen konfigurieren',
+    configureSettings: '{{provider}} konfigurieren',
     valid: 'Gültig',
     invalid: 'Ungültig',
     validating: 'Prüfung...',
     validateKey: 'Schlüssel prüfen',
     done: 'Fertig',
-    enterApiKey: 'Gib deinen {provider} API-Schlüssel ein',
-    visitProvider: 'Besuche {provider} für deinen API-Schlüssel',
+    enterApiKey: '{{provider}} API-Schlüssel eingeben',
+    visitProvider: 'Besuche {{provider}} für deinen API-Schlüssel',
+    selectSTTService: 'Wähle deinen bevorzugten Sprache-zu-Text Dienst',
+    selectTTSService: 'Wähle deinen bevorzugten Text-zu-Sprache Dienst',
+    selectLLMService: 'Wähle deinen bevorzugten KI-Assistenten',
+    apiKeysInfo:
+      'API-Schlüssel werden lokal auf deinem Gerät gespeichert und niemals an unsere Server gesendet',
 
     theme: {
+      title: 'Design',
       auto: 'Auto',
       light: 'Hell',
       dark: 'Dunkel',
@@ -154,8 +163,10 @@ export default {
     hideApiKey: 'Verbergen',
     speechToTextProvider: 'Sprache-zu-Text Anbieter',
     textToSpeechProvider: 'Text-zu-Sprache Anbieter',
+    llmProvider: 'KI-Assistent Anbieter',
     model: 'Modell',
     voice: 'Stimme',
+    searchModels: 'Modelle durchsuchen...',
 
     models: {
       speechToText: 'Sprache-zu-Text Modell',
@@ -180,8 +191,6 @@ export default {
       },
     },
 
-    saveSettings: 'Einstellungen speichern',
-
     status: {
       loading: 'Lade Einstellungen...',
       loaded: 'Einstellungen geladen',
@@ -193,10 +202,6 @@ export default {
       failed: 'Fehler beim Speichern',
       autoSaved: 'Automatisch gespeichert 💾',
     },
-    autoSave: 'Automatisch speichern',
-    autoSaveDescription: 'Änderungen werden automatisch nach 1 Sekunde gespeichert',
-    autoSaveEnabled: 'Automatisches Speichern aktiviert',
-    autoSaveDisabled: 'Automatisches Speichern deaktiviert',
   },
 
   errors: {
@@ -205,6 +210,7 @@ export default {
     noAudio: 'Bitte erzeuge zuerst eine Sprachausgabe',
     clipboardEmpty: 'Zwischenablage ist leer',
     microphoneRequired: 'Diese App benötigt Mikrofonzugriff für die Sprache-zu-Text Funktion',
+    noLLMProvider: 'Bitte konfiguriere einen KI-Assistenten Anbieter in den Einstellungen',
   },
 
   alerts: {
@@ -221,6 +227,56 @@ export default {
     error: 'Fehler',
     success: 'Erfolg',
     clipboardEmpty: 'Zwischenablage ist leer',
+  },
+
+  ai: {
+    quickActions: 'KI-Schnellaktionen',
+    quickActionsSubtitle: 'Verarbeite deinen Text mit KI',
+    result: 'KI-Ergebnis',
+    processingError: 'Fehler bei der KI-Verarbeitung',
+    magicQuill: 'Magische Feder',
+    magicQuillDescription: 'Gib deine eigene KI-Anweisung ein',
+    magicQuillPlaceholder: 'z.B. "Mache es freundlicher" oder "Übersetze ins Spanische"',
+    process: 'Verarbeiten',
+    customPromptHint: 'Eigene Anweisung eingeben',
+    actions: {
+      summarize: {
+        title: 'Zusammenfassen',
+        subtitle: 'Kernpunkte erhalten',
+      },
+      todos: {
+        title: 'To-Dos extrahieren',
+        subtitle: 'Aktionspunkte finden',
+      },
+      improve: {
+        title: 'Text verbessern',
+        subtitle: 'Besser formulieren',
+      },
+      translate: {
+        title: 'Übersetzen',
+        subtitle: 'Sprache ändern',
+      },
+      keypoints: {
+        title: 'Kernpunkte',
+        subtitle: 'Wichtigste Punkte',
+      },
+      formal: {
+        title: 'Formalisieren',
+        subtitle: 'Professioneller Ton',
+      },
+      rewrite: {
+        title: 'Umschreiben',
+        subtitle: 'Bessere Struktur',
+      },
+      friendly: {
+        title: 'Freundlicher',
+        subtitle: 'Warmer Ton',
+      },
+      simplify: {
+        title: 'Vereinfachen',
+        subtitle: 'Leichter lesbar',
+      },
+    },
   },
 
   history: {
