@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
-  "buildNumber": 43,
-  "description": "Voice input for Magic Quill, React 19 compatibility fixes"
+  "version": "2.1.1",
+  "buildNumber": 44,
+  "description": "Magic Quill with voice input, LLM provider, AI quick actions"
 }
