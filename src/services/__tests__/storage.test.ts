@@ -70,7 +70,7 @@ describe('StorageService', () => {
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
       (AsyncStorage.setItem as jest.Mock).mockRejectedValue(new Error('Storage error'));
 
-      await StorageService.setApiKey('test-key');
+      await expect(StorageService.setApiKey('test-key')).rejects.toThrow('Storage error');
 
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();

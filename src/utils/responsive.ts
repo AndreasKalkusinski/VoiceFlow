@@ -40,7 +40,8 @@ export const spacing = {
 
 // Responsive font sizes as a function
 export const fontSize = (size: number): number => {
-  return (screenWidth / 375) * size;
+  const { width } = Dimensions.get('window');
+  return (width / 375) * size;
 };
 
 // Font size presets
