@@ -31,12 +31,17 @@ import Modal from 'react-native-modal';
 
 type TabType = 'general' | 'providers' | 'about';
 
-// App Info
-const APP_VERSION = '2.1.1';
-const BUILD_NUMBER = '44';
+// App Info - Dynamically loaded from version utils
+import Constants from 'expo-constants';
+import { APP_VERSION, BUILD_NUMBER } from '../utils/version';
 const GITHUB_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow';
-const PRIVACY_URL = 'https://example.com/privacy';
-const TERMS_URL = 'https://example.com/terms';
+const PRIVACY_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki/Privacy-Policy';
+const TERMS_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki/Terms-of-Service';
+const WIKI_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki';
+const ISSUES_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/issues';
+const DISCUSSIONS_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/discussions';
+const RELEASES_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/releases';
+const CONTRIBUTING_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki/Contributing';
 
 export const Modern2025SettingsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('general');
@@ -47,6 +52,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
     ttsVoice: 'alloy',
     sttProvider: 'openai-stt',
     ttsProvider: 'openai-tts',
+    llmProvider: 'openai-llm',
     apiKeys: {
       openai: '',
       google: '',
@@ -92,6 +98,94 @@ export const Modern2025SettingsScreen: React.FC = () => {
     return () => clearTimeout(saveTimer);
   }, [settings]);
 
+  // Helper functions to get provider display names
+  const getSTTProviderName = (provider: string | undefined) => {
+    switch (provider) {
+      case 'openai-stt':
+        return 'OpenAI Whisper';
+      case 'google-stt':
+        return 'Google Cloud';
+      default:
+        return provider || 'Not configured';
+    }
+  };
+
+  const getTTSProviderName = (provider: string | undefined) => {
+    switch (provider) {
+      case 'openai-tts':
+        return 'OpenAI TTS';
+      case 'google-tts':
+        return 'Google Cloud';
+      case 'elevenlabs':
+        return 'ElevenLabs';
+      default:
+        return provider || 'Not configured';
+    }
+  };
+
+  const getLLMProviderName = (provider: string | undefined) => {
+    switch (provider) {
+      case 'openai-llm':
+        return 'OpenAI GPT';
+      case 'anthropic-llm':
+        return 'Anthropic Claude';
+      case 'google-gemini':
+        return 'Google Gemini';
+      case 'mistral':
+        return 'Mistral AI';
+      default:
+        return provider || 'Not configured';
+    }
+  };
+
+  // Helper functions to get current models
+  const getSTTModel = () => {
+    const provider = settings.sttProvider;
+    if (provider && settings.providerSettings?.[provider]?.model) {
+      return settings.providerSettings[provider].model;
+    }
+    // Fallback to legacy field
+    return settings.sttModel || 'whisper-1';
+  };
+
+  const getTTSModel = () => {
+    const provider = settings.ttsProvider;
+    if (provider && settings.providerSettings?.[provider]?.model) {
+      return settings.providerSettings[provider].model;
+    }
+    // Fallback to legacy field
+    return settings.ttsModel || 'tts-1';
+  };
+
+  const getTTSVoice = () => {
+    const provider = settings.ttsProvider;
+    if (provider && settings.providerSettings?.[provider]?.voice) {
+      return settings.providerSettings[provider].voice;
+    }
+    // Fallback to legacy field
+    return settings.ttsVoice || 'alloy';
+  };
+
+  const getLLMModel = () => {
+    const provider = settings.llmProvider;
+    if (provider && settings.providerSettings?.[provider]?.model) {
+      return settings.providerSettings[provider].model;
+    }
+    // Default models based on provider
+    switch (provider) {
+      case 'openai-llm':
+        return 'gpt-4o-mini';
+      case 'anthropic-llm':
+        return 'claude-3-haiku-20240307';
+      case 'google-gemini':
+        return 'gemini-1.5-flash';
+      case 'mistral':
+        return 'mistral-small-latest';
+      default:
+        return 'gpt-4o-mini';
+    }
+  };
+
   const loadSettings = async () => {
     try {
       const loadedSettings = await StorageService.getSettings();
@@ -99,10 +193,12 @@ export const Modern2025SettingsScreen: React.FC = () => {
         ...loadedSettings,
         sttProvider: loadedSettings.sttProvider || 'openai-stt',
         ttsProvider: loadedSettings.ttsProvider || 'openai-tts',
+        llmProvider: loadedSettings.llmProvider || 'openai-llm',
         apiKeys: loadedSettings.apiKeys || {
           openai: loadedSettings.openaiApiKey || '',
           google: '',
           elevenlabs: '',
+          mistral: '',
         },
         providerSettings: loadedSettings.providerSettings || {},
       };
@@ -413,16 +509,15 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* Speech-to-Text Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.speechToTextProvider')}
               </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
-                {settings.sttProvider === 'openai-stt'
-                  ? 'OpenAI Whisper'
-                  : settings.sttProvider === 'google-stt'
-                    ? 'Google Cloud'
-                    : settings.sttProvider}
+                {getSTTProviderName(settings.sttProvider)}
+              </Text>
+              <Text style={[styles.modelText, { color: colors.textSecondary }]}>
+                {t('settings.model')}: {getSTTModel()}
               </Text>
             </View>
             <View style={styles.providerStatus}>
@@ -459,18 +554,15 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* Text-to-Speech Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.textToSpeechProvider')}
               </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
-                {settings.ttsProvider === 'openai-tts'
-                  ? 'OpenAI TTS'
-                  : settings.ttsProvider === 'google-tts'
-                    ? 'Google Cloud'
-                    : settings.ttsProvider === 'elevenlabs'
-                      ? 'ElevenLabs'
-                      : settings.ttsProvider}
+                {getTTSProviderName(settings.ttsProvider)}
+              </Text>
+              <Text style={[styles.modelText, { color: colors.textSecondary }]}>
+                {t('settings.model')}: {getTTSModel()} • {t('settings.voice')}: {getTTSVoice()}
               </Text>
             </View>
             <View style={styles.providerStatus}>
@@ -508,25 +600,23 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* AI Assistant Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.llmProvider')}
               </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
-                {settings.llmProvider === 'openai-llm'
-                  ? 'OpenAI GPT'
-                  : settings.llmProvider === 'anthropic-llm'
-                    ? 'Anthropic Claude'
-                    : settings.llmProvider === 'google-gemini'
-                      ? 'Google Gemini'
-                      : 'OpenAI GPT'}
+                {getLLMProviderName(settings.llmProvider)}
+              </Text>
+              <Text style={[styles.modelText, { color: colors.textSecondary }]}>
+                {t('settings.model')}: {getLLMModel()}
               </Text>
             </View>
             <View style={styles.providerStatus}>
               {(settings.llmProvider?.includes('openai') &&
                 (settings.apiKeys?.openai || settings.openaiApiKey)) ||
               (settings.llmProvider?.includes('anthropic') && settings.apiKeys?.anthropic) ||
-              (settings.llmProvider?.includes('google') && settings.apiKeys?.google) ? (
+              (settings.llmProvider?.includes('google') && settings.apiKeys?.google) ||
+              (settings.llmProvider?.includes('mistral') && settings.apiKeys?.mistral) ? (
                 <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.success} />
                   <Text style={[styles.statusText, { color: colors.success }]}>
@@ -577,6 +667,33 @@ export const Modern2025SettingsScreen: React.FC = () => {
           </Text>
         </View>
 
+        {/* Open Source Badge */}
+        <ModernCard variant="glass" style={styles.openSourceCard}>
+          <LinearGradient
+            colors={[colors.success + '15', colors.primary + '15']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.badgeGradient}
+          >
+            <View style={styles.badgeContent}>
+              <Ionicons name="heart" size={20} color={colors.success} />
+              <Text style={[styles.badgeTitle, { color: colors.text }]}>
+                {t('settings.openSource')}
+              </Text>
+              <Ionicons name="code-slash" size={20} color={colors.primary} />
+            </View>
+            <Text style={[styles.badgeSubtitle, { color: colors.textSecondary }]}>
+              {t('settings.freeForever')}
+            </Text>
+            <View style={styles.transparencyRow}>
+              <Ionicons name="eye-outline" size={16} color={colors.primary} />
+              <Text style={[styles.transparencyText, { color: colors.textSecondary }]}>
+                {t('settings.fullTransparency')}
+              </Text>
+            </View>
+          </LinearGradient>
+        </ModernCard>
+
         {/* Links */}
         <ModernCard variant="glass" style={styles.card}>
           <TouchableOpacity style={styles.linkRow} onPress={() => openURL(GITHUB_URL)}>
@@ -589,12 +706,11 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-          <TouchableOpacity
-            style={styles.linkRow}
-            onPress={() => Alert.alert('Report Issue', 'Feature coming soon!')}
-          >
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(ISSUES_URL)}>
             <Ionicons name="bug-outline" size={22} color={colors.text} />
-            <Text style={[styles.linkText, { color: colors.text }]}>Report an Issue</Text>
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.reportIssue')}
+            </Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
 
@@ -628,6 +744,78 @@ export const Modern2025SettingsScreen: React.FC = () => {
             <Ionicons name="document-text-outline" size={22} color={colors.text} />
             <Text style={[styles.linkText, { color: colors.text }]}>
               {t('settings.termsOfService')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </ModernCard>
+
+        {/* Community & Support */}
+        <ModernCard variant="surface" style={styles.card}>
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(WIKI_URL)}>
+            <Ionicons name="book-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.documentation')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(DISCUSSIONS_URL)}>
+            <Ionicons name="chatbubbles-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>{t('settings.community')}</Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(ISSUES_URL)}>
+            <Ionicons name="bug-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.reportIssue')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(CONTRIBUTING_URL)}>
+            <Ionicons name="heart-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.contribute')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </ModernCard>
+
+        {/* Technical Info */}
+        <ModernCard variant="surface" style={styles.card}>
+          <View style={styles.techInfoRow}>
+            <Text style={[styles.techLabel, { color: colors.textSecondary }]}>
+              {t('settings.platform')}
+            </Text>
+            <Text style={[styles.techValue, { color: colors.text }]}>
+              {Platform.OS === 'ios' ? 'iOS' : 'Android'} {Platform.Version}
+            </Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <View style={styles.techInfoRow}>
+            <Text style={[styles.techLabel, { color: colors.textSecondary }]}>
+              {t('settings.expoSDK')}
+            </Text>
+            <Text style={[styles.techValue, { color: colors.text }]}>
+              SDK {Constants.expoConfig?.sdkVersion || 'N/A'}
+            </Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(RELEASES_URL)}>
+            <Ionicons name="download-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.checkUpdates')}
             </Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
@@ -869,6 +1057,11 @@ const styles = StyleSheet.create({
     ...designTokens.typography.bodySmall,
     marginTop: designTokens.spacing.xs,
   },
+  modelText: {
+    ...designTokens.typography.labelSmall,
+    marginTop: designTokens.spacing.xs / 2,
+    fontSize: 12,
+  },
   providerStatus: {
     alignItems: 'flex-end',
     flex: 0,
@@ -947,6 +1140,55 @@ const styles = StyleSheet.create({
   copyrightText: {
     ...designTokens.typography.bodySmall,
     marginTop: designTokens.spacing.xs,
+  },
+  techInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: designTokens.spacing.sm,
+  },
+  techLabel: {
+    ...designTokens.typography.bodyMedium,
+  },
+  techValue: {
+    ...designTokens.typography.bodyMedium,
+    fontWeight: '600',
+  },
+  openSourceCard: {
+    marginBottom: designTokens.spacing.md,
+    padding: 0,
+    overflow: 'hidden',
+  },
+  badgeGradient: {
+    padding: designTokens.spacing.lg,
+    alignItems: 'center',
+  },
+  badgeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: designTokens.spacing.sm,
+  },
+  badgeTitle: {
+    ...designTokens.typography.titleMedium,
+    fontWeight: '700',
+  },
+  badgeSubtitle: {
+    ...designTokens.typography.bodyMedium,
+    marginTop: designTokens.spacing.xs,
+    textAlign: 'center',
+  },
+  transparencyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: designTokens.spacing.xs,
+    marginTop: designTokens.spacing.sm,
+    paddingTop: designTokens.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  transparencyText: {
+    ...designTokens.typography.bodySmall,
+    fontStyle: 'italic',
   },
   modal: {
     margin: 0,

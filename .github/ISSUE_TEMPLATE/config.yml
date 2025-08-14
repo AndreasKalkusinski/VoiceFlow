@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/AndreasKalkusinski/VoiceFlow/wiki
+    about: Check the wiki for guides and documentation
+  - name: 💬 Discussions
+    url: https://github.com/AndreasKalkusinski/VoiceFlow/discussions
+    about: Ask questions and discuss with the community
+  - name: 🔐 Privacy & Legal
+    url: https://github.com/AndreasKalkusinski/VoiceFlow/tree/main/docs
+    about: Privacy policy, terms, and data processing info
