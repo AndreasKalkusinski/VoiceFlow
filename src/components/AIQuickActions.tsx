@@ -136,7 +136,9 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
           ? settings.apiKeys?.anthropic
           : settings.llmProvider.includes('google')
             ? settings.apiKeys?.google
-            : null;
+            : settings.llmProvider.includes('mistral')
+              ? settings.apiKeys?.mistral
+              : null;
 
       if (!apiKey) {
         Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
@@ -154,7 +156,7 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
           {
             role: 'system',
             content:
-              'You are a helpful assistant that processes text according to specific instructions. Be concise and clear.',
+              'You are a helpful assistant that processes text according to specific instructions. Return ONLY the processed result without any explanation, introduction, or the original text. Be concise and clear.',
           },
           {
             role: 'user',
@@ -166,9 +168,10 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
       setProcessedResult(result);
       onResult?.(result);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch (error: any) {
       console.error('AI processing error:', error);
-      Alert.alert(t('alerts.error'), t('ai.processingError'));
+      const errorMessage = error?.message || t('ai.processingError');
+      Alert.alert(t('alerts.error'), errorMessage);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setProcessingAction(null);

@@ -24,8 +24,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ModernCard } from '../components/ModernCard';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
+import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { designTokens } from '../utils/design-system';
@@ -134,11 +134,6 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
     const currentSettings = await StorageService.getSettings();
     setSettings(currentSettings);
 
-    if (!currentSettings?.apiKeys?.openai && !currentSettings?.openaiApiKey) {
-      Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
-      return;
-    }
-
     if (!inputText.trim()) {
       Alert.alert(t('alerts.noTextTitle'), t('errors.noText'));
       return;
@@ -149,26 +144,39 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      const apiKey = currentSettings.apiKeys?.openai || currentSettings.openaiApiKey;
+      // Get the selected TTS provider
+      const providerId = currentSettings.ttsProvider || 'openai-tts';
+      const provider = ProviderRegistry.getTTSProvider(providerId);
 
-      // Get model and voice from providerSettings or fallback to defaults
-      const ttsModel =
-        currentSettings.providerSettings?.['openai-tts']?.model ||
-        currentSettings.ttsModel ||
-        'tts-1';
-      const ttsVoice =
-        currentSettings.providerSettings?.['openai-tts']?.voice ||
-        currentSettings.ttsVoice ||
-        'alloy';
-
-      // TTS Settings logging disabled for production
-
-      if (!apiKey) {
-        throw new Error('API key is missing');
+      if (!provider) {
+        throw new Error(`TTS provider ${providerId} not found`);
       }
 
-      const openaiService = new OpenAIService(apiKey);
-      const newAudioUri = await openaiService.textToSpeech(inputText, ttsModel, ttsVoice);
+      // Get the API key for the selected provider
+      const apiKey = providerId.includes('openai')
+        ? currentSettings.apiKeys?.openai || currentSettings.openaiApiKey
+        : providerId.includes('google')
+          ? currentSettings.apiKeys?.google
+          : providerId.includes('elevenlabs')
+            ? currentSettings.apiKeys?.elevenlabs
+            : '';
+
+      if (!apiKey) {
+        Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
+        return;
+      }
+
+      // Get model and voice from providerSettings
+      const ttsModel = currentSettings.providerSettings?.[providerId]?.model || 'tts-1';
+      const ttsVoice = currentSettings.providerSettings?.[providerId]?.voice || 'alloy';
+
+      // Synthesize using the selected provider
+      const newAudioUri = await provider.synthesize(inputText, {
+        apiKey,
+        model: ttsModel,
+        voice: ttsVoice,
+        speed: 1.0,
+      });
 
       if (sound) {
         await sound.unloadAsync();

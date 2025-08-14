@@ -22,9 +22,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ModernCard } from '../components/ModernCard';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
+import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { useTranslation } from 'react-i18next';
 import { designTokens } from '../utils/design-system';
 import { vh } from '../utils/responsive-dimensions';
@@ -127,13 +127,31 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       setIsProcessing(true);
       showStatus(t('speechToText.status.transcribing'));
 
-      const openaiService = new OpenAIService(settings.apiKeys?.openai || settings.openaiApiKey);
+      // Get the selected STT provider
+      const providerId = settings.sttProvider || 'openai-stt';
+      const provider = ProviderRegistry.getSTTProvider(providerId);
+
+      if (!provider) {
+        throw new Error(`STT provider ${providerId} not found`);
+      }
+
+      // Get the API key for the selected provider
+      const apiKey = providerId.includes('openai')
+        ? settings.apiKeys?.openai || settings.openaiApiKey
+        : providerId.includes('google')
+          ? settings.apiKeys?.google
+          : '';
+
+      if (!apiKey) {
+        throw new Error(`API key not configured for ${provider.name}`);
+      }
 
       // Transcribe the shared audio file
-      const text = await openaiService.transcribeAudio(
-        sharedAudioUri,
-        settings.providerSettings?.['openai-stt']?.model || settings.sttModel || 'whisper-1',
-      );
+      const text = await provider.transcribe(sharedAudioUri, {
+        apiKey,
+        model: settings.providerSettings?.[providerId]?.model || settings.sttModel || 'whisper-1',
+        // Don't specify language to enable auto-detection
+      });
 
       if (text) {
         setTranscribedText(text);
@@ -307,8 +325,32 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
 
       if (uri && settings) {
         showStatus(t('speechToText.status.transcribing'));
-        const openaiService = new OpenAIService(settings.openaiApiKey);
-        const text = await openaiService.transcribeAudio(uri, settings.sttModel);
+
+        // Get the selected STT provider
+        const providerId = settings.sttProvider || 'openai-stt';
+        const provider = ProviderRegistry.getSTTProvider(providerId);
+
+        if (!provider) {
+          throw new Error(`STT provider ${providerId} not found`);
+        }
+
+        // Get the API key for the selected provider
+        const apiKey = providerId.includes('openai')
+          ? settings.apiKeys?.openai || settings.openaiApiKey
+          : providerId.includes('google')
+            ? settings.apiKeys?.google
+            : '';
+
+        if (!apiKey) {
+          throw new Error(`API key not configured for ${provider.name}`);
+        }
+
+        // Transcribe using the selected provider
+        const text = await provider.transcribe(uri, {
+          apiKey,
+          model: settings.providerSettings?.[providerId]?.model || settings.sttModel || 'whisper-1',
+          // Don't specify language to enable auto-detection
+        });
 
         const fullText = transcribedText ? transcribedText + ' ' + text : text;
         setTranscribedText(fullText);
