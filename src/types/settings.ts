@@ -20,6 +20,7 @@ export interface Settings {
     deepgram?: string;
     assemblyai?: string;
     anthropic?: string;
+    mistral?: string;
   };
 
   // Provider-specific settings

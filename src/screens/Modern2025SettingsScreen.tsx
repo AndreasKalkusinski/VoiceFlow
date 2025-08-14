@@ -98,6 +98,94 @@ export const Modern2025SettingsScreen: React.FC = () => {
     return () => clearTimeout(saveTimer);
   }, [settings]);
 
+  // Helper functions to get provider display names
+  const getSTTProviderName = (provider: string | undefined) => {
+    switch (provider) {
+      case 'openai-stt':
+        return 'OpenAI Whisper';
+      case 'google-stt':
+        return 'Google Cloud';
+      default:
+        return provider || 'Not configured';
+    }
+  };
+
+  const getTTSProviderName = (provider: string | undefined) => {
+    switch (provider) {
+      case 'openai-tts':
+        return 'OpenAI TTS';
+      case 'google-tts':
+        return 'Google Cloud';
+      case 'elevenlabs':
+        return 'ElevenLabs';
+      default:
+        return provider || 'Not configured';
+    }
+  };
+
+  const getLLMProviderName = (provider: string | undefined) => {
+    switch (provider) {
+      case 'openai-llm':
+        return 'OpenAI GPT';
+      case 'anthropic-llm':
+        return 'Anthropic Claude';
+      case 'google-gemini':
+        return 'Google Gemini';
+      case 'mistral':
+        return 'Mistral AI';
+      default:
+        return provider || 'Not configured';
+    }
+  };
+
+  // Helper functions to get current models
+  const getSTTModel = () => {
+    const provider = settings.sttProvider;
+    if (provider && settings.providerSettings?.[provider]?.model) {
+      return settings.providerSettings[provider].model;
+    }
+    // Fallback to legacy field
+    return settings.sttModel || 'whisper-1';
+  };
+
+  const getTTSModel = () => {
+    const provider = settings.ttsProvider;
+    if (provider && settings.providerSettings?.[provider]?.model) {
+      return settings.providerSettings[provider].model;
+    }
+    // Fallback to legacy field
+    return settings.ttsModel || 'tts-1';
+  };
+
+  const getTTSVoice = () => {
+    const provider = settings.ttsProvider;
+    if (provider && settings.providerSettings?.[provider]?.voice) {
+      return settings.providerSettings[provider].voice;
+    }
+    // Fallback to legacy field
+    return settings.ttsVoice || 'alloy';
+  };
+
+  const getLLMModel = () => {
+    const provider = settings.llmProvider;
+    if (provider && settings.providerSettings?.[provider]?.model) {
+      return settings.providerSettings[provider].model;
+    }
+    // Default models based on provider
+    switch (provider) {
+      case 'openai-llm':
+        return 'gpt-4o-mini';
+      case 'anthropic-llm':
+        return 'claude-3-haiku-20240307';
+      case 'google-gemini':
+        return 'gemini-1.5-flash';
+      case 'mistral':
+        return 'mistral-small-latest';
+      default:
+        return 'gpt-4o-mini';
+    }
+  };
+
   const loadSettings = async () => {
     try {
       const loadedSettings = await StorageService.getSettings();
@@ -110,6 +198,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
           openai: loadedSettings.openaiApiKey || '',
           google: '',
           elevenlabs: '',
+          mistral: '',
         },
         providerSettings: loadedSettings.providerSettings || {},
       };
@@ -420,16 +509,15 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* Speech-to-Text Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.speechToTextProvider')}
               </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
-                {settings.sttProvider === 'openai-stt'
-                  ? 'OpenAI Whisper'
-                  : settings.sttProvider === 'google-stt'
-                    ? 'Google Cloud'
-                    : settings.sttProvider}
+                {getSTTProviderName(settings.sttProvider)}
+              </Text>
+              <Text style={[styles.modelText, { color: colors.textSecondary }]}>
+                {t('settings.model')}: {getSTTModel()}
               </Text>
             </View>
             <View style={styles.providerStatus}>
@@ -466,18 +554,15 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* Text-to-Speech Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.textToSpeechProvider')}
               </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
-                {settings.ttsProvider === 'openai-tts'
-                  ? 'OpenAI TTS'
-                  : settings.ttsProvider === 'google-tts'
-                    ? 'Google Cloud'
-                    : settings.ttsProvider === 'elevenlabs'
-                      ? 'ElevenLabs'
-                      : settings.ttsProvider}
+                {getTTSProviderName(settings.ttsProvider)}
+              </Text>
+              <Text style={[styles.modelText, { color: colors.textSecondary }]}>
+                {t('settings.model')}: {getTTSModel()} • {t('settings.voice')}: {getTTSVoice()}
               </Text>
             </View>
             <View style={styles.providerStatus}>
@@ -515,25 +600,23 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* AI Assistant Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.llmProvider')}
               </Text>
               <Text style={[styles.providerName, { color: colors.textSecondary }]}>
-                {settings.llmProvider === 'openai-llm'
-                  ? 'OpenAI GPT'
-                  : settings.llmProvider === 'anthropic-llm'
-                    ? 'Anthropic Claude'
-                    : settings.llmProvider === 'google-gemini'
-                      ? 'Google Gemini'
-                      : 'OpenAI GPT'}
+                {getLLMProviderName(settings.llmProvider)}
+              </Text>
+              <Text style={[styles.modelText, { color: colors.textSecondary }]}>
+                {t('settings.model')}: {getLLMModel()}
               </Text>
             </View>
             <View style={styles.providerStatus}>
               {(settings.llmProvider?.includes('openai') &&
                 (settings.apiKeys?.openai || settings.openaiApiKey)) ||
               (settings.llmProvider?.includes('anthropic') && settings.apiKeys?.anthropic) ||
-              (settings.llmProvider?.includes('google') && settings.apiKeys?.google) ? (
+              (settings.llmProvider?.includes('google') && settings.apiKeys?.google) ||
+              (settings.llmProvider?.includes('mistral') && settings.apiKeys?.mistral) ? (
                 <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.success} />
                   <Text style={[styles.statusText, { color: colors.success }]}>
@@ -973,6 +1056,11 @@ const styles = StyleSheet.create({
   providerName: {
     ...designTokens.typography.bodySmall,
     marginTop: designTokens.spacing.xs,
+  },
+  modelText: {
+    ...designTokens.typography.labelSmall,
+    marginTop: designTokens.spacing.xs / 2,
+    fontSize: 12,
   },
   providerStatus: {
     alignItems: 'flex-end',
