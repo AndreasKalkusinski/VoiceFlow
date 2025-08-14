@@ -114,6 +114,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
     if (providerId.startsWith('google')) return apiKeys.google || '';
     if (providerId.startsWith('elevenlabs')) return apiKeys.elevenlabs || '';
     if (providerId.startsWith('anthropic')) return apiKeys.anthropic || '';
+    if (providerId === 'mistral' || providerId.startsWith('mistral')) return apiKeys.mistral || '';
     return '';
   };
 
@@ -123,6 +124,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
     else if (providerId.startsWith('google')) keyName = 'google';
     else if (providerId.startsWith('elevenlabs')) keyName = 'elevenlabs';
     else if (providerId.startsWith('anthropic')) keyName = 'anthropic';
+    else if (providerId === 'mistral' || providerId.startsWith('mistral')) keyName = 'mistral';
 
     if (keyName) {
       onApiKeyChange(keyName, value);

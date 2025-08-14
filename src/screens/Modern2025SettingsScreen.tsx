@@ -57,6 +57,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
       openai: '',
       google: '',
       elevenlabs: '',
+      mistral: '',
+      anthropic: '',
     },
     providerSettings: {},
   });
@@ -194,11 +196,13 @@ export const Modern2025SettingsScreen: React.FC = () => {
         sttProvider: loadedSettings.sttProvider || 'openai-stt',
         ttsProvider: loadedSettings.ttsProvider || 'openai-tts',
         llmProvider: loadedSettings.llmProvider || 'openai-llm',
-        apiKeys: loadedSettings.apiKeys || {
-          openai: loadedSettings.openaiApiKey || '',
-          google: '',
-          elevenlabs: '',
-          mistral: '',
+        apiKeys: {
+          openai: loadedSettings.apiKeys?.openai || loadedSettings.openaiApiKey || '',
+          google: loadedSettings.apiKeys?.google || '',
+          elevenlabs: loadedSettings.apiKeys?.elevenlabs || '',
+          mistral: loadedSettings.apiKeys?.mistral || '',
+          anthropic: loadedSettings.apiKeys?.anthropic || '',
+          ...loadedSettings.apiKeys,
         },
         providerSettings: loadedSettings.providerSettings || {},
       };
