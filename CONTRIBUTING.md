@@ -1,300 +1,156 @@
 # Contributing to VoiceFlow
 
-Thank you for your interest in contributing to VoiceFlow! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to VoiceFlow! We love contributions from the community.
 
-## Table of Contents
+## 🎯 Our Philosophy
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [How to Contribute](#how-to-contribute)
-- [Coding Standards](#coding-standards)
-- [Testing](#testing)
-- [Pull Request Process](#pull-request-process)
-- [Reporting Issues](#reporting-issues)
+VoiceFlow is committed to:
 
-## Code of Conduct
+- **Privacy First**: No tracking, no servers, no data collection
+- **User Control**: Users own their data and API keys
+- **Simplicity**: Clean, intuitive interface
+- **Open Source**: Transparent and auditable
 
-By participating in this project, you agree to abide by our Code of Conduct:
-
-- Be respectful and inclusive
-- Welcome newcomers and help them get started
-- Focus on constructive criticism
-- Accept feedback gracefully
-- Put the project's best interests first
-
-## Getting Started
+## 🚀 Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/your-username/VoiceFlow.git`
-3. Add the upstream remote: `git remote add upstream https://github.com/original-owner/VoiceFlow.git`
-4. Create a new branch: `git checkout -b feature/your-feature-name`
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/VoiceFlow.git
+   cd VoiceFlow
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   cd ios && pod install && cd ..  # For iOS
+   ```
+4. Create a feature branch:
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
 
-## Development Setup
+## 💻 Development Setup
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
-- Expo CLI: `npm install -g expo-cli`
-- iOS Simulator (Mac only) or Android Emulator
+- Node.js 18+
+- React Native development environment
+- Xcode (for iOS)
+- Android Studio (for Android)
 
-### Installation
+### Running the app
 
 ```bash
-# Install dependencies
-npm install
-
-# Start the development server
+# Start Metro
 npm start
 
-# Run on iOS
+# iOS
 npm run ios
 
-# Run on Android
+# Android
 npm run android
 ```
 
-### Environment Variables
-
-1. Copy `.env.example` to `.env`
-2. Add your OpenAI API key and other configuration values
-3. Never commit `.env` file (it's already in `.gitignore`)
-
-## How to Contribute
-
-### Types of Contributions
-
-- **Bug Fixes**: Fix issues reported in GitHub Issues
-- **Features**: Implement new features or enhance existing ones
-- **Documentation**: Improve README, add code comments, or write guides
-- **Tests**: Add unit tests, integration tests, or e2e tests
-- **Performance**: Optimize code for better performance
-- **Refactoring**: Improve code structure and maintainability
-
-### Contribution Workflow
-
-1. Check existing issues or create a new one to discuss your idea
-2. Fork and clone the repository
-3. Create a feature branch from `main`
-4. Make your changes following our coding standards
-5. Write/update tests for your changes
-6. Ensure all tests pass
-7. Commit your changes with meaningful commit messages
-8. Push to your fork and create a Pull Request
-
-## Coding Standards
-
-### TypeScript/JavaScript
-
-- Use TypeScript for all new code
-- Follow ESLint and Prettier configurations
-- Use meaningful variable and function names
-- Add JSDoc comments for public APIs and complex functions
-- Prefer functional components with hooks for React
-
-### File Structure
-
-```
-src/
-├── components/     # Reusable UI components
-├── screens/        # Screen components
-├── services/       # API and external services
-├── utils/          # Utility functions
-├── hooks/          # Custom React hooks
-├── contexts/       # React Context providers
-├── types/          # TypeScript type definitions
-└── config/         # Configuration files
-```
-
-### Code Style
-
-```typescript
-// Good
-export const calculateTotal = (items: Item[]): number => {
-  return items.reduce((sum, item) => sum + item.price, 0);
-};
-
-// Bad
-export const calc = (i) => {
-  let t = 0;
-  for (let x of i) t += x.p;
-  return t;
-};
-```
-
-### Component Guidelines
-
-- One component per file
-- Use PascalCase for component names
-- Use camelCase for props and variables
-- Destructure props in function parameters
-- Use React.memo for expensive components
-
-## Testing
-
-### Running Tests
+### Testing
 
 ```bash
-# Run all tests
 npm test
-
-# Run tests in watch mode
-npm test -- --watch
-
-# Run tests with coverage
-npm test -- --coverage
-
-# Run specific test file
-npm test -- MyComponent.test.tsx
+npm run typecheck
+npm run lint
 ```
 
-### Writing Tests
+## 📝 Pull Request Process
 
-- Write tests for all new features and bug fixes
-- Aim for at least 80% code coverage
-- Use descriptive test names
-- Test both success and error cases
-- Mock external dependencies
+1. **Before submitting:**
+   - Run all tests: `npm test`
+   - Check types: `npm run typecheck`
+   - Lint code: `npm run lint`
+   - Test on both iOS and Android if possible
 
-Example test:
+2. **PR Guidelines:**
+   - Clear description of changes
+   - Reference any related issues
+   - Include screenshots for UI changes
+   - Update documentation if needed
 
-```typescript
-describe('StorageService', () => {
-  it('should store and retrieve API key', async () => {
-    const apiKey = 'test-key-123';
-    await StorageService.setApiKey(apiKey);
-    const retrieved = await StorageService.getApiKey();
-    expect(retrieved).toBe(apiKey);
-  });
-});
-```
+3. **Code Review:**
+   - All PRs require at least one review
+   - Address feedback constructively
+   - Keep discussions focused and respectful
 
-## Pull Request Process
+## 🎨 Code Style
 
-### Before Submitting
+- TypeScript for type safety
+- Functional components with hooks
+- Clear, descriptive variable names
+- Comments for complex logic
+- No console.logs in production code
 
-1. **Test your changes**: Run `npm test` to ensure all tests pass
-2. **Lint your code**: Run `npm run lint` to check for style issues
-3. **Format your code**: Run `npm run format` to apply consistent formatting
-4. **Update documentation**: Update README.md if needed
-5. **Write meaningful commits**: Use conventional commit format
+## 🔒 Privacy Guidelines
 
-### Commit Message Format
+**Never add code that:**
 
-```
-type(scope): subject
+- Sends data to external servers (except user's configured APIs)
+- Tracks user behavior
+- Stores data outside the device
+- Requires user registration
+- Collects analytics
 
-body (optional)
+## 🐛 Reporting Issues
 
-footer (optional)
-```
+Use our [issue templates](https://github.com/AndreasKalkusinski/VoiceFlow/issues/new/choose):
 
-Types:
+- Bug Report: For bugs and errors
+- Feature Request: For new features
+- Use Discussions for questions
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
+## 💡 Feature Requests
 
-Examples:
+We welcome feature ideas that:
 
-```
-feat(audio): add support for multiple audio formats
-fix(api): handle rate limiting errors gracefully
-docs: update installation instructions
-```
+- Work entirely offline
+- Enhance privacy
+- Improve user experience
+- Don't require backend servers
 
-### PR Template
+## 🌍 Translations
 
-When creating a PR, please include:
+Help us translate VoiceFlow:
 
-- **Description**: What does this PR do?
-- **Related Issue**: Link to the issue (if applicable)
-- **Type of Change**: Bug fix, feature, etc.
-- **Testing**: How has this been tested?
-- **Screenshots**: For UI changes (if applicable)
-- **Checklist**:
-  - [ ] Code follows project style guidelines
-  - [ ] Self-review completed
-  - [ ] Comments added for complex code
-  - [ ] Documentation updated
-  - [ ] Tests added/updated
-  - [ ] All tests passing
+1. Copy `src/i18n/translations/en.ts`
+2. Translate to your language
+3. Submit a PR with the new file
 
-### Review Process
+## 📚 Documentation
 
-1. At least one maintainer review required
-2. All CI checks must pass
-3. No merge conflicts
-4. PR branch must be up to date with main
+- Update README for significant changes
+- Add wiki pages for new features
+- Include JSDoc comments for utilities
+- Document API integrations
 
-## Reporting Issues
+## 🤝 Community
 
-### Bug Reports
+- Be respectful and inclusive
+- Help others in Discussions
+- Share your use cases
+- Report security issues privately
 
-When reporting bugs, please include:
+## 📜 License
 
-- **Description**: Clear description of the bug
-- **Steps to Reproduce**: Detailed steps to reproduce the issue
-- **Expected Behavior**: What should happen
-- **Actual Behavior**: What actually happens
-- **Environment**:
-  - Device/OS version
-  - App version
-  - React Native version
-- **Screenshots/Logs**: If applicable
+By contributing, you agree that your contributions will be licensed under the MIT License.
 
-### Feature Requests
+## 🙏 Recognition
 
-For feature requests, please include:
+Contributors are recognized in:
 
-- **Problem Statement**: What problem does this solve?
-- **Proposed Solution**: How would you implement it?
-- **Alternatives**: Other solutions you've considered
-- **Additional Context**: Any other relevant information
-
-## Scripts
-
-```bash
-# Development
-npm start              # Start Expo development server
-npm run ios           # Run on iOS simulator
-npm run android       # Run on Android emulator
-npm run web           # Run in web browser
-
-# Testing
-npm test              # Run tests
-npm run test:watch    # Run tests in watch mode
-npm run test:coverage # Run tests with coverage
-
-# Code Quality
-npm run lint          # Run ESLint
-npm run lint:fix      # Fix ESLint issues
-npm run format        # Format code with Prettier
-npm run typecheck     # Run TypeScript compiler
-
-# Build
-npm run build:ios     # Build for iOS
-npm run build:android # Build for Android
-```
-
-## Getting Help
-
-- Check the [README](README.md) for basic setup and usage
-- Search [existing issues](https://github.com/owner/VoiceFlow/issues)
-- Join our [Discord community](https://discord.gg/voiceflow) (if applicable)
-- Contact maintainers: [maintainers@voiceflow.app]
-
-## Recognition
-
-Contributors will be recognized in:
-
-- The project's README
+- GitHub contributors page
 - Release notes
-- Our contributors page
+- Special thanks in README
 
-Thank you for contributing to VoiceFlow! 🎉
+## ❓ Questions?
+
+- Check the [Wiki](https://github.com/AndreasKalkusinski/VoiceFlow/wiki)
+- Ask in [Discussions](https://github.com/AndreasKalkusinski/VoiceFlow/discussions)
+- Open an issue for bugs
+
+Thank you for making VoiceFlow better! 🎉

@@ -19,7 +19,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-	<string>2.1.1</string>
+    <string>2.1.2</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleURLTypes</key>
@@ -32,7 +32,9 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-	<string>44</string>
+    <string>45</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>12.0</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSAppTransportSecurity</key>
@@ -44,31 +46,6 @@
     </dict>
     <key>NSMicrophoneUsageDescription</key>
     <string>This app needs access to microphone for speech to text functionality.</string>
-    <key>CFBundleDocumentTypes</key>
-    <array>
-      <dict>
-        <key>CFBundleTypeName</key>
-        <string>Audio</string>
-        <key>LSHandlerRank</key>
-        <string>Alternate</string>
-        <key>LSItemContentTypes</key>
-        <array>
-          <string>public.audio</string>
-          <string>public.mp3</string>
-          <string>public.mpeg-4-audio</string>
-          <string>com.apple.m4a-audio</string>
-          <string>public.aiff-audio</string>
-          <string>public.aifc-audio</string>
-          <string>com.apple.coreaudio-format</string>
-          <string>org.3gpp.adaptive-multi-rate-audio</string>
-          <string>com.microsoft.waveform-audio</string>
-        </array>
-      </dict>
-    </array>
-    <key>UISupportsDocumentBrowser</key>
-    <true/>
-    <key>LSSupportsOpeningDocumentsInPlace</key>
-    <true/>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>

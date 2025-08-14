@@ -71,6 +71,7 @@ export const CleanSettingsScreen: React.FC = () => {
         ...loadedSettings,
         sttProvider: loadedSettings.sttProvider || 'openai-stt',
         ttsProvider: loadedSettings.ttsProvider || 'openai-tts',
+        llmProvider: loadedSettings.llmProvider || 'openai-llm',
         apiKeys: loadedSettings.apiKeys || {
           openai: loadedSettings.openaiApiKey || '',
           google: '',

@@ -31,12 +31,17 @@ import Modal from 'react-native-modal';
 
 type TabType = 'general' | 'providers' | 'about';
 
-// App Info
-const APP_VERSION = '2.1.1';
-const BUILD_NUMBER = '44';
+// App Info - Dynamically loaded from version utils
+import Constants from 'expo-constants';
+import { APP_VERSION, BUILD_NUMBER } from '../utils/version';
 const GITHUB_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow';
-const PRIVACY_URL = 'https://example.com/privacy';
-const TERMS_URL = 'https://example.com/terms';
+const PRIVACY_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki/Privacy-Policy';
+const TERMS_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki/Terms-of-Service';
+const WIKI_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki';
+const ISSUES_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/issues';
+const DISCUSSIONS_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/discussions';
+const RELEASES_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/releases';
+const CONTRIBUTING_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki/Contributing';
 
 export const Modern2025SettingsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('general');
@@ -47,6 +52,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
     ttsVoice: 'alloy',
     sttProvider: 'openai-stt',
     ttsProvider: 'openai-tts',
+    llmProvider: 'openai-llm',
     apiKeys: {
       openai: '',
       google: '',
@@ -99,6 +105,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
         ...loadedSettings,
         sttProvider: loadedSettings.sttProvider || 'openai-stt',
         ttsProvider: loadedSettings.ttsProvider || 'openai-tts',
+        llmProvider: loadedSettings.llmProvider || 'openai-llm',
         apiKeys: loadedSettings.apiKeys || {
           openai: loadedSettings.openaiApiKey || '',
           google: '',
@@ -577,6 +584,33 @@ export const Modern2025SettingsScreen: React.FC = () => {
           </Text>
         </View>
 
+        {/* Open Source Badge */}
+        <ModernCard variant="glass" style={styles.openSourceCard}>
+          <LinearGradient
+            colors={[colors.success + '15', colors.primary + '15']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.badgeGradient}
+          >
+            <View style={styles.badgeContent}>
+              <Ionicons name="heart" size={20} color={colors.success} />
+              <Text style={[styles.badgeTitle, { color: colors.text }]}>
+                {t('settings.openSource')}
+              </Text>
+              <Ionicons name="code-slash" size={20} color={colors.primary} />
+            </View>
+            <Text style={[styles.badgeSubtitle, { color: colors.textSecondary }]}>
+              {t('settings.freeForever')}
+            </Text>
+            <View style={styles.transparencyRow}>
+              <Ionicons name="eye-outline" size={16} color={colors.primary} />
+              <Text style={[styles.transparencyText, { color: colors.textSecondary }]}>
+                {t('settings.fullTransparency')}
+              </Text>
+            </View>
+          </LinearGradient>
+        </ModernCard>
+
         {/* Links */}
         <ModernCard variant="glass" style={styles.card}>
           <TouchableOpacity style={styles.linkRow} onPress={() => openURL(GITHUB_URL)}>
@@ -589,12 +623,11 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-          <TouchableOpacity
-            style={styles.linkRow}
-            onPress={() => Alert.alert('Report Issue', 'Feature coming soon!')}
-          >
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(ISSUES_URL)}>
             <Ionicons name="bug-outline" size={22} color={colors.text} />
-            <Text style={[styles.linkText, { color: colors.text }]}>Report an Issue</Text>
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.reportIssue')}
+            </Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
 
@@ -628,6 +661,78 @@ export const Modern2025SettingsScreen: React.FC = () => {
             <Ionicons name="document-text-outline" size={22} color={colors.text} />
             <Text style={[styles.linkText, { color: colors.text }]}>
               {t('settings.termsOfService')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </ModernCard>
+
+        {/* Community & Support */}
+        <ModernCard variant="surface" style={styles.card}>
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(WIKI_URL)}>
+            <Ionicons name="book-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.documentation')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(DISCUSSIONS_URL)}>
+            <Ionicons name="chatbubbles-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>{t('settings.community')}</Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(ISSUES_URL)}>
+            <Ionicons name="bug-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.reportIssue')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(CONTRIBUTING_URL)}>
+            <Ionicons name="heart-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.contribute')}
+            </Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </ModernCard>
+
+        {/* Technical Info */}
+        <ModernCard variant="surface" style={styles.card}>
+          <View style={styles.techInfoRow}>
+            <Text style={[styles.techLabel, { color: colors.textSecondary }]}>
+              {t('settings.platform')}
+            </Text>
+            <Text style={[styles.techValue, { color: colors.text }]}>
+              {Platform.OS === 'ios' ? 'iOS' : 'Android'} {Platform.Version}
+            </Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <View style={styles.techInfoRow}>
+            <Text style={[styles.techLabel, { color: colors.textSecondary }]}>
+              {t('settings.expoSDK')}
+            </Text>
+            <Text style={[styles.techValue, { color: colors.text }]}>
+              SDK {Constants.expoConfig?.sdkVersion || 'N/A'}
+            </Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+          <TouchableOpacity style={styles.linkRow} onPress={() => openURL(RELEASES_URL)}>
+            <Ionicons name="download-outline" size={22} color={colors.text} />
+            <Text style={[styles.linkText, { color: colors.text }]}>
+              {t('settings.checkUpdates')}
             </Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
@@ -947,6 +1052,55 @@ const styles = StyleSheet.create({
   copyrightText: {
     ...designTokens.typography.bodySmall,
     marginTop: designTokens.spacing.xs,
+  },
+  techInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: designTokens.spacing.sm,
+  },
+  techLabel: {
+    ...designTokens.typography.bodyMedium,
+  },
+  techValue: {
+    ...designTokens.typography.bodyMedium,
+    fontWeight: '600',
+  },
+  openSourceCard: {
+    marginBottom: designTokens.spacing.md,
+    padding: 0,
+    overflow: 'hidden',
+  },
+  badgeGradient: {
+    padding: designTokens.spacing.lg,
+    alignItems: 'center',
+  },
+  badgeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: designTokens.spacing.sm,
+  },
+  badgeTitle: {
+    ...designTokens.typography.titleMedium,
+    fontWeight: '700',
+  },
+  badgeSubtitle: {
+    ...designTokens.typography.bodyMedium,
+    marginTop: designTokens.spacing.xs,
+    textAlign: 'center',
+  },
+  transparencyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: designTokens.spacing.xs,
+    marginTop: designTokens.spacing.sm,
+    paddingTop: designTokens.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  transparencyText: {
+    ...designTokens.typography.bodySmall,
+    fontStyle: 'italic',
   },
   modal: {
     margin: 0,

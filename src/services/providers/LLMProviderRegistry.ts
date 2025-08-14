@@ -2,6 +2,7 @@ import { BaseLLMProvider } from './llm/BaseLLMProvider';
 import { OpenAILLMProvider } from './llm/OpenAILLMProvider';
 import { AnthropicLLMProvider } from './llm/AnthropicLLMProvider';
 import { GoogleGeminiProvider } from './llm/GoogleGeminiProvider';
+import { MistralProvider } from './llm/MistralProvider';
 
 export class LLMProviderRegistry {
   private static providers: Map<string, BaseLLMProvider> = new Map();
@@ -14,6 +15,7 @@ export class LLMProviderRegistry {
     this.registerProvider(new OpenAILLMProvider());
     this.registerProvider(new AnthropicLLMProvider());
     this.registerProvider(new GoogleGeminiProvider());
+    this.registerProvider(new MistralProvider());
 
     this.initialized = true;
   }

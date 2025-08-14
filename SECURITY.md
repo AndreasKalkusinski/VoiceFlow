@@ -1,159 +1,111 @@
 # Security Policy
 
-## Supported Versions
+## 🔒 VoiceFlow Security Model
 
-We provide security updates for the following versions:
+VoiceFlow is designed with security and privacy at its core:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+### Architecture
 
-## Reporting a Vulnerability
+- **No Backend**: No servers to hack
+- **Local Storage**: All data stays on device
+- **Direct API Calls**: No middleman servers
+- **Open Source**: Fully auditable code
 
-We take the security of VoiceFlow seriously. If you discover a security vulnerability, please follow these steps:
+### Data Protection
 
-### 1. Do NOT Create a Public Issue
+- API keys stored in device keychain (iOS) / encrypted storage (Android)
+- Audio files deleted immediately after processing
+- No telemetry or analytics
+- No user tracking
 
-Security vulnerabilities should NOT be reported through public GitHub issues.
+## 🚨 Reporting Security Vulnerabilities
 
-### 2. Report Privately
+If you discover a security vulnerability, please:
 
-Please report vulnerabilities via one of these methods:
+1. **DO NOT** open a public issue
+2. Use GitHub's [Security Advisory](https://github.com/AndreasKalkusinski/VoiceFlow/security/advisories/new)
+3. Or create a private security report
 
-- **Email**: security@voiceflow.app
-- **GitHub Security Advisory**: [Create a security advisory](https://github.com/yourusername/VoiceFlow/security/advisories/new)
+### What to include:
 
-### 3. What to Include
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fix (if any)
 
-Please include the following information:
+## ✅ Security Best Practices
 
-- Type of vulnerability
-- Full paths of source file(s) related to the vulnerability
-- Location of the affected source code (tag/branch/commit or direct URL)
-- Step-by-step instructions to reproduce the issue
-- Proof-of-concept or exploit code (if possible)
-- Impact of the vulnerability
+### For Users:
 
-### 4. Response Timeline
+- **Never share API keys** in screenshots or recordings
+- **Use strong device passcodes** (API keys are protected by device security)
+- **Keep the app updated** for security patches
+- **Review API provider security** (OpenAI, Google, Anthropic policies)
 
-- **Initial Response**: Within 48 hours
-- **Status Update**: Within 5 business days
-- **Resolution Target**: Within 30 days for critical issues
+### For Contributors:
 
-## Security Best Practices for Users
+- **Never log API keys** or sensitive data
+- **Use HTTPS only** for API calls
+- **Sanitize user inputs** before API calls
+- **Keep dependencies updated**
+- **No hardcoded secrets**
 
-### API Key Security
+## 🛡️ Security Features
 
-- **Never commit API keys** to version control
-- Use environment variables for sensitive data
-- Rotate API keys regularly
-- Use separate API keys for development and production
+### Current:
 
-### App Security
+- ✅ Encrypted API key storage
+- ✅ HTTPS for all API calls
+- ✅ No persistent audio storage
+- ✅ No user tracking
+- ✅ Minimal permissions
 
-- Keep the app updated to the latest version
-- Only download the app from official sources
-- Review app permissions before granting them
-- Be cautious when processing sensitive audio content
+### Planned:
 
-### Building from Source
+- [ ] Biometric authentication option
+- [ ] API key rotation reminders
+- [ ] Security audit logging (local only)
 
-If you're building from source:
+## 📋 Security Checklist for PRs
 
-1. Verify the source code integrity
-2. Use official dependencies only
-3. Keep dependencies updated
-4. Review third-party code changes
-5. Use security scanning tools
+Before merging code:
 
-## Known Security Considerations
+- [ ] No API keys in code
+- [ ] No console.logs of sensitive data
+- [ ] HTTPS for all external calls
+- [ ] Input validation added
+- [ ] No new permissions required
 
-### Third-Party Dependencies
+## 🔍 Third-Party Security
 
-- The app relies on OpenAI's API - ensure you trust OpenAI with your data
-- Audio processing happens through external APIs
-- Dependencies are regularly updated for security patches
+VoiceFlow uses:
 
-### Data Storage
+- **React Native**: [Security Guide](https://reactnative.dev/docs/security)
+- **Expo**: [Security Documentation](https://docs.expo.dev/guides/security/)
+- **AsyncStorage**: Device-encrypted storage
 
-- API keys are stored in AsyncStorage (not encrypted by default)
-- Consider additional encryption for sensitive deployments
-- Audio files are temporarily stored and should be automatically cleaned
+API Providers:
 
-### Network Security
+- **OpenAI**: [Security Portal](https://openai.com/security)
+- **Google Cloud**: [Security](https://cloud.google.com/security)
+- **Anthropic**: [Security](https://www.anthropic.com/security)
 
-- All API calls use HTTPS
-- No certificate pinning is implemented by default
-- Consider implementing certificate pinning for production deployments
+## 📅 Security Updates
 
-## Security Features
+- Security patches: Released ASAP
+- Regular updates: Monthly
+- Dependency updates: Weekly automated checks
 
-### Implemented
+## 🤝 Responsible Disclosure
 
-- ✅ HTTPS for all API communications
-- ✅ No data collection or telemetry (except optional Sentry)
-- ✅ Local storage only (no backend servers)
-- ✅ Input validation for API calls
-- ✅ Error boundaries for crash handling
-- ✅ Secure headers in API requests
+We follow responsible disclosure:
 
-### Planned Improvements
-
-- 🚧 Certificate pinning
-- 🚧 API key encryption
-- 🚧 Biometric authentication option
-- 🚧 Automatic audio file cleanup
-- 🚧 Rate limiting implementation
-
-## Vulnerability Disclosure Policy
-
-### For Security Researchers
-
-We appreciate the security research community's efforts in helping keep VoiceFlow safe. If you report a vulnerability:
-
-- We will acknowledge your contribution (unless you prefer to remain anonymous)
-- We will keep you updated on the fix progress
-- We will credit you in the release notes (with your permission)
-
-### Scope
-
-The following are in scope for security reports:
-
-- The VoiceFlow mobile application
-- Security issues in dependencies
-- API key exposure risks
-- Data leakage vulnerabilities
-- Authentication/authorization issues
-
-The following are OUT of scope:
-
-- Third-party API vulnerabilities (report to the respective service)
-- Social engineering attacks
-- Physical attacks
-- Denial of Service attacks
-
-## Security Updates
-
-Security updates will be released as:
-
-- **Critical**: Immediate patch release
-- **High**: Within 7 days
-- **Medium**: Within 30 days
-- **Low**: Next regular release
-
-## Contact
-
-For security concerns: security@voiceflow.app
-
-For general issues: [GitHub Issues](https://github.com/yourusername/VoiceFlow/issues)
-
-## Acknowledgments
-
-We thank the following researchers for responsibly disclosing security issues:
-
-- (Your name could be here!)
+1. Reporter submits vulnerability privately
+2. We acknowledge within 48 hours
+3. We work on a fix
+4. We release the fix
+5. We publicly disclose after users have updated
 
 ---
 
-**Remember**: Security is everyone's responsibility. If you see something, say something!
+_Last updated: January 2025_

@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { APP_VERSION } from '../utils/version';
 
 const { width } = Dimensions.get('window');
 
@@ -275,7 +276,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       {/* App name with shimmer effect */}
       <Animated.View style={[styles.textContainer, { opacity: textOpacity }]}>
         <Text style={styles.appName}>VoiceFlow</Text>
-        <Text style={styles.tagline}>AI Voice Assistant 2025</Text>
+        <Text style={styles.tagline}>AI Voice Assistant</Text>
 
         {/* Shimmer overlay */}
         <Animated.View
@@ -298,7 +299,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       {/* Version badge */}
       <Animated.View style={[styles.versionBadge, { opacity: textOpacity }]}>
         <BlurView intensity={80} style={styles.badge}>
-          <Text style={styles.versionText}>v2.0</Text>
+          <Text style={styles.versionText}>v{APP_VERSION}</Text>
           <View style={styles.betaBadge}>
             <Text style={styles.betaText}>BETA</Text>
           </View>

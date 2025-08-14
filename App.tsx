@@ -16,6 +16,10 @@ import { Modern2025SettingsScreen } from './src/screens/Modern2025SettingsScreen
 import { LiquidTabBar } from './src/components/LiquidTabBar';
 import { SharedAudioProvider, useSharedAudio } from './src/contexts/SharedAudioContext';
 import { SplashScreen } from './src/screens/SplashScreen';
+import { setupNetworkInterceptor } from './src/utils/network-security';
+
+// Initialize network security on app start
+setupNetworkInterceptor();
 
 const Tab = createBottomTabNavigator();
 
