@@ -71,7 +71,7 @@ export class OpenAILLMProvider extends BaseLLMProvider {
         }))
         .sort((a: LLMModel, b: LLMModel) => {
           // Sort to put newest models first
-          const order = ['gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5', 'o1'];
+          const order = ['gpt-5', 'gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5', 'o1'];
           const aIndex = order.findIndex((o) => a.id.startsWith(o));
           const bIndex = order.findIndex((o) => b.id.startsWith(o));
           if (aIndex === -1) return 1;
@@ -84,8 +84,8 @@ export class OpenAILLMProvider extends BaseLLMProvider {
       }
 
       return this.models;
-    } catch (error) {
-      console.log('Failed to load models dynamically, using defaults:', error);
+    } catch {
+      // Failed to load models dynamically, using defaults
       return this.models;
     } finally {
       this.isLoadingModels = false;
@@ -94,17 +94,28 @@ export class OpenAILLMProvider extends BaseLLMProvider {
 
   private formatModelName(modelId: string): string {
     // Format model names to be more readable
+    // Check for specific known models first
+    if (modelId === 'gpt-4o-mini') return 'GPT-4o Mini';
+    if (modelId === 'gpt-4o') return 'GPT-4o';
+    if (modelId === 'gpt-4-turbo') return 'GPT-4 Turbo';
+    if (modelId === 'gpt-3.5-turbo') return 'GPT-3.5 Turbo';
+    if (modelId === 'o1-preview') return 'O1 Preview';
+    if (modelId === 'o1-mini') return 'O1 Mini';
+
+    // Generic formatting for unknown/future models
     return modelId
-      .replace('gpt-4o-mini', 'GPT-4o Mini')
-      .replace('gpt-4o', 'GPT-4o')
-      .replace('gpt-4-turbo', 'GPT-4 Turbo')
-      .replace('gpt-4', 'GPT-4')
-      .replace('gpt-3.5-turbo', 'GPT-3.5 Turbo')
-      .replace('o1-preview', 'O1 Preview')
-      .replace('o1-mini', 'O1 Mini');
+      .replace(/^gpt-/, 'GPT-')
+      .replace(/^o(\d+)/, 'O$1')
+      .replace(/-turbo/i, ' Turbo')
+      .replace(/-mini/i, ' Mini')
+      .replace(/-/g, ' ')
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   }
 
   private getModelDescription(modelId: string): string {
+    if (modelId.includes('gpt-5')) return 'Next-generation AI model';
     if (modelId.includes('gpt-4o-mini')) return 'Fast and affordable for most tasks';
     if (modelId.includes('gpt-4o')) return 'Most capable model, best for complex tasks';
     if (modelId.includes('gpt-4-turbo')) return 'Latest GPT-4 with vision capabilities';
@@ -116,6 +127,7 @@ export class OpenAILLMProvider extends BaseLLMProvider {
   }
 
   private getMaxTokens(modelId: string): number {
+    if (modelId.includes('gpt-5')) return 8192; // Assumption for GPT-5
     if (modelId.includes('gpt-4o')) return 4096;
     if (modelId.includes('gpt-4')) return 8192;
     if (modelId.includes('gpt-3.5-turbo-16k')) return 4096;
@@ -125,6 +137,7 @@ export class OpenAILLMProvider extends BaseLLMProvider {
   }
 
   private getContextWindow(modelId: string): number {
+    if (modelId.includes('gpt-5')) return 256000; // Assumption for GPT-5
     if (modelId.includes('gpt-4o')) return 128000;
     if (modelId.includes('gpt-4-turbo')) return 128000;
     if (modelId.includes('gpt-4')) return 8192;

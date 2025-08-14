@@ -14,8 +14,14 @@
       "bundleIdentifier": "de.jeantools.voiceflow",
       "buildNumber": "45",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "This app needs access to microphone for speech to text functionality."
+        "NSMicrophoneUsageDescription": "This app needs access to microphone for speech to text functionality.",
+        "CFBundleLocalizations": ["en", "de", "es"]
       }
+    },
+    "locales": {
+      "de": "./assets/locales/de.json",
+      "en": "./assets/locales/en.json",
+      "es": "./assets/locales/es.json"
     },
     "android": {
       "package": "de.jeantools.voiceflow",

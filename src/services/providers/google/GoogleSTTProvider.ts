@@ -101,6 +101,16 @@ export class GoogleSTTProvider extends BaseSTTProvider {
 
   private baseURL = 'https://speech.googleapis.com/v1';
 
+  /**
+   * Load available models - Google doesn't provide a models endpoint for STT yet
+   * so we maintain a static list that we update periodically
+   */
+  async loadModels(_apiKey: string): Promise<STTModel[]> {
+    // Google Speech-to-Text doesn't have a public models endpoint
+    // Return the current known models
+    return this.models;
+  }
+
   async transcribe(audioUri: string, options: STTOptions): Promise<string> {
     if (!options.apiKey) {
       throw new Error('Google Cloud API key is required');

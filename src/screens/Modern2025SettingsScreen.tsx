@@ -144,36 +144,56 @@ export const Modern2025SettingsScreen: React.FC = () => {
   const getSTTModel = () => {
     const provider = settings.sttProvider;
     if (provider && settings.providerSettings?.[provider]?.model) {
-      return settings.providerSettings[provider].model;
+      const model = settings.providerSettings[provider].model;
+      // Validate model exists
+      if (model && typeof model === 'string' && model.length > 0) {
+        return model;
+      }
     }
-    // Fallback to legacy field
+    // Fallback to legacy field or default
     return settings.sttModel || 'whisper-1';
   };
 
   const getTTSModel = () => {
     const provider = settings.ttsProvider;
     if (provider && settings.providerSettings?.[provider]?.model) {
-      return settings.providerSettings[provider].model;
+      const model = settings.providerSettings[provider].model;
+      // Validate model exists
+      if (model && typeof model === 'string' && model.length > 0) {
+        return model;
+      }
     }
-    // Fallback to legacy field
+    // Fallback to legacy field or default
     return settings.ttsModel || 'tts-1';
   };
 
   const getTTSVoice = () => {
     const provider = settings.ttsProvider;
     if (provider && settings.providerSettings?.[provider]?.voice) {
-      return settings.providerSettings[provider].voice;
+      const voice = settings.providerSettings[provider].voice;
+      // Validate voice exists
+      if (voice && typeof voice === 'string' && voice.length > 0) {
+        return voice;
+      }
     }
-    // Fallback to legacy field
+    // Fallback to legacy field or default
     return settings.ttsVoice || 'alloy';
   };
 
   const getLLMModel = () => {
     const provider = settings.llmProvider;
-    if (provider && settings.providerSettings?.[provider]?.model) {
-      return settings.providerSettings[provider].model;
+    const model = provider ? settings.providerSettings?.[provider]?.model : undefined;
+
+    // Return model if it exists and is valid
+    if (model && typeof model === 'string' && model.length > 0) {
+      return model;
     }
-    // Default models based on provider
+
+    // Return default model based on provider
+    return getDefaultModelForProvider(provider);
+  };
+
+  const getDefaultModelForProvider = (provider: string | undefined) => {
     switch (provider) {
       case 'openai-llm':
         return 'gpt-4o-mini';
@@ -906,7 +926,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
               openaiApiKey: provider === 'openai' ? key : settings.openaiApiKey,
             })
           }
-          onSettingChange={(providerId, setting, value) =>
+          onSettingChange={(providerId, setting, value) => {
             setSettings({
               ...settings,
               providerSettings: {
@@ -916,8 +936,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
                   [setting]: value,
                 },
               },
-            })
-          }
+            });
+          }}
           onClose={() => {
             setShowProviderModal(false);
             // Reload settings to refresh status

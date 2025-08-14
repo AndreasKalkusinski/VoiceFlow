@@ -21,8 +21,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
+import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { wp, hp, spacing, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
@@ -214,12 +214,44 @@ export const ModernTextToSpeechScreen: React.FC = () => {
       showStatus(t('textToSpeech.status.generating'));
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-      const openaiService = new OpenAIService(currentSettings.openaiApiKey);
-      const audioUri = await openaiService.textToSpeech(
-        inputText,
-        currentSettings.ttsModel,
-        currentSettings.ttsVoice,
-      );
+      // Get the selected TTS provider
+      const providerId = currentSettings.ttsProvider || 'openai-tts';
+      const provider = ProviderRegistry.getTTSProvider(providerId);
+
+      if (!provider) {
+        throw new Error(`TTS provider ${providerId} not found`);
+      }
+
+      // Get the API key for the selected provider
+      const apiKey = providerId.includes('openai')
+        ? currentSettings.apiKeys?.openai || currentSettings.openaiApiKey
+        : providerId.includes('google')
+          ? currentSettings.apiKeys?.google
+          : providerId.includes('elevenlabs')
+            ? currentSettings.apiKeys?.elevenlabs
+            : '';
+
+      if (!apiKey) {
+        throw new Error('API key is missing');
+      }
+
+      // Get model and voice from providerSettings
+      const ttsModel =
+        currentSettings.providerSettings?.[providerId]?.model ||
+        currentSettings.ttsModel ||
+        'tts-1';
+      const ttsVoice =
+        currentSettings.providerSettings?.[providerId]?.voice ||
+        currentSettings.ttsVoice ||
+        'alloy';
+
+      // Synthesize using the selected provider
+      const audioUri = await provider.synthesize(inputText, {
+        apiKey,
+        model: ttsModel,
+        voice: ttsVoice,
+        speed: 1.0,
+      });
 
       showStatus(t('textToSpeech.status.loading'));
 

@@ -8,25 +8,31 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		2E1F1CB00781A345F217758A /* libPods-VoiceFlow.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EBC49E9253925D3F762FCF0 /* libPods-VoiceFlow.a */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
+		6FADF081FFB5477F975CD8EC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3F477F78778F4609954CB02D /* InfoPlist.strings */; };
+		86AFB2BA12D84D74AB9B61D2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A40446ABC65D4843BE110C31 /* InfoPlist.strings */; };
+		A4ABE400AAC1AE8D5F09B3A1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2B9FE5DE2EC11B74749275D3 /* PrivacyInfo.xcprivacy */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		BCD818B2E6EB05913277D4B0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = CBFAE5A00EE2FCA121B17C7E /* PrivacyInfo.xcprivacy */; };
-		D4CA39F0A540AE6AF5104056 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FBF7CE8D67338E36D065978 /* ExpoModulesProvider.swift */; };
+		C58614F860D3961F3157BB96 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB29A21004E8A92D2AA89874 /* ExpoModulesProvider.swift */; };
+		EEDA8FAEB1244458B7F1EC3E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4944AF4A49F14F1BACD2897A /* InfoPlist.strings */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F853AA3B546F2E1E23EA1031 /* libPods-VoiceFlow.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E2210552ADAC4ED2CC485DF /* libPods-VoiceFlow.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		016D9EA3C3B2B39D0F0C2C55 /* Pods-VoiceFlow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoiceFlow.release.xcconfig"; path = "Target Support Files/Pods-VoiceFlow/Pods-VoiceFlow.release.xcconfig"; sourceTree = "<group>"; };
-		0A5003D3886BEA574963CAD5 /* Pods-VoiceFlow.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoiceFlow.debug.xcconfig"; path = "Target Support Files/Pods-VoiceFlow/Pods-VoiceFlow.debug.xcconfig"; sourceTree = "<group>"; };
-		0FBF7CE8D67338E36D065978 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-VoiceFlow/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* VoiceFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = VoiceFlow/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = VoiceFlow/Info.plist; sourceTree = "<group>"; };
-		1EBC49E9253925D3F762FCF0 /* libPods-VoiceFlow.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-VoiceFlow.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E8E82DE383C93E5520D7CCD /* Pods-VoiceFlow.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoiceFlow.debug.xcconfig"; path = "Target Support Files/Pods-VoiceFlow/Pods-VoiceFlow.debug.xcconfig"; sourceTree = "<group>"; };
+		2B9FE5DE2EC11B74749275D3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = VoiceFlow/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3F477F78778F4609954CB02D /* InfoPlist.strings */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4944AF4A49F14F1BACD2897A /* InfoPlist.strings */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5E2210552ADAC4ED2CC485DF /* libPods-VoiceFlow.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-VoiceFlow.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A40446ABC65D4843BE110C31 /* InfoPlist.strings */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = VoiceFlow/SplashScreen.storyboard; sourceTree = "<group>"; };
+		BB29A21004E8A92D2AA89874 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-VoiceFlow/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		CBFAE5A00EE2FCA121B17C7E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = VoiceFlow/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C5E2234C07420704DCD742E9 /* Pods-VoiceFlow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoiceFlow.release.xcconfig"; path = "Target Support Files/Pods-VoiceFlow/Pods-VoiceFlow.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = VoiceFlow/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* VoiceFlow-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "VoiceFlow-Bridging-Header.h"; path = "VoiceFlow/VoiceFlow-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -37,22 +43,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2E1F1CB00781A345F217758A /* libPods-VoiceFlow.a in Frameworks */,
+				F853AA3B546F2E1E23EA1031 /* libPods-VoiceFlow.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		136B663A966A4E4D47C98066 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				0A5003D3886BEA574963CAD5 /* Pods-VoiceFlow.debug.xcconfig */,
-				016D9EA3C3B2B39D0F0C2C55 /* Pods-VoiceFlow.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* VoiceFlow */ = {
 			isa = PBXGroup;
 			children = (
@@ -62,18 +59,46 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				CBFAE5A00EE2FCA121B17C7E /* PrivacyInfo.xcprivacy */,
+				2B9FE5DE2EC11B74749275D3 /* PrivacyInfo.xcprivacy */,
 			);
 			name = VoiceFlow;
+			sourceTree = "<group>";
+		};
+		27EB910B7B56470B9BEBBF76 /* de.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				3F477F78778F4609954CB02D /* InfoPlist.strings */,
+			);
+			name = de.lproj;
+			path = "";
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				1EBC49E9253925D3F762FCF0 /* libPods-VoiceFlow.a */,
+				5E2210552ADAC4ED2CC485DF /* libPods-VoiceFlow.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		50BED5010D1D462B92C99C8C /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				A40446ABC65D4843BE110C31 /* InfoPlist.strings */,
+			);
+			name = en.lproj;
+			path = "";
+			sourceTree = "<group>";
+		};
+		6E8AAE90C1AFBFB27F6AB9BC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1E8E82DE383C93E5520D7CCD /* Pods-VoiceFlow.debug.xcconfig */,
+				C5E2234C07420704DCD742E9 /* Pods-VoiceFlow.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -90,8 +115,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				B9C13008FD18FC9742E244E7 /* ExpoModulesProviders */,
-				136B663A966A4E4D47C98066 /* Pods */,
+				6E8AAE90C1AFBFB27F6AB9BC /* Pods */,
+				B8ABD844C9DF5AEDF23649EC /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -106,10 +131,10 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B9C13008FD18FC9742E244E7 /* ExpoModulesProviders */ = {
+		B8ABD844C9DF5AEDF23649EC /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				F90F853A2A8CC2616BFAF359 /* VoiceFlow */,
+				F8FE2D82E15FD5205C3FF35A /* VoiceFlow */,
 			);
 			name = ExpoModulesProviders;
 			sourceTree = "<group>";
@@ -118,15 +143,27 @@
 			isa = PBXGroup;
 			children = (
 				BB2F792C24A3F905000567C9 /* Expo.plist */,
+				27EB910B7B56470B9BEBBF76 /* de.lproj */,
+				50BED5010D1D462B92C99C8C /* en.lproj */,
+				F52FB31010334CE5BDA0A2FA /* es.lproj */,
 			);
 			name = Supporting;
 			path = VoiceFlow/Supporting;
 			sourceTree = "<group>";
 		};
-		F90F853A2A8CC2616BFAF359 /* VoiceFlow */ = {
+		F52FB31010334CE5BDA0A2FA /* es.lproj */ = {
 			isa = PBXGroup;
 			children = (
-				0FBF7CE8D67338E36D065978 /* ExpoModulesProvider.swift */,
+				4944AF4A49F14F1BACD2897A /* InfoPlist.strings */,
+			);
+			name = es.lproj;
+			path = "";
+			sourceTree = "<group>";
+		};
+		F8FE2D82E15FD5205C3FF35A /* VoiceFlow */ = {
+			isa = PBXGroup;
+			children = (
+				BB29A21004E8A92D2AA89874 /* ExpoModulesProvider.swift */,
 			);
 			name = VoiceFlow;
 			sourceTree = "<group>";
@@ -138,14 +175,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "VoiceFlow" */;
 			buildPhases = (
-				52A8B27938B5730C14B3F558 /* [CP] Check Pods Manifest.lock */,
-				CA96FC613E439EF482287B0C /* [Expo] Configure project */,
+				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
+				F77942EE65CF05E6A9CD3E0C /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				AF228D3B23040879B363F363 /* [CP] Embed Pods Frameworks */,
-				3DD25CD9410FB81159737320 /* [CP] Copy Pods Resources */,
+				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
+				A7AC9FE22814D48BAB3E1AA8 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -165,8 +202,8 @@
 				LastUpgradeCheck = 1130;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = 9RN6UD7PMA;
 						LastSwiftMigration = 1250;
+						DevelopmentTeam = "9RN6UD7PMA";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -197,7 +234,10 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				BCD818B2E6EB05913277D4B0 /* PrivacyInfo.xcprivacy in Resources */,
+				6FADF081FFB5477F975CD8EC /* InfoPlist.strings in Resources */,
+				86AFB2BA12D84D74AB9B61D2 /* InfoPlist.strings in Resources */,
+				EEDA8FAEB1244458B7F1EC3E /* InfoPlist.strings in Resources */,
+				A4ABE400AAC1AE8D5F09B3A1 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,7 +259,29 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n# Source .xcode.env.updates if it exists to allow\n# SKIP_BUNDLING to be unset if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.updates\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.updates\"\nfi\n# Source local changes to allow overrides\n# if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n\n";
 		};
-		3DD25CD9410FB81159737320 /* [CP] Copy Pods Resources */ = {
+		08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-VoiceFlow-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -303,29 +365,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-VoiceFlow/Pods-VoiceFlow-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		52A8B27938B5730C14B3F558 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-VoiceFlow-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		AF228D3B23040879B363F363 /* [CP] Embed Pods Frameworks */ = {
+		A7AC9FE22814D48BAB3E1AA8 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -343,7 +383,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-VoiceFlow/Pods-VoiceFlow-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CA96FC613E439EF482287B0C /* [Expo] Configure project */ = {
+		F77942EE65CF05E6A9CD3E0C /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -370,7 +410,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				D4CA39F0A540AE6AF5104056 /* ExpoModulesProvider.swift in Sources */,
+				C58614F860D3961F3157BB96 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,15 +419,12 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0A5003D3886BEA574963CAD5 /* Pods-VoiceFlow.debug.xcconfig */;
+			baseConfigurationReference = 1E8E82DE383C93E5520D7CCD /* Pods-VoiceFlow.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = VoiceFlow/VoiceFlow.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9RN6UD7PMA;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -408,29 +445,25 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = de.jeantools.voiceflow;
 				PRODUCT_NAME = VoiceFlow;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "VoiceFlow/VoiceFlow-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
+				DEVELOPMENT_TEAM = "9RN6UD7PMA";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 			};
 			name = Debug;
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 016D9EA3C3B2B39D0F0C2C55 /* Pods-VoiceFlow.release.xcconfig */;
+			baseConfigurationReference = C5E2234C07420704DCD742E9 /* Pods-VoiceFlow.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = VoiceFlow/VoiceFlow.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9RN6UD7PMA;
 				INFOPLIST_FILE = VoiceFlow/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -446,14 +479,13 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = de.jeantools.voiceflow;
 				PRODUCT_NAME = VoiceFlow;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "VoiceFlow/VoiceFlow-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
+				DEVELOPMENT_TEAM = "9RN6UD7PMA";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 			};
 			name = Release;
 		};
@@ -512,7 +544,10 @@
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -567,7 +602,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
