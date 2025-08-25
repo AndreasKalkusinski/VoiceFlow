@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -68,6 +68,22 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   const slideAnim = useRef(new Animated.Value(30)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
 
+  const animateEntry = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: designTokens.animation.normal,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
   useEffect(() => {
     setupAudio();
     animateEntry();
@@ -84,21 +100,6 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
     }, []),
   );
 
-  const animateEntry = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: designTokens.animation.normal,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        friction: 8,
-        tension: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
 
   const loadSettings = async () => {
     try {
@@ -228,7 +229,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       console.error('Error details:', {
         message: errorData.message,
         response: (errorData as any)?.response?.data,
-        stack: errorData.stack,
+        stack: error instanceof Error ? error.stack : undefined,
       });
       showStatus(t('textToSpeech.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
