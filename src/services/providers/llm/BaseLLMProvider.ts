@@ -53,7 +53,7 @@ export abstract class BaseLLMProvider {
     return this.config?.model || this.models[0]?.id || '';
   }
 
-  protected handleError(error: unknown): never {
+  protected handleError(error: any): never {
     console.error(`[${this.name}] Error:`, error);
     throw new Error(`${this.name} error: ${error.message || 'Unknown error'}`);
   }

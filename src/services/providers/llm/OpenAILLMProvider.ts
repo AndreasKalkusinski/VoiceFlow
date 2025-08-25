@@ -61,8 +61,8 @@ export class OpenAILLMProvider extends BaseLLMProvider {
 
       // Filter for chat models (GPT and O1 models)
       const chatModels = data.data
-        .filter((m: unknown) => m.id.includes('gpt') || m.id.includes('o1'))
-        .map((m: unknown) => ({
+        .filter((m: any) => m.id.includes('gpt') || m.id.includes('o1'))
+        .map((m: any) => ({
           id: m.id,
           name: this.formatModelName(m.id),
           description: this.getModelDescription(m.id),

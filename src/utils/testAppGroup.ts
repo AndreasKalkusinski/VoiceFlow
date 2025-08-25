@@ -70,7 +70,7 @@ export async function testAppGroupFunctionality() {
     );
 
     return summary;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[TestAppGroup] Error during test:', error);
     Alert.alert('App Group Test Failed', `Error: ${error.message}`, [{ text: 'OK' }]);
     throw error;

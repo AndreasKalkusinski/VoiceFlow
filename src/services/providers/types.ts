@@ -7,7 +7,7 @@ export interface STTProvider {
   supportedLanguages?: string[];
   models?: STTModel[];
   transcribe(audioUri: string, options: STTOptions): Promise<string>;
-  validateConfig?(config: unknown): Promise<boolean>;
+  validateConfig?(config: any): Promise<boolean>;
   loadModels?(apiKey: string, forceRefresh?: boolean): Promise<STTModel[]>;
   refreshModels?(apiKey: string): Promise<STTModel[]>;
   isLoadingModels?: boolean;
@@ -22,7 +22,7 @@ export interface TTSProvider {
   voices?: TTSVoice[];
   models?: TTSModel[];
   synthesize(text: string, options: TTSOptions): Promise<string>;
-  validateConfig?(config: unknown): Promise<boolean>;
+  validateConfig?(config: any): Promise<boolean>;
   loadModelsAndVoices?(
     apiKey: string,
     forceRefresh?: boolean,
@@ -78,4 +78,36 @@ export interface ProviderConfig {
   voice?: string;
   customEndpoint?: string;
   additionalSettings?: Record<string, any>;
+}
+
+// LLM Provider types
+export interface LLMMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+export interface LLMCompletionOptions {
+  messages: LLMMessage[];
+  temperature?: number;
+  maxTokens?: number;
+  stream?: boolean;
+}
+
+export interface LLMProvider {
+  id: string;
+  name: string;
+  description: string;
+  requiresApiKey: boolean;
+  models?: LLMModel[];
+  complete(options: LLMCompletionOptions): Promise<string>;
+  validateConfig?(config: any): Promise<boolean>;
+  loadModels?(apiKey: string, forceRefresh?: boolean): Promise<LLMModel[]>;
+}
+
+export interface LLMModel {
+  id: string;
+  name: string;
+  description?: string;
+  contextWindow?: number;
+  maxTokens?: number;
 }

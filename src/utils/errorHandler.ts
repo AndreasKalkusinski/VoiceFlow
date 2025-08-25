@@ -51,7 +51,7 @@ export class ApplicationError extends Error {
 /**
  * Error handler for API responses
  */
-export function handleApiError(error: unknown): ApplicationError {
+export function handleApiError(error: any): ApplicationError {
   if (error.response) {
     // Server responded with error status
     const status = error.response.status;
@@ -115,7 +115,7 @@ export function handleApiError(error: unknown): ApplicationError {
 /**
  * Error handler for storage operations
  */
-export function handleStorageError(error: unknown): ApplicationError {
+export function handleStorageError(error: any): ApplicationError {
   return new ApplicationError(
     ErrorType.STORAGE,
     'Failed to access local storage. Please try again.',
@@ -139,7 +139,7 @@ export function handlePermissionError(permission: string): ApplicationError {
 /**
  * Generic error handler
  */
-export function handleError(error: unknown): ApplicationError {
+export function handleError(error: any): ApplicationError {
   if (error instanceof ApplicationError) {
     return error;
   }

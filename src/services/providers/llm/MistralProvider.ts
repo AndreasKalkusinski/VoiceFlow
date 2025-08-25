@@ -131,7 +131,7 @@ export class MistralProvider extends BaseLLMProvider {
 
       // Map Mistral API response to our model format
       const apiModels =
-        data.data?.map((model: unknown) => ({
+        data.data?.map((model: any) => ({
           id: model.id,
           name: this.formatModelName(model.id),
           description: this.getModelDescription(model.id),

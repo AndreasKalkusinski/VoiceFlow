@@ -109,13 +109,13 @@ export class OpenAISTTProvider extends BaseSTTProvider {
       });
 
       return response.data.text;
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('OpenAI STT Error:', error.response?.data || error.message);
       throw new Error('Failed to transcribe audio with OpenAI');
     }
   }
 
-  async validateConfig(config: unknown): Promise<boolean> {
+  async validateConfig(config: any): Promise<boolean> {
     if (!config.apiKey) return false;
 
     try {

@@ -148,8 +148,8 @@ export class GoogleGeminiProvider extends BaseLLMProvider {
       // Filter for Gemini models
       const geminiModels =
         data.models
-          ?.filter((m: unknown) => m.name.includes('gemini'))
-          ?.map((m: unknown) => ({
+          ?.filter((m: any) => m.name.includes('gemini'))
+          ?.map((m: any) => ({
             id: m.name.replace('models/', ''),
             name: m.displayName || m.name.replace('models/', ''),
             description: m.description || `${m.name} model`,

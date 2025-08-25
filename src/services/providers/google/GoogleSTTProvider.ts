@@ -146,18 +146,18 @@ export class GoogleSTTProvider extends BaseSTTProvider {
 
       if (response.data.results && response.data.results.length > 0) {
         return response.data.results
-          .map((result: unknown) => result.alternatives[0].transcript)
+          .map((result: any) => result.alternatives[0].transcript)
           .join(' ');
       }
 
       return '';
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Google STT Error:', error.response?.data || error.message);
       throw new Error('Failed to transcribe audio with Google Cloud Speech');
     }
   }
 
-  async validateConfig(config: unknown): Promise<boolean> {
+  async validateConfig(config: any): Promise<boolean> {
     if (!config.apiKey) return false;
 
     // Google doesn't have a simple validation endpoint
