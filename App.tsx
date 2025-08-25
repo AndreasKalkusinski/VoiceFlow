@@ -28,7 +28,7 @@ function ThemedApp() {
   const { isDark } = useTheme();
   const { t, i18n } = useTranslation();
   const { setSharedAudioUri } = useSharedAudio();
-  const navigationRef = React.useRef<NavigationContainerRef<any>>(null);
+  const navigationRef = React.useRef<NavigationContainerRef<any>>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [showSplash, setShowSplash] = useState(true);
 
   // Check for shared data from app group on app launch and when app becomes active
@@ -36,6 +36,7 @@ function ThemedApp() {
     // Removed automatic test on startup - can be triggered manually in Settings
 
     const checkSharedData = async () => {
+      // eslint-disable-next-line no-console
       console.log('[App] checkSharedData called, navigationRef.current:', !!navigationRef.current);
       if (!navigationRef.current) return;
 
@@ -43,17 +44,21 @@ function ThemedApp() {
         // Dynamic import to avoid issues if module is not available
         const AppGroupService = (await import('./src/services/AppGroupService')).default;
 
+        // eslint-disable-next-line no-console
         console.log('[App] AppGroupService available:', AppGroupService.isAvailable());
 
         // Test the module first
         const testResult = await AppGroupService.test();
+        // eslint-disable-next-line no-console
         console.log('[App] Module test result:', testResult);
 
         if (AppGroupService.isAvailable()) {
           const sharedContent = await AppGroupService.checkForSharedContent();
+          // eslint-disable-next-line no-console
           console.log('[App] Shared content:', sharedContent);
 
           if (sharedContent.hasAudio && sharedContent.audioData) {
+            // eslint-disable-next-line no-console
             console.log(
               '[App] Navigating to Speech to Text with audio:',
               sharedContent.audioData.path,
@@ -62,6 +67,7 @@ function ThemedApp() {
             setSharedAudioUri(sharedContent.audioData.path);
             navigationRef.current.navigate('Speech to Text');
           } else if (sharedContent.hasText && sharedContent.textData) {
+            // eslint-disable-next-line no-console
             console.log('[App] Navigating to Text to Speech with text');
             // Navigate to Text to Speech with the text
             navigationRef.current.navigate('Text to Speech', {
@@ -71,6 +77,7 @@ function ThemedApp() {
         }
       } catch (error) {
         // Silently fail if module is not available
+        // eslint-disable-next-line no-console
         console.log('[App] AppGroupService error:', error);
       }
     };
@@ -79,7 +86,7 @@ function ThemedApp() {
     checkSharedData();
 
     // Setup listener for app state changes
-    let subscription: any;
+    let subscription: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     (async () => {
       // Check when app becomes active (from background)
@@ -121,6 +128,7 @@ function ThemedApp() {
 
         if (path === 'shared') {
           // Handle shared content from Share Extension
+          // eslint-disable-next-line no-console
           console.log('[App] Handling shared content from URL scheme');
           // Will be handled by the useEffect that checks shared data
         } else if (path === 'audio') {
@@ -180,7 +188,7 @@ function ThemedApp() {
     <NavigationContainer ref={navigationRef}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Tab.Navigator
-        tabBar={(props: BottomTabBarProps) => <LiquidTabBar {...(props as any)} />}
+        tabBar={(props: BottomTabBarProps) => <LiquidTabBar {...(props as any)} />} // eslint-disable-line @typescript-eslint/no-explicit-any
         screenOptions={{
           headerShown: false,
           tabBarStyle: { display: 'none' }, // Hide the default tab bar
