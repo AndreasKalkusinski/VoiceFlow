@@ -53,7 +53,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         useNativeDriver: true,
       }).start();
     }
-  }, [isActive]);
+  }, [isActive, pulseAnim, rotateAnim]);
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {

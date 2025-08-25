@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
 import { vw, vh } from '../utils/responsive-dimensions';
 import { getScreenTheme } from '../utils/screen-themes';
-import { TabBarProps } from '../types/navigation';
+import { TabBarProps, TabBarState } from '../types/navigation';
 
 const { width } = Dimensions.get('window');
 
@@ -46,7 +46,7 @@ export const LiquidTabBar: React.FC<TabBarProps> = ({ state, navigation }) => {
     }).start();
 
     // Animate icon scales
-    state.routes.forEach((route: any, index: number) => {
+    state.routes.forEach((route: TabBarState['routes'][0], index: number) => {
       Animated.spring(scaleAnims[index], {
         toValue: index === state.index ? 1.2 : 1,
         damping: 15,
@@ -54,9 +54,9 @@ export const LiquidTabBar: React.FC<TabBarProps> = ({ state, navigation }) => {
         useNativeDriver: true,
       }).start();
     });
-  }, [state.index]);
+  }, [state.index, scaleAnims, state.routes, translateX]);
 
-  const handlePress = (route: any, index: number, isFocused: boolean) => {
+  const handlePress = (route: TabBarState['routes'][0], index: number, isFocused: boolean) => {
     const event = navigation.emit({
       type: 'tabPress',
       target: route.key,
@@ -124,7 +124,7 @@ export const LiquidTabBar: React.FC<TabBarProps> = ({ state, navigation }) => {
 
       {/* Tab items */}
       <View style={styles.tabContainer}>
-        {state.routes.map((route: any, index: number) => {
+        {state.routes.map((route: TabBarState['routes'][0], index: number) => {
           const isFocused = state.index === index;
           const routeTheme = getScreenTheme(route.name, isDark);
 
@@ -150,10 +150,8 @@ export const LiquidTabBar: React.FC<TabBarProps> = ({ state, navigation }) => {
                   <Animated.View
                     style={[
                       styles.iconGlassEffect,
+                      isDark ? styles.iconGlassEffectDark : styles.iconGlassEffectLight,
                       {
-                        backgroundColor: isDark
-                          ? 'rgba(255,255,255,0.08)'
-                          : 'rgba(255,255,255,0.5)',
                         borderColor: routeTheme?.primary + '30',
                       },
                     ]}
@@ -254,5 +252,11 @@ const styles = StyleSheet.create({
     width: vw(8),
     height: 3,
     borderRadius: 1.5,
+  },
+  iconGlassEffectDark: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  iconGlassEffectLight: {
+    backgroundColor: 'rgba(255,255,255,0.5)',
   },
 });

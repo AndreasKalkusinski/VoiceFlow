@@ -21,7 +21,7 @@ import { designTokens } from '../utils/design-system';
 import * as Haptics from 'expo-haptics';
 import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { LLMProviderRegistry } from '../services/providers/LLMProviderRegistry';
-import { BaseLLMProvider } from '../services/providers/llm/BaseLLMProvider';
+// import { BaseLLMProvider } from '../services/providers/llm/BaseLLMProvider'; // Removed unused import
 
 interface ProviderConfigModalProps {
   type: 'stt' | 'tts' | 'llm';
@@ -63,19 +63,19 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
         : LLMProviderRegistry.getAllProviders();
 
   const currentProvider = providers.find((p: any) => p.id === selectedProvider);
-  const isLLMProvider = (provider: any): provider is BaseLLMProvider => {
-    return type === 'llm' && provider && 'loadModels' in provider;
-  };
+  // const isLLMProvider = (provider: any): provider is BaseLLMProvider => {
+  //   return type === 'llm' && provider && 'loadModels' in provider;
+  // }; // Removed unused function
 
   useEffect(() => {
     // Reset validation status when provider changes
     setValidationStatus(null);
     setLoadedModels([]);
 
-    // Load models for LLM providers if API key exists
-    if (isLLMProvider(currentProvider)) {
+    // Load models for providers if API key exists
+    if (currentProvider) {
       const apiKey = getApiKeyForProvider(currentProvider.id);
-      if (apiKey) {
+      if (apiKey && ('loadModels' in currentProvider || 'loadModelsAndVoices' in currentProvider)) {
         loadModelsForProvider(apiKey);
       }
     }
@@ -84,9 +84,13 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
 
   // Load models when entering config step
   useEffect(() => {
-    if (currentStep === 'config' && isLLMProvider(currentProvider)) {
+    if (currentStep === 'config' && currentProvider) {
       const apiKey = getApiKeyForProvider(currentProvider.id);
-      if (apiKey && loadedModels.length === 0) {
+      if (
+        apiKey &&
+        loadedModels.length === 0 &&
+        ('loadModels' in currentProvider || 'loadModelsAndVoices' in currentProvider)
+      ) {
         loadModelsForProvider(apiKey);
       }
     }
@@ -94,12 +98,28 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
   }, [currentStep]);
 
   const loadModelsForProvider = async (apiKey: string) => {
-    if (!isLLMProvider(currentProvider)) return;
+    if (!currentProvider) return;
 
     setIsLoadingModels(true);
     try {
-      const models = await currentProvider.loadModels(apiKey);
-      setLoadedModels(models);
+      // Check if provider has loadModels method (LLM providers)
+      if ('loadModels' in currentProvider && typeof currentProvider.loadModels === 'function') {
+        const models = await currentProvider.loadModels(apiKey);
+        setLoadedModels(models);
+      }
+      // Check if provider has loadModelsAndVoices method (some TTS providers)
+      else if (
+        'loadModelsAndVoices' in currentProvider &&
+        typeof currentProvider.loadModelsAndVoices === 'function'
+      ) {
+        const result = await currentProvider.loadModelsAndVoices(apiKey);
+        setLoadedModels(result.models);
+        // Voices are handled separately in the UI
+      }
+      // Otherwise use static models
+      else {
+        setLoadedModels(currentProvider.models || []);
+      }
     } catch (error) {
       console.error('Failed to load models:', error);
       // Fall back to default models
@@ -130,8 +150,12 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
       onApiKeyChange(keyName, value);
       setValidationStatus(null); // Reset validation when key changes
 
-      // Load models for LLM providers when API key changes
-      if (value && isLLMProvider(currentProvider)) {
+      // Load models for providers when API key changes
+      if (
+        value &&
+        currentProvider &&
+        ('loadModels' in currentProvider || 'loadModelsAndVoices' in currentProvider)
+      ) {
         loadModelsForProvider(value);
       }
     }
@@ -171,21 +195,36 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
     setCurrentStep('config');
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    // Load models when selecting an LLM provider
-    if (type === 'llm') {
-      const provider = providers.find((p: any) => p.id === providerId);
-      if (provider && 'loadModels' in provider) {
-        const apiKey = getApiKeyForProvider(providerId);
-        if (apiKey) {
+    // Load models when selecting a provider
+    const provider = providers.find((p: any) => p.id === providerId);
+    if (provider) {
+      const apiKey = getApiKeyForProvider(providerId);
+      if (apiKey) {
+        if ('loadModels' in provider && typeof provider.loadModels === 'function') {
           setIsLoadingModels(true);
-          (provider as BaseLLMProvider)
+          provider
             .loadModels(apiKey)
             .then((models: any) => {
               setLoadedModels(models);
               setIsLoadingModels(false);
             })
             .catch(() => {
-              setLoadedModels((provider as BaseLLMProvider).models || []);
+              setLoadedModels(provider.models || []);
+              setIsLoadingModels(false);
+            });
+        } else if (
+          'loadModelsAndVoices' in provider &&
+          typeof provider.loadModelsAndVoices === 'function'
+        ) {
+          setIsLoadingModels(true);
+          provider
+            .loadModelsAndVoices(apiKey)
+            .then((result: any) => {
+              setLoadedModels(result.models);
+              setIsLoadingModels(false);
+            })
+            .catch(() => {
+              setLoadedModels(provider.models || []);
               setIsLoadingModels(false);
             });
         }
@@ -425,58 +464,71 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
 
               <ScrollView style={styles.modelsList} showsVerticalScrollIndicator={false}>
                 <View style={styles.optionsGrid}>
-                  {(loadedModels.length > 0 ? loadedModels : currentProvider.models)
-                    .filter(
-                      (model: any) =>
-                        model.id.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
-                        model.name.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
-                        (model.description &&
-                          model.description.toLowerCase().includes(modelSearchQuery.toLowerCase())),
-                    )
-                    .map((model: any) => {
-                      const isSelected =
-                        providerSettings[currentProvider.id]?.model === model.id ||
-                        (!providerSettings[currentProvider.id]?.model &&
-                          currentProvider.models?.[0]?.id === model.id);
+                  {(() => {
+                    // Use loadedModels if available, otherwise fallback to static models
+                    const modelsToShow =
+                      loadedModels.length > 0 ? loadedModels : currentProvider.models || [];
 
-                      return (
-                        <TouchableOpacity
-                          key={model.id}
-                          style={[
-                            styles.optionCard,
-                            isSelected && [
-                              styles.optionCardSelected,
-                              { borderColor: colors.primary },
-                            ],
-                          ]}
-                          onPress={() => {
-                            onSettingChange(currentProvider.id, 'model', model.id);
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                          }}
-                        >
-                          <Text style={[styles.optionName, { color: colors.text }]}>
-                            {model.name}
-                          </Text>
-                          {model.description && (
-                            <Text
-                              style={[styles.optionDescription, { color: colors.textSecondary }]}
-                            >
-                              {model.description}
+                    // Deduplicate models by ID
+                    const uniqueModels = Array.from(
+                      new Map(modelsToShow.map((m: any) => [m.id, m])).values(),
+                    );
+
+                    return uniqueModels
+                      .filter(
+                        (model: any) =>
+                          model.id.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
+                          model.name.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
+                          (model.description &&
+                            model.description
+                              .toLowerCase()
+                              .includes(modelSearchQuery.toLowerCase())),
+                      )
+                      .map((model: any) => {
+                        const isSelected =
+                          providerSettings[currentProvider.id]?.model === model.id ||
+                          (!providerSettings[currentProvider.id]?.model &&
+                            currentProvider.models?.[0]?.id === model.id);
+
+                        return (
+                          <TouchableOpacity
+                            key={model.id}
+                            style={[
+                              styles.optionCard,
+                              isSelected && [
+                                styles.optionCardSelected,
+                                { borderColor: colors.primary },
+                              ],
+                            ]}
+                            onPress={() => {
+                              onSettingChange(currentProvider.id, 'model', model.id);
+                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            }}
+                          >
+                            <Text style={[styles.optionName, { color: colors.text }]}>
+                              {model.name}
                             </Text>
-                          )}
-                          {isSelected && (
-                            <View
-                              style={[
-                                styles.selectedIndicator,
-                                { backgroundColor: colors.primary },
-                              ]}
-                            >
-                              <Ionicons name="checkmark" size={12} color="#fff" />
-                            </View>
-                          )}
-                        </TouchableOpacity>
-                      );
-                    })}
+                            {model.description && (
+                              <Text
+                                style={[styles.optionDescription, { color: colors.textSecondary }]}
+                              >
+                                {model.description}
+                              </Text>
+                            )}
+                            {isSelected && (
+                              <View
+                                style={[
+                                  styles.selectedIndicator,
+                                  { backgroundColor: colors.primary },
+                                ]}
+                              >
+                                <Ionicons name="checkmark" size={12} color="#fff" />
+                              </View>
+                            )}
+                          </TouchableOpacity>
+                        );
+                      });
+                  })()}
                 </View>
               </ScrollView>
             </ModernCard>
@@ -559,7 +611,7 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
     >
       {/* Modal Header with Close Button */}
       <View style={styles.modalHeader}>
-        <View style={{ width: 40 }} />
+        <View style={styles.spacer} />
         <Text style={[styles.modalTitle, { color: colors.text }]}>
           {type === 'stt'
             ? t('settings.speechToTextProvider')
@@ -577,9 +629,9 @@ export const ProviderConfigModal: React.FC<ProviderConfigModalProps> = ({
         <View
           style={[
             styles.progressFill,
+            currentStep === 'provider' ? styles.progressProvider : styles.progressComplete,
             {
               backgroundColor: colors.primary,
-              width: currentStep === 'provider' ? '50%' : '100%',
             },
           ]}
         />
@@ -855,5 +907,14 @@ const styles = StyleSheet.create({
     paddingTop: designTokens.spacing.lg,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  spacer: {
+    width: 40,
+  },
+  progressProvider: {
+    width: '50%',
+  },
+  progressComplete: {
+    width: '100%',
   },
 });

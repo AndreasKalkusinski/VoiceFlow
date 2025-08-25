@@ -76,7 +76,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
         sound.unloadAsync();
       }
     };
-  }, []);
+  }, [animateEntry, sound]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -159,7 +159,9 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
           ? currentSettings.apiKeys?.google
           : providerId.includes('elevenlabs')
             ? currentSettings.apiKeys?.elevenlabs
-            : '';
+            : providerId.includes('mistral')
+              ? currentSettings.apiKeys?.mistral
+              : '';
 
       if (!apiKey) {
         Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
@@ -221,18 +223,21 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
           setIsPlaying(status.isPlaying);
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorData = error instanceof Error ? error : { message: 'Unknown error' };
       console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        stack: error.stack,
+        message: errorData.message,
+        response: (errorData as any)?.response?.data,
+        stack: errorData.stack,
       });
       showStatus(t('textToSpeech.status.failed'));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
       // More specific error message
       const errorMessage =
-        error.response?.data?.error?.message || error.message || t('textToSpeech.status.failed');
+        (errorData as any)?.response?.data?.error?.message ||
+        errorData.message ||
+        t('textToSpeech.status.failed');
       Alert.alert(t('common.error'), errorMessage);
     } finally {
       setIsGenerating(false);
@@ -625,13 +630,11 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
                 <Animated.View
                   style={[
                     styles.playButton,
+                    (isGenerating ||
+                      !inputText.trim() ||
+                      (!settings?.apiKeys?.openai && !settings?.openaiApiKey)) &&
+                      styles.playButtonDisabled,
                     {
-                      opacity:
-                        isGenerating ||
-                        !inputText.trim() ||
-                        (!settings?.apiKeys?.openai && !settings?.openaiApiKey)
-                          ? 0.5
-                          : 1,
                       borderColor: colors.primary,
                     },
                   ]}
@@ -836,6 +839,9 @@ const styles = StyleSheet.create({
   playInfoText: {
     fontSize: responsiveDimensions.fontSize.small,
     fontWeight: '500',
+  },
+  playButtonDisabled: {
+    opacity: 0.5,
   },
   audioPlayerCard: {
     marginBottom: vh(2),

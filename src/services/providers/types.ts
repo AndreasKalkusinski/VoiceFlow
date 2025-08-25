@@ -7,7 +7,7 @@ export interface STTProvider {
   supportedLanguages?: string[];
   models?: STTModel[];
   transcribe(audioUri: string, options: STTOptions): Promise<string>;
-  validateConfig?(config: any): Promise<boolean>;
+  validateConfig?(config: unknown): Promise<boolean>;
   loadModels?(apiKey: string, forceRefresh?: boolean): Promise<STTModel[]>;
   refreshModels?(apiKey: string): Promise<STTModel[]>;
   isLoadingModels?: boolean;
@@ -22,7 +22,7 @@ export interface TTSProvider {
   voices?: TTSVoice[];
   models?: TTSModel[];
   synthesize(text: string, options: TTSOptions): Promise<string>;
-  validateConfig?(config: any): Promise<boolean>;
+  validateConfig?(config: unknown): Promise<boolean>;
   loadModelsAndVoices?(
     apiKey: string,
     forceRefresh?: boolean,
@@ -58,7 +58,7 @@ export interface STTOptions {
   model?: string;
   language?: string;
   apiKey: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface TTSOptions {
@@ -68,7 +68,7 @@ export interface TTSOptions {
   speed?: number;
   pitch?: number;
   apiKey: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ProviderConfig {

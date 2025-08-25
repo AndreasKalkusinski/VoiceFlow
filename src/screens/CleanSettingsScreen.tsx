@@ -62,7 +62,7 @@ export const CleanSettingsScreen: React.FC = () => {
         saveSettingsSilently();
       }, 1000);
     }
-  }, [settings, autoSave]);
+  }, [settings, autoSave, saveSettingsSilently]);
 
   const loadSettings = async () => {
     try {

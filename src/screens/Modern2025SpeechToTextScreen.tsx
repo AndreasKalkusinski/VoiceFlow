@@ -74,6 +74,8 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const slideAnim = useRef(new Animated.Value(30)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const buttonBottomAnim = useRef(new Animated.Value(140)).current;
+  const processingRotateAnim = useRef(new Animated.Value(0)).current;
+  const processingScaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     setupAudio();
@@ -106,7 +108,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
-  }, []);
+  }, [animateEntry, buttonBottomAnim]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -140,7 +142,9 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
         ? settings.apiKeys?.openai || settings.openaiApiKey
         : providerId.includes('google')
           ? settings.apiKeys?.google
-          : '';
+          : providerId.includes('mistral')
+            ? settings.apiKeys?.mistral
+            : '';
 
       if (!apiKey) {
         throw new Error(`API key not configured for ${provider.name}`);
@@ -185,7 +189,40 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     } else {
       pulseAnim.setValue(1);
     }
-  }, [isRecording]);
+  }, [isRecording, animatePulse, pulseAnim]);
+
+  useEffect(() => {
+    if (isProcessing) {
+      // Start rotation animation for processing
+      Animated.loop(
+        Animated.timing(processingRotateAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ).start();
+
+      // Start scale pulse animation for processing
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(processingScaleAnim, {
+            toValue: 1.2,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(processingScaleAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    } else {
+      // Reset animations when not processing
+      processingRotateAnim.setValue(0);
+      processingScaleAnim.setValue(1);
+    }
+  }, [isProcessing, processingRotateAnim, processingScaleAnim]);
 
   const animateEntry = () => {
     Animated.parallel([
@@ -339,7 +376,9 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
           ? settings.apiKeys?.openai || settings.openaiApiKey
           : providerId.includes('google')
             ? settings.apiKeys?.google
-            : '';
+            : providerId.includes('mistral')
+              ? settings.apiKeys?.mistral
+              : '';
 
         if (!apiKey) {
           throw new Error(`API key not configured for ${provider.name}`);
@@ -413,8 +452,12 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     }
   };
 
-  const wordCount = transcribedText.split(' ').filter((w) => w).length;
-  const charCount = transcribedText.length;
+  const wordCount =
+    transcribedText && typeof transcribedText === 'string'
+      ? transcribedText.split(' ').filter((w) => w).length
+      : 0;
+  const charCount =
+    transcribedText && typeof transcribedText === 'string' ? transcribedText.length : 0;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
@@ -502,12 +545,16 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                 )}
 
                 {/* AI Quick Actions */}
-                {transcribedText && !isProcessing && !isRecording && (
-                  <AIQuickActions
-                    text={transcribedText}
-                    onResult={(result) => setTranscribedText(result)}
-                  />
-                )}
+                {transcribedText &&
+                  typeof transcribedText === 'string' &&
+                  transcribedText.trim() &&
+                  !isProcessing &&
+                  !isRecording && (
+                    <AIQuickActions
+                      text={transcribedText}
+                      onResult={(result) => setTranscribedText(result)}
+                    />
+                  )}
 
                 {/* Modern recording indicator */}
                 {isRecording && (
@@ -610,8 +657,18 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
           style={[
             styles.floatingRecordButtonInner,
             {
-              backgroundColor: isRecording ? colors.error : colors.primary,
-              shadowColor: isRecording ? colors.error : colors.primary,
+              backgroundColor: isRecording
+                ? colors.error
+                : isProcessing
+                  ? colors.accent
+                  : colors.primary,
+              shadowColor: isRecording
+                ? colors.error
+                : isProcessing
+                  ? colors.accent
+                  : colors.primary,
+              shadowOpacity: isProcessing ? 0.6 : 0.3,
+              shadowRadius: isProcessing ? 12 : 8,
             },
           ]}
         >
@@ -619,15 +676,25 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
             style={[
               styles.floatingButtonContent,
               {
-                transform: [{ scale: pulseAnim }],
+                transform: [
+                  { scale: isProcessing ? processingScaleAnim : pulseAnim },
+                  {
+                    rotate: processingRotateAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg'],
+                    }),
+                  },
+                ],
               },
             ]}
           >
-            <Ionicons
-              name={isProcessing ? 'hourglass-outline' : isRecording ? 'stop' : 'mic'}
-              size={28}
-              color="white"
-            />
+            {isProcessing ? (
+              <View style={styles.processingIconContainer}>
+                <Ionicons name="sync-outline" size={28} color="white" />
+              </View>
+            ) : (
+              <Ionicons name={isRecording ? 'stop' : 'mic'} size={28} color="white" />
+            )}
           </Animated.View>
 
           {/* Recording indicator dot */}
@@ -804,5 +871,9 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
+  },
+  processingIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

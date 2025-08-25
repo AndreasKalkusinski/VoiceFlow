@@ -33,7 +33,7 @@ export const TextToSpeechScreen: React.FC = () => {
         sound.unloadAsync();
       }
     };
-  }, []);
+  }, [sound]);
 
   const loadSettings = async () => {
     const loadedSettings = await StorageService.getSettings();

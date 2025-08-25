@@ -10,7 +10,9 @@ import {
   Animated,
   Platform,
   Linking,
+  Image,
 } from 'react-native';
+import AppIconImage from '../../assets/icon.png';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -87,7 +89,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       duration: designTokens.animation.normal,
       useNativeDriver: true,
     }).start();
-  }, []);
+  }, [fadeAnim]);
 
   // Auto-save settings whenever they change
   useEffect(() => {
@@ -98,7 +100,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
     }, 1000);
 
     return () => clearTimeout(saveTimer);
-  }, [settings]);
+  }, [settings, saveSettingsSilently]);
 
   // Helper functions to get provider display names
   const getSTTProviderName = (provider: string | undefined) => {
@@ -107,6 +109,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
         return 'OpenAI Whisper';
       case 'google-stt':
         return 'Google Cloud';
+      case 'mistral-stt':
+        return 'Mistral AI';
       default:
         return provider || 'Not configured';
     }
@@ -120,6 +124,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
         return 'Google Cloud';
       case 'elevenlabs':
         return 'ElevenLabs';
+      case 'mistral-tts':
+        return 'Mistral AI';
       default:
         return provider || 'Not configured';
     }
@@ -323,6 +329,33 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
   const renderGeneralTab = () => (
     <Animated.View style={{ opacity: fadeAnim }}>
+      {/* Debug Section - Temporary for testing */}
+      {/* <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Debug Tools
+        </Text>
+        
+        <ModernCard variant="glass" style={styles.card}>
+          <ModernButton
+            title="Test App Group Functionality"
+            onPress={async () => {
+              try {
+                const { testAppGroupFunctionality } = await import('../utils/testAppGroup');
+                await testAppGroupFunctionality();
+              } catch (error) {
+                Alert.alert('Error', `Failed to test App Group: ${error.message}`);
+              }
+            }}
+            variant="secondary"
+            icon="bug-outline"
+            style={{ marginBottom: 10 }}
+          />
+          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+            Tests Share Extension and App Group communication
+          </Text>
+        </ModernCard>
+      </View> */}
+
       {/* Appearance Section */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -380,7 +413,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
                   style={[
                     styles.themeText,
                     { color: themeMode === option.id ? colors.primary : colors.text },
-                    themeMode === option.id && { fontWeight: '600' },
+                    themeMode === option.id && styles.selectedText,
                   ]}
                 >
                   {option.name}
@@ -419,7 +452,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
                   style={[
                     styles.languageText,
                     { color: selectedLanguage === lang.code ? colors.primary : colors.text },
-                    selectedLanguage === lang.code && { fontWeight: '600' },
+                    selectedLanguage === lang.code && styles.selectedText,
                   ]}
                 >
                   {lang.name}
@@ -466,7 +499,9 @@ export const Modern2025SettingsScreen: React.FC = () => {
 
           {historySettings.enabled && (
             <View style={styles.historyOptions}>
-              <Text style={[styles.label, { color: colors.textSecondary, marginTop: 16 }]}>
+              <Text
+                style={[styles.label, styles.labelWithTopMargin, { color: colors.textSecondary }]}
+              >
                 {t('history.maxItems')}
               </Text>
 
@@ -533,7 +568,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* Speech-to-Text Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View style={{ flex: 1 }}>
+            <View style={styles.flexOne}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.speechToTextProvider')}
               </Text>
@@ -547,7 +582,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
             <View style={styles.providerStatus}>
               {(settings.sttProvider?.includes('openai') &&
                 (settings.apiKeys?.openai || settings.openaiApiKey)) ||
-              (settings.sttProvider?.includes('google') && settings.apiKeys?.google) ? (
+              (settings.sttProvider?.includes('google') && settings.apiKeys?.google) ||
+              (settings.sttProvider?.includes('mistral') && settings.apiKeys?.mistral) ? (
                 <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.success} />
                   <Text style={[styles.statusText, { color: colors.success }]}>
@@ -578,7 +614,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* Text-to-Speech Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View style={{ flex: 1 }}>
+            <View style={styles.flexOne}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.textToSpeechProvider')}
               </Text>
@@ -593,7 +629,8 @@ export const Modern2025SettingsScreen: React.FC = () => {
               {(settings.ttsProvider?.includes('openai') &&
                 (settings.apiKeys?.openai || settings.openaiApiKey)) ||
               (settings.ttsProvider?.includes('google') && settings.apiKeys?.google) ||
-              (settings.ttsProvider?.includes('elevenlabs') && settings.apiKeys?.elevenlabs) ? (
+              (settings.ttsProvider?.includes('elevenlabs') && settings.apiKeys?.elevenlabs) ||
+              (settings.ttsProvider?.includes('mistral') && settings.apiKeys?.mistral) ? (
                 <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.success} />
                   <Text style={[styles.statusText, { color: colors.success }]}>
@@ -624,7 +661,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
         {/* AI Assistant Provider */}
         <ModernCard variant="elevated" style={styles.card}>
           <View style={styles.providerHeader}>
-            <View style={{ flex: 1 }}>
+            <View style={styles.flexOne}>
               <Text style={[styles.label, { color: colors.text }]}>
                 {t('settings.llmProvider')}
               </Text>
@@ -682,10 +719,12 @@ export const Modern2025SettingsScreen: React.FC = () => {
       <View style={styles.section}>
         {/* App Info */}
         <View style={styles.appInfoContainer}>
-          <LinearGradient colors={[colors.primary, colors.accent]} style={styles.appIcon}>
-            <Ionicons name="mic" size={40} color="#fff" />
-          </LinearGradient>
-          <Text style={[styles.appName, { color: colors.text }]}>VoiceFlow</Text>
+          <Image
+            source={AppIconImage}
+            style={styles.appIconImage}
+            resizeMode="contain"
+          />
+          <Text style={[styles.appName, { color: colors.text }]}>SpeakFlow AI</Text>
           <Text style={[styles.appVersion, { color: colors.textSecondary }]}>
             {t('settings.version')} {APP_VERSION} ({t('settings.build')} {BUILD_NUMBER})
           </Text>
@@ -851,7 +890,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
             {t('settings.madeWithLove')} Andreas Kalkusinski
           </Text>
           <Text style={[styles.copyrightText, { color: colors.textMuted }]}>
-            © 2024 VoiceFlow. All rights reserved.
+            © 2024 SpeakFlow AI. All rights reserved.
           </Text>
         </View>
       </View>
@@ -1124,12 +1163,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: designTokens.spacing.xl,
   },
-  appIcon: {
+  appIconImage: {
     width: 80,
     height: 80,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: designTokens.spacing.md,
   },
   appName: {
@@ -1195,6 +1232,15 @@ const styles = StyleSheet.create({
   badgeTitle: {
     ...designTokens.typography.titleMedium,
     fontWeight: '700',
+  },
+  selectedText: {
+    fontWeight: '600',
+  },
+  labelWithTopMargin: {
+    marginTop: 16,
+  },
+  flexOne: {
+    flex: 1,
   },
   badgeSubtitle: {
     ...designTokens.typography.bodyMedium,

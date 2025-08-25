@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../hooks/useTheme';
 import { vw, vh } from '../utils/responsive-dimensions';
 
-import { TabBarProps } from '../types/navigation';
+import { TabBarProps, TabBarState } from '../types/navigation';
 
 export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, navigation }) => {
   const { isDark } = useTheme();
@@ -40,7 +40,7 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
     Settings: '⚙️',
   };
 
-  const handlePress = (route: any, index: number, isFocused: boolean) => {
+  const handlePress = (route: TabBarState['routes'][0], index: number, isFocused: boolean) => {
     const event = navigation.emit({
       type: 'tabPress',
       target: route.key,
@@ -82,7 +82,7 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
   };
 
   useEffect(() => {
-    state.routes.forEach((route: any, index: number) => {
+    state.routes.forEach((route: TabBarState['routes'][0], index: number) => {
       const isFocused = state.index === index;
       Animated.timing(animations[index].opacity, {
         toValue: isFocused ? 1 : 0,
@@ -90,7 +90,7 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
         useNativeDriver: true,
       }).start();
     });
-  }, [state.index]);
+  }, [state.index, animations, state.routes]);
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom, backgroundColor: colors.bg }]}>
@@ -101,7 +101,7 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
       />
 
       <View style={styles.tabContainer}>
-        {state.routes.map((route: any, index: number) => {
+        {state.routes.map((route: TabBarState['routes'][0], index: number) => {
           const { options } = descriptors[route.key];
           const label =
             options.tabBarLabel !== undefined
@@ -176,10 +176,9 @@ export const ModernTabBar: React.FC<TabBarProps> = ({ state, descriptors, naviga
                 <Animated.Text
                   style={[
                     styles.label,
+                    isFocused ? styles.labelActive : styles.labelInactive,
                     {
                       color: isFocused ? colors.active : colors.inactive,
-                      opacity: isFocused ? 1 : 0.7,
-                      fontWeight: isFocused ? '600' : '500',
                     },
                   ]}
                   numberOfLines={1}
@@ -273,5 +272,13 @@ const styles = StyleSheet.create({
     height: vw(1.5),
     borderRadius: vw(0.75),
     marginTop: vh(0.5),
+  },
+  labelInactive: {
+    opacity: 0.7,
+    fontWeight: '500',
+  },
+  labelActive: {
+    opacity: 1,
+    fontWeight: '600',
   },
 });

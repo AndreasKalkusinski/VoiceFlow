@@ -150,9 +150,13 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
           <Text
             style={[
               styles.text,
+              size === 'small'
+                ? styles.textSmall
+                : size === 'large'
+                  ? styles.textLarge
+                  : styles.textMedium,
               {
                 color: getTextColor(),
-                fontSize: size === 'small' ? 14 : size === 'large' ? 18 : 16,
               },
               textStyle,
             ]}
@@ -187,6 +191,15 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 8,
+  },
+  textSmall: {
+    fontSize: 14,
+  },
+  textMedium: {
+    fontSize: 16,
+  },
+  textLarge: {
+    fontSize: 18,
   },
   disabled: {
     opacity: 0.5,

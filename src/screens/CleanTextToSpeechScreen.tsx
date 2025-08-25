@@ -39,7 +39,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
         sound.unloadAsync();
       }
     };
-  }, []);
+  }, [sound]);
 
   useFocusEffect(
     React.useCallback(() => {

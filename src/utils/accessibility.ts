@@ -83,7 +83,7 @@ export const a11y = {
  * Helper function to create accessibility props
  */
 export const createA11yProps = (label: string, hint?: string, role?: string, state?: object) => {
-  const props: any = {
+  const props: unknown = {
     accessible: true,
     accessibilityLabel: label,
   };
@@ -112,7 +112,7 @@ export const createA11yProps = (label: string, hint?: string, role?: string, sta
  * Helper to create button accessibility props
  */
 export const buttonA11y = (label: string, hint?: string, disabled = false, loading = false) => {
-  const state: any = { disabled };
+  const state: unknown = { disabled };
   if (loading) {
     state.busy = true;
   }

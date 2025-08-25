@@ -190,7 +190,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
     showStatus(t('speechToText.textCleared'));
   };
 
-  const wordCount = transcribedText.split(' ').filter((w) => w).length;
+  const wordCount = transcribedText ? transcribedText.split(' ').filter((w) => w).length : 0;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
@@ -258,7 +258,7 @@ export const CleanSpeechToTextScreen: React.FC = () => {
                   <View
                     style={[
                       styles.recordingDot,
-                      { backgroundColor: isRecording ? '#FF4444' : colors.primary },
+                      isRecording ? styles.recordingState : { backgroundColor: colors.primary },
                     ]}
                   />
                   <Text style={[styles.recordingText, { color: colors.text }]}>
@@ -425,6 +425,9 @@ const styles = StyleSheet.create({
   recordLabel: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  recordingState: {
+    backgroundColor: '#FF4444',
   },
   actions: {
     flexDirection: 'row',

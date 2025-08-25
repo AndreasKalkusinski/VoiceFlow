@@ -29,7 +29,7 @@ export const SettingsScreen: React.FC = () => {
 
   useEffect(() => {
     loadSettings();
-  }, []);
+  }, [loadSettings]);
 
   const loadSettings = async () => {
     setIsLoading(true);

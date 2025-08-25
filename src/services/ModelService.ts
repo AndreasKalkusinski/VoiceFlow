@@ -50,7 +50,7 @@ export class ModelService {
       await AsyncStorage.removeItem(key);
       return null;
     } catch (error) {
-      console.error('Error reading cache:', error);
+      // console.error('Error reading cache:', error);
       return null;
     }
   }
@@ -67,7 +67,7 @@ export class ModelService {
       };
       await AsyncStorage.setItem(key, JSON.stringify(cachedData));
     } catch (error) {
-      console.error('Error writing to cache:', error);
+      // console.error('Error writing to cache:', error);
     }
   }
 
@@ -87,7 +87,7 @@ export class ModelService {
         await AsyncStorage.multiRemove(providerKeys);
       }
     } catch (error) {
-      console.error('Error clearing provider cache:', error);
+      // console.error('Error clearing provider cache:', error);
     }
   }
 
@@ -105,7 +105,7 @@ export class ModelService {
         await AsyncStorage.multiRemove(cacheKeys);
       }
     } catch (error) {
-      console.error('Error clearing all cache:', error);
+      // console.error('Error clearing all cache:', error);
     }
   }
 
@@ -131,9 +131,9 @@ export class ModelService {
 
       // Filter for Whisper models and format them
       const whisperModels = response.data.data
-        .filter((model: any) => model.id.startsWith('whisper'))
+        .filter((model: unknown) => model.id.startsWith('whisper'))
         .map(
-          (model: any): STTModel => ({
+          (model: unknown): STTModel => ({
             id: model.id,
             name: this.formatModelName(model.id),
             description: 'OpenAI Whisper model for speech recognition',
@@ -165,8 +165,8 @@ export class ModelService {
       // Cache the results
       await this.setCachedData(cacheKey, whisperModels);
       return whisperModels;
-    } catch (error: any) {
-      console.error('Failed to fetch OpenAI models:', error.response?.data || error.message);
+    } catch {
+      // console.error('Failed to fetch OpenAI models:', error.response?.data || error.message);
       throw new Error('Failed to fetch OpenAI models');
     }
   }
@@ -193,9 +193,9 @@ export class ModelService {
       );
 
       const voices = response.data.voices
-        .filter((voice: any) => voice.name.includes('Neural2')) // Focus on Neural2 voices
+        .filter((voice: unknown) => voice.name.includes('Neural2')) // Focus on Neural2 voices
         .map(
-          (voice: any): TTSVoice => ({
+          (voice: unknown): TTSVoice => ({
             id: voice.name,
             name: this.formatGoogleVoiceName(voice.name),
             gender: this.mapGoogleGender(voice.ssmlGender),
@@ -207,8 +207,8 @@ export class ModelService {
       // Cache the results
       await this.setCachedData(cacheKey, voices);
       return voices;
-    } catch (error: any) {
-      console.error('Failed to fetch Google voices:', error.response?.data || error.message);
+    } catch {
+      // console.error('Failed to fetch Google voices:', error.response?.data || error.message);
       throw new Error('Failed to fetch Google Cloud voices');
     }
   }
@@ -234,7 +234,7 @@ export class ModelService {
       });
 
       const voices = response.data.voices.map(
-        (voice: any): TTSVoice => ({
+        (voice: unknown): TTSVoice => ({
           id: voice.voice_id,
           name: voice.name,
           gender: this.inferGenderFromName(voice.name),
@@ -246,10 +246,17 @@ export class ModelService {
       // Cache the results
       await this.setCachedData(cacheKey, voices);
       return voices;
-    } catch (error: any) {
-      console.error('Failed to fetch ElevenLabs voices:', error.response?.data || error.message);
+    } catch {
+      // console.error('Failed to fetch ElevenLabs voices:', error.response?.data || error.message);
       throw new Error('Failed to fetch ElevenLabs voices');
     }
+  }
+
+  /**
+   * Get supported languages for Whisper models
+   */
+  private getSupportedLanguages(): string[] {
+    return ['en', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'zh', 'ja', 'ko'];
   }
 
   /**
@@ -260,8 +267,20 @@ export class ModelService {
       {
         id: 'whisper-1',
         name: 'Whisper v1',
-        description: 'Latest Whisper model with excellent accuracy',
-        languages: ['en', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'zh', 'ja', 'ko'],
+        description: 'Latest Whisper model with improved accuracy',
+        languages: this.getSupportedLanguages(),
+      },
+      {
+        id: 'whisper-large-v3',
+        name: 'Whisper Large v3',
+        description: 'Most accurate Whisper model, slower processing',
+        languages: this.getSupportedLanguages(),
+      },
+      {
+        id: 'whisper-large-v2',
+        name: 'Whisper Large v2',
+        description: 'Previous large model version',
+        languages: this.getSupportedLanguages(),
       },
     ];
   }

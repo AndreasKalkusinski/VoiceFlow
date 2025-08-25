@@ -24,7 +24,7 @@ export const LogView: React.FC<LogViewProps> = ({ messages }) => {
         useNativeDriver: true,
       }).start();
     }
-  }, [messages.length]);
+  }, [messages.length, fadeAnim]);
 
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });

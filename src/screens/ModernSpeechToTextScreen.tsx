@@ -51,7 +51,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
   useEffect(() => {
     setupAudio();
     animateEntry();
-  }, []);
+  }, [animateEntry]);
 
   // Reload settings when screen comes into focus
   useFocusEffect(
@@ -66,7 +66,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     } else {
       stopWaveAnimation();
     }
-  }, [isRecording]);
+  }, [isRecording, animateWaves, stopWaveAnimation]);
 
   const animateEntry = () => {
     Animated.parallel([
@@ -119,10 +119,6 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-      console.log(
-        'Loaded settings:',
-        loadedSettings?.openaiApiKey ? 'API key present' : 'No API key',
-      );
     } catch {
       /* ignore */
     }
@@ -268,7 +264,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const wordCount = transcribedText.split(' ').filter((w) => w).length;
+  const wordCount = transcribedText ? transcribedText.split(' ').filter((w) => w).length : 0;
 
   return (
     <SafeAreaView style={styles.safeArea}>

@@ -4,6 +4,9 @@ import { OpenAITTSProvider } from './openai/OpenAITTSProvider';
 import { ElevenLabsTTSProvider } from './elevenlabs/ElevenLabsTTSProvider';
 import { GoogleSTTProvider } from './google/GoogleSTTProvider';
 import { GoogleTTSProvider } from './google/GoogleTTSProvider';
+import { MistralSTTProvider } from './mistral/MistralSTTProvider';
+// Mistral TTS not available yet
+// import { MistralTTSProvider } from './mistral/MistralTTSProvider';
 
 export class ProviderRegistry {
   private static sttProviders = new Map<string, STTProvider>();
@@ -17,9 +20,12 @@ export class ProviderRegistry {
     // Register default providers
     this.sttProviders.set('openai-stt', new OpenAISTTProvider());
     this.sttProviders.set('google-stt', new GoogleSTTProvider());
+    this.sttProviders.set('mistral-stt', new MistralSTTProvider());
     this.ttsProviders.set('openai-tts', new OpenAITTSProvider());
     this.ttsProviders.set('elevenlabs-tts', new ElevenLabsTTSProvider());
     this.ttsProviders.set('google-tts', new GoogleTTSProvider());
+    // Mistral TTS not available yet
+    // this.ttsProviders.set('mistral-tts', new MistralTTSProvider());
   }
 
   static registerSTTProvider(provider: STTProvider): void {
