@@ -109,6 +109,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       ]),
     ).start();
   }, [pulseAnim]);
+
   useEffect(() => {
     setupAudio();
     animateEntry();

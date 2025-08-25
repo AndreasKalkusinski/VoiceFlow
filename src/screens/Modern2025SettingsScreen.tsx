@@ -13,8 +13,6 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const AppIconImage = require('../../assets/icon.png');
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
@@ -37,6 +35,7 @@ type TabType = 'general' | 'providers' | 'about';
 // App Info - Dynamically loaded from version utils
 import Constants from 'expo-constants';
 import { APP_VERSION, BUILD_NUMBER } from '../utils/version';
+import AppIconImage from '../../assets/icon.png';
 const GITHUB_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow';
 const PRIVACY_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki/Privacy-Policy';
 const TERMS_URL = 'https://github.com/AndreasKalkusinski/VoiceFlow/wiki/Terms-of-Service';
@@ -288,6 +287,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       setSelectedLanguage(i18n.language);
     }
   };
+
   const openProviderConfig = (type: 'stt' | 'tts' | 'llm') => {
     setProviderModalType(type);
     setShowProviderModal(true);

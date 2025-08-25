@@ -60,6 +60,7 @@ export const CleanSettingsScreen: React.FC = () => {
       /* ignore */
     }
   }, [settings]);
+
   useEffect(() => {
     if (autoSave && settings.openaiApiKey) {
       if (saveTimeout.current) {
