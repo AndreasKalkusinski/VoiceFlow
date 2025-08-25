@@ -41,41 +41,43 @@ function ThemedApp() {
       if (!navigationRef.current) return;
 
       try {
-        // Dynamic import to avoid issues if module is not available
-        const AppGroupService = (await import('./src/services/AppGroupService')).default;
+        // Use the safe wrapper that handles Expo Go gracefully
+        const AppGroupService = (await import('./src/services/AppGroupServiceWrapper')).default;
 
         // eslint-disable-next-line no-console
         console.log('[App] AppGroupService available:', AppGroupService.isAvailable());
 
-        // Only test if module is available (not in Expo Go)
-        if (AppGroupService.isAvailable()) {
-          const testResult = await AppGroupService.test();
+        if (!AppGroupService.isAvailable()) {
           // eslint-disable-next-line no-console
-          console.log('[App] Module test result:', testResult);
+          console.log('[App] AppGroup not available - running in Expo Go or native module missing');
+          return;
         }
 
-        if (AppGroupService.isAvailable()) {
-          const sharedContent = await AppGroupService.checkForSharedContent();
-          // eslint-disable-next-line no-console
-          console.log('[App] Shared content:', sharedContent);
+        // Only test if module is available (not in Expo Go)
+        const testResult = await AppGroupService.test();
+        // eslint-disable-next-line no-console
+        console.log('[App] Module test result:', testResult);
 
-          if (sharedContent.hasAudio && sharedContent.audioData) {
-            // eslint-disable-next-line no-console
-            console.log(
-              '[App] Navigating to Speech to Text with audio:',
-              sharedContent.audioData.path,
-            );
-            // Navigate to Speech to Text with the audio
-            setSharedAudioUri(sharedContent.audioData.path);
-            navigationRef.current.navigate('Speech to Text');
-          } else if (sharedContent.hasText && sharedContent.textData) {
-            // eslint-disable-next-line no-console
-            console.log('[App] Navigating to Text to Speech with text');
-            // Navigate to Text to Speech with the text
-            navigationRef.current.navigate('Text to Speech', {
-              sharedText: sharedContent.textData.text,
-            });
-          }
+        const sharedContent = await AppGroupService.checkForSharedContent();
+        // eslint-disable-next-line no-console
+        console.log('[App] Shared content:', sharedContent);
+
+        if (sharedContent.hasAudio && sharedContent.audioData) {
+          // eslint-disable-next-line no-console
+          console.log(
+            '[App] Navigating to Speech to Text with audio:',
+            sharedContent.audioData.path,
+          );
+          // Navigate to Speech to Text with the audio
+          setSharedAudioUri(sharedContent.audioData.path);
+          navigationRef.current.navigate('Speech to Text');
+        } else if (sharedContent.hasText && sharedContent.textData) {
+          // eslint-disable-next-line no-console
+          console.log('[App] Navigating to Text to Speech with text');
+          // Navigate to Text to Speech with the text
+          navigationRef.current.navigate('Text to Speech', {
+            sharedText: sharedContent.textData.text,
+          });
         }
       } catch (error) {
         // Silently fail if module is not available
