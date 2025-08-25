@@ -123,7 +123,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   const setupAudio = async () => {
     try {
       await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
+        allowsRecording: false,
         playsInSilentModeIOS: true,
         staysActiveInBackground: true,
         shouldDuckAndroid: true,
@@ -263,7 +263,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
 
       // Setup audio mode for playback
       await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
+        allowsRecording: false,
         playsInSilentModeIOS: true,
         staysActiveInBackground: true,
         shouldDuckAndroid: true,
@@ -330,7 +330,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         } else {
           // Ensure audio mode is set for playback
           await Audio.setAudioModeAsync({
-            allowsRecordingIOS: false,
+            allowsRecording: false,
             playsInSilentModeIOS: true,
             staysActiveInBackground: true,
             shouldDuckAndroid: true,

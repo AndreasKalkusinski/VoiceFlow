@@ -59,7 +59,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
   const setupAudio = async () => {
     try {
       await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
+        allowsRecording: false,
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
       });

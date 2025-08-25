@@ -219,9 +219,7 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
       });
 
       // Start recording
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingPresets.HIGH_QUALITY);
 
       setRecording(recording);
       setIsRecordingPrompt(true);

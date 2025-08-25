@@ -126,7 +126,6 @@ export const ModernSpeechToTextScreen: React.FC = () => {
 
   const setupAudio = async () => {
     try {
-      await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,

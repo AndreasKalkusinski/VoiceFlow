@@ -41,8 +41,11 @@ function ThemedApp() {
       if (!navigationRef.current) return;
 
       try {
-        // Use the safe wrapper that handles Expo Go gracefully
-        const AppGroupService = (await import('./src/services/AppGroupServiceWrapper')).default;
+        // Use stub service in Expo Go, real service in dev builds
+        const isExpoDev = __DEV__ && !window.location;
+        const AppGroupService = isExpoDev
+          ? (await import('./src/services/AppGroupServiceStub')).default
+          : (await import('./src/services/AppGroupServiceWrapper')).default;
 
         // eslint-disable-next-line no-console
         console.log('[App] AppGroupService available:', AppGroupService.isAvailable());

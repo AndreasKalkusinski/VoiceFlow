@@ -112,7 +112,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
   const setupAudio = async () => {
     try {
       await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
+        allowsRecording: false,
         playsInSilentModeIOS: true,
         staysActiveInBackground: true,
         shouldDuckAndroid: true,

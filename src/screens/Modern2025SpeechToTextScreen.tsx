@@ -290,7 +290,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     try {
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
+        allowsRecording: true,
         playsInSilentModeIOS: true,
       });
     } catch {
@@ -323,13 +323,11 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       }
 
       await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
+        allowsRecording: true,
         playsInSilentModeIOS: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingPresets.HIGH_QUALITY);
 
       setRecording(recording);
       setIsRecording(true);
