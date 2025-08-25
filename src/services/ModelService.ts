@@ -131,9 +131,9 @@ export class ModelService {
 
       // Filter for Whisper models and format them
       const whisperModels = response.data.data
-        .filter((model: unknown) => model.id.startsWith('whisper'))
+        .filter((model: any) => model.id.startsWith('whisper'))
         .map(
-          (model: unknown): STTModel => ({
+          (model: any): STTModel => ({
             id: model.id,
             name: this.formatModelName(model.id),
             description: 'OpenAI Whisper model for speech recognition',
@@ -193,9 +193,9 @@ export class ModelService {
       );
 
       const voices = response.data.voices
-        .filter((voice: unknown) => voice.name.includes('Neural2')) // Focus on Neural2 voices
+        .filter((voice: any) => voice.name.includes('Neural2')) // Focus on Neural2 voices
         .map(
-          (voice: unknown): TTSVoice => ({
+          (voice: any): TTSVoice => ({
             id: voice.name,
             name: this.formatGoogleVoiceName(voice.name),
             gender: this.mapGoogleGender(voice.ssmlGender),
@@ -234,7 +234,7 @@ export class ModelService {
       });
 
       const voices = response.data.voices.map(
-        (voice: unknown): TTSVoice => ({
+        (voice: any): TTSVoice => ({
           id: voice.voice_id,
           name: voice.name,
           gender: this.inferGenderFromName(voice.name),

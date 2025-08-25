@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Animated, Dimensions, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -22,6 +22,69 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   const waveAnim3 = useRef(new Animated.Value(0)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
   const shimmerAnim = useRef(new Animated.Value(0)).current;
+
+  const startPulseAnimation = useCallback(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, [pulseAnim]);
+
+  const startWaveAnimations = useCallback(() => {
+    // Wave 1
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(waveAnim1, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(waveAnim1, {
+          toValue: 0,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    // Wave 2 with delay
+    setTimeout(() => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(waveAnim2, {
+            toValue: 1,
+            duration: 3000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(waveAnim2, {
+            toValue: 0,
+            duration: 3000,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    }, 2000);
+  }, [waveAnim1, waveAnim2]);
+
+  const startShimmerAnimation = useCallback(() => {
+    Animated.loop(
+      Animated.timing(shimmerAnim, {
+        toValue: 1,
+        duration: 2000,
+        useNativeDriver: true,
+      }),
+    ).start();
+  }, [shimmerAnim]);
 
   useEffect(() => {
     StatusBar.setHidden(true);
@@ -86,87 +149,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
     startWaveAnimations,
     textOpacity,
   ]);
-
-  const startPulseAnimation = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-  };
-
-  const startWaveAnimations = () => {
-    // Wave 1
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(waveAnim1, {
-          toValue: 1,
-          duration: 3000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(waveAnim1, {
-          toValue: 0,
-          duration: 0,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-
-    // Wave 2 with delay
-    setTimeout(() => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(waveAnim2, {
-            toValue: 1,
-            duration: 3000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(waveAnim2, {
-            toValue: 0,
-            duration: 0,
-            useNativeDriver: true,
-          }),
-        ]),
-      ).start();
-    }, 1000);
-
-    // Wave 3 with delay
-    setTimeout(() => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(waveAnim3, {
-            toValue: 1,
-            duration: 3000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(waveAnim3, {
-            toValue: 0,
-            duration: 0,
-            useNativeDriver: true,
-          }),
-        ]),
-      ).start();
-    }, 2000);
-  };
-
-  const startShimmerAnimation = () => {
-    Animated.loop(
-      Animated.timing(shimmerAnim, {
-        toValue: 1,
-        duration: 2000,
-        useNativeDriver: true,
-      }),
-    ).start();
-  };
 
   const spin = rotateAnim.interpolate({
     inputRange: [0, 1],
