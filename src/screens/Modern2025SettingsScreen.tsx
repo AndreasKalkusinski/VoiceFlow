@@ -719,11 +719,7 @@ export const Modern2025SettingsScreen: React.FC = () => {
       <View style={styles.section}>
         {/* App Info */}
         <View style={styles.appInfoContainer}>
-          <Image
-            source={AppIconImage}
-            style={styles.appIconImage}
-            resizeMode="contain"
-          />
+          <Image source={AppIconImage} style={styles.appIconImage} resizeMode="contain" />
           <Text style={[styles.appName, { color: colors.text }]}>SpeakFlow AI</Text>
           <Text style={[styles.appVersion, { color: colors.textSecondary }]}>
             {t('settings.version')} {APP_VERSION} ({t('settings.build')} {BUILD_NUMBER})

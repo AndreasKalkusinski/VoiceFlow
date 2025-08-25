@@ -77,7 +77,7 @@ export class MistralSTTProvider implements STTProvider {
       // If no API models found, use fallback
       this._models = uniqueModels.length > 0 ? uniqueModels : this.fallbackModels;
       return this._models;
-    } catch (error) {
+    } catch {
       console.log('Using fallback Mistral STT models');
       this._models = this.fallbackModels;
       return this.fallbackModels;

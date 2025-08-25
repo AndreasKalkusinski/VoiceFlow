@@ -80,7 +80,7 @@ function ThemedApp() {
 
     // Setup listener for app state changes
     let subscription: any;
-    
+
     (async () => {
       // Check when app becomes active (from background)
       const { AppState } = await import('react-native');

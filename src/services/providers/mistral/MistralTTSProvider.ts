@@ -117,7 +117,7 @@ export class MistralTTSProvider implements TTSProvider {
       this._voices = this.fallbackVoices; // Voices are still static for now
 
       return { models: this._models, voices: this._voices };
-    } catch (error) {
+    } catch {
       console.log('Using fallback Mistral TTS models and voices');
       this._models = this.fallbackModels;
       this._voices = this.fallbackVoices;

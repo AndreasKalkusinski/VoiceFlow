@@ -49,7 +49,7 @@ export class ModelService {
       // Cache expired, remove it
       await AsyncStorage.removeItem(key);
       return null;
-    } catch (error) {
+    } catch {
       // console.error('Error reading cache:', error);
       return null;
     }
@@ -66,7 +66,7 @@ export class ModelService {
         ttl,
       };
       await AsyncStorage.setItem(key, JSON.stringify(cachedData));
-    } catch (error) {
+    } catch {
       // console.error('Error writing to cache:', error);
     }
   }
@@ -86,7 +86,7 @@ export class ModelService {
       if (providerKeys.length > 0) {
         await AsyncStorage.multiRemove(providerKeys);
       }
-    } catch (error) {
+    } catch {
       // console.error('Error clearing provider cache:', error);
     }
   }
@@ -104,7 +104,7 @@ export class ModelService {
       if (cacheKeys.length > 0) {
         await AsyncStorage.multiRemove(cacheKeys);
       }
-    } catch (error) {
+    } catch {
       // console.error('Error clearing all cache:', error);
     }
   }
