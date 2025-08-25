@@ -1,6 +1,5 @@
 import { TTSProvider, TTSModel, TTSVoice } from '../types';
 import axios from 'axios';
-import * as FileSystem from 'expo-file-system';
 
 export class MistralTTSProvider implements TTSProvider {
   readonly id = 'mistral-tts';
@@ -13,8 +12,8 @@ export class MistralTTSProvider implements TTSProvider {
   private apiKey: string = '';
   private baseURL = 'https://api.mistral.ai/v1';
 
-  private _models: TTSModel[] | null = null;
-  private _voices: TTSVoice[] | null = null;
+  private _models: TTSModel[] = [];
+  private _voices: TTSVoice[] = [];
 
   // Static models as fallback
   private fallbackModels: TTSModel[] = [
@@ -242,47 +241,6 @@ export class MistralTTSProvider implements TTSProvider {
       throw new Error(
         'Mistral TTS is not yet available. Mistral AI currently only provides LLM services.',
       );
-
-      /* Future implementation when Mistral releases TTS API:
-      const response = await axios.post(
-        `${this.baseURL}/audio/speech`,
-        {
-          model: options?.model || 'mistral-tts-v1',
-          input: text,
-          voice: options?.voice || 'emma',
-          response_format: options?.format || 'mp3',
-          speed: options?.speed || 1.0,
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          responseType: 'arraybuffer',
-          timeout: 30000,
-        }
-      );
-      */
-
-      // Save the audio data to a temporary file
-      const fileName = `mistral_tts_${Date.now()}.${options?.format || 'mp3'}`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-
-      // Convert ArrayBuffer to base64
-      const base64 = btoa(
-        new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), ''),
-      );
-
-      await FileSystem.writeAsStringAsync(fileUri, base64, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      return {
-        audioUri: fileUri,
-        duration: undefined, // Mistral doesn't return duration
-        format: options?.format || 'mp3',
-        size: response.data.byteLength,
-      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {

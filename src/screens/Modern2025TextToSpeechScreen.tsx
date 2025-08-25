@@ -100,7 +100,6 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
     }, []),
   );
 
-
   const loadSettings = async () => {
     try {
       const loadedSettings = await StorageService.getSettings();

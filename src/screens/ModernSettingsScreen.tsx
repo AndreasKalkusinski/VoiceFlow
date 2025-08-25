@@ -7,7 +7,6 @@ import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 import { ProviderSettings } from '../components/ProviderSettings';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme, ThemeMode } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
@@ -31,7 +30,7 @@ export const ModernSettingsScreen: React.FC = () => {
     providerSettings: {},
   });
   const [statusMessage, setStatusMessage] = useState('');
-  const [availableModels, setAvailableModels] = useState<any[]>([]);
+  const [, setAvailableModels] = useState<any[]>([]);
   const modelRefreshInterval = useRef<NodeJS.Timeout | null>(null);
 
   const { colors, isDark, themeMode, setTheme } = useTheme();
@@ -61,26 +60,29 @@ export const ModernSettingsScreen: React.FC = () => {
     setTimeout(() => setStatusMessage(''), duration);
   };
 
-  const fetchAvailableModels = useCallback(async (silent = false) => {
-    if (!settings?.openaiApiKey) return;
+  const fetchAvailableModels = useCallback(
+    async (silent = false) => {
+      if (!settings?.openaiApiKey) return;
 
-    if (!silent) {
-      // Show loading status if not silent
-    }
+      if (!silent) {
+        // Show loading status if not silent
+      }
 
-    try {
-      // For now, just use static models
-      const models = ['whisper-1', 'tts-1', 'tts-1-hd'];
-      setAvailableModels(models);
-      if (!silent) {
-        showStatus(`Found ${models.length} available models`);
+      try {
+        // For now, just use static models
+        const models = ['whisper-1', 'tts-1', 'tts-1-hd'];
+        setAvailableModels(models);
+        if (!silent) {
+          showStatus(`Found ${models.length} available models`);
+        }
+      } catch {
+        if (!silent) {
+          showStatus('Failed to fetch models');
+        }
       }
-    } catch {
-      if (!silent) {
-        showStatus('Failed to fetch models');
-      }
-    }
-  }, [settings]);
+    },
+    [settings],
+  );
 
   const loadSettings = useCallback(async () => {
     showStatus(t('settings.status.loading'));

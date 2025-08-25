@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -48,6 +48,53 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       .map(() => new Animated.Value(0)),
   ).current;
 
+  const animateEntry = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        tension: 20,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
+  const animateWaves = useCallback(() => {
+    waveAnims.forEach((anim, index) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(index * 100),
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    });
+  }, [waveAnims]);
+
+  const stopWaveAnimation = useCallback(() => {
+    waveAnims.forEach((anim) => {
+      anim.stopAnimation();
+      Animated.timing(anim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    });
+  }, [waveAnims]);
+
   useEffect(() => {
     setupAudio();
     animateEntry();
@@ -67,53 +114,6 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       stopWaveAnimation();
     }
   }, [isRecording, animateWaves, stopWaveAnimation]);
-
-  const animateEntry = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        tension: 20,
-        friction: 7,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const animateWaves = () => {
-    waveAnims.forEach((anim, index) => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(index * 100),
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim, {
-            toValue: 0,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-        ]),
-      ).start();
-    });
-  };
-
-  const stopWaveAnimation = () => {
-    waveAnims.forEach((anim) => {
-      anim.stopAnimation();
-      Animated.timing(anim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    });
-  };
 
   const loadSettings = async () => {
     try {

@@ -10,10 +10,10 @@ export { ElevenLabsTTSProvider } from './elevenlabs/ElevenLabsTTSProvider';
 export { MistralTTSProvider } from './mistral/MistralTTSProvider';
 
 // LLM Providers
-export { OpenAILLMProvider } from './openai/OpenAILLMProvider';
-export { GoogleLLMProvider } from './google/GoogleLLMProvider';
-export { AnthropicLLMProvider } from './anthropic/AnthropicLLMProvider';
-export { MistralLLMProvider } from './mistral/MistralLLMProvider';
+export { OpenAILLMProvider } from './llm/OpenAILLMProvider';
+export { GoogleGeminiProvider as GoogleLLMProvider } from './llm/GoogleGeminiProvider';
+export { AnthropicLLMProvider } from './llm/AnthropicLLMProvider';
+export { MistralProvider as MistralLLMProvider } from './llm/MistralProvider';
 
 // Provider registry
 import { STTProvider, TTSProvider, LLMProvider } from './types';
@@ -24,10 +24,10 @@ import { OpenAITTSProvider } from './openai/OpenAITTSProvider';
 import { GoogleTTSProvider } from './google/GoogleTTSProvider';
 import { ElevenLabsTTSProvider } from './elevenlabs/ElevenLabsTTSProvider';
 import { MistralTTSProvider } from './mistral/MistralTTSProvider';
-import { OpenAILLMProvider } from './openai/OpenAILLMProvider';
-import { GoogleLLMProvider } from './google/GoogleLLMProvider';
-import { AnthropicLLMProvider } from './anthropic/AnthropicLLMProvider';
-import { MistralLLMProvider } from './mistral/MistralLLMProvider';
+import { OpenAILLMProvider } from './llm/OpenAILLMProvider';
+import { GoogleGeminiProvider as GoogleLLMProvider } from './llm/GoogleGeminiProvider';
+import { AnthropicLLMProvider } from './llm/AnthropicLLMProvider';
+import { MistralProvider as MistralLLMProvider } from './llm/MistralProvider';
 
 export const STT_PROVIDERS: STTProvider[] = [
   new OpenAISTTProvider(),
