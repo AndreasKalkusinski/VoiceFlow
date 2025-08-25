@@ -12,8 +12,9 @@ import {
   Linking,
   Image,
 } from 'react-native';
-const AppIconImage = require('../../assets/icon.png');
 import { SafeAreaView } from 'react-native-safe-area-context';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const AppIconImage = require('../../assets/icon.png');
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { ModernCard } from '../components/ModernCard';
@@ -287,7 +288,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
       setSelectedLanguage(i18n.language);
     }
   };
-
   const openProviderConfig = (type: 'stt' | 'tts' | 'llm') => {
     setProviderModalType(type);
     setShowProviderModal(true);
