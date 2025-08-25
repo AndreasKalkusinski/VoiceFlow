@@ -47,10 +47,12 @@ function ThemedApp() {
         // eslint-disable-next-line no-console
         console.log('[App] AppGroupService available:', AppGroupService.isAvailable());
 
-        // Test the module first
-        const testResult = await AppGroupService.test();
-        // eslint-disable-next-line no-console
-        console.log('[App] Module test result:', testResult);
+        // Only test if module is available (not in Expo Go)
+        if (AppGroupService.isAvailable()) {
+          const testResult = await AppGroupService.test();
+          // eslint-disable-next-line no-console
+          console.log('[App] Module test result:', testResult);
+        }
 
         if (AppGroupService.isAvailable()) {
           const sharedContent = await AppGroupService.checkForSharedContent();

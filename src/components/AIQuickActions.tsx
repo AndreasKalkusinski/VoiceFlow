@@ -19,7 +19,7 @@ import { designTokens } from '../utils/design-system';
 import * as Haptics from 'expo-haptics';
 import * as Clipboard from 'expo-clipboard';
 import Modal from 'react-native-modal';
-import { Audio } from 'expo-av';
+import { Audio } from 'expo-audio';
 import { StorageService } from '../services/storage';
 import { LLMProviderRegistry } from '../services/providers/LLMProviderRegistry';
 import { Settings } from '../types/settings';

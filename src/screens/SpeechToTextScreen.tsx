@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Audio } from 'expo-av';
+import { Audio } from 'expo-audio';
 import * as Clipboard from 'expo-clipboard';
 import { RecordingAnimation } from '../components/RecordingAnimation';
 import { LogView } from '../components/LogView';

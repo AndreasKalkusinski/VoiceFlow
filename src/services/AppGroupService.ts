@@ -1,6 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 
-const { AppGroupModule } = NativeModules;
+// Safely access the native module - it won't exist in Expo Go
+const AppGroupModule = NativeModules.AppGroupModule || null;
 
 export interface SharedAudioData {
   path: string;
