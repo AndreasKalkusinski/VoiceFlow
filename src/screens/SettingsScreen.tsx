@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -27,11 +27,17 @@ export const SettingsScreen: React.FC = () => {
   const [isValidating, setIsValidating] = useState(false);
   const [logs, setLogs] = useState<LogMessage[]>([]);
 
-  useEffect(() => {
-    loadSettings();
-  }, [loadSettings]);
+  const addLog = (message: string, type: LogMessage['type']) => {
+    const newLog: LogMessage = {
+      id: Date.now().toString(),
+      message,
+      type,
+      timestamp: new Date(),
+    };
+    setLogs((prev) => [newLog, ...prev].slice(0, 10));
+  };
 
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     setIsLoading(true);
     addLog('Loading settings...', 'info');
     try {
@@ -44,17 +50,11 @@ export const SettingsScreen: React.FC = () => {
       setIsLoading(false);
       setTimeout(() => setLogs([]), 2000);
     }
-  };
+  }, []);
 
-  const addLog = (message: string, type: LogMessage['type']) => {
-    const newLog: LogMessage = {
-      id: Date.now().toString(),
-      message,
-      type,
-      timestamp: new Date(),
-    };
-    setLogs((prev) => [...prev, newLog]);
-  };
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
   const validateApiKey = async () => {
     if (!settings.openaiApiKey) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -47,6 +47,102 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   const waveformAnims = useRef([...Array(15)].map(() => new Animated.Value(0.3))).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
+  const animateEntry = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        tension: 20,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
+  const startWaveformAnimation = useCallback(() => {
+    waveformAnims.forEach((anim, index) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 300 + Math.random() * 200,
+            useNativeDriver: true,
+            delay: index * 50,
+          }),
+          Animated.timing(anim, {
+            toValue: 0.3,
+            duration: 300 + Math.random() * 200,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    });
+  }, [waveformAnims]);
+
+  const stopWaveformAnimation = useCallback(() => {
+    waveformAnims.forEach((anim) => {
+      anim.stopAnimation();
+      Animated.timing(anim, {
+        toValue: 0.3,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    });
+  }, [waveformAnims]);
+
+  const startPulseAnimation = useCallback(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, [pulseAnim]);
+
+  const stopPulseAnimation = useCallback(() => {
+    pulseAnim.stopAnimation();
+    Animated.timing(pulseAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [pulseAnim]);
+
+  const setupAudio = async () => {
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const loadSettings = async () => {
+    try {
+      const loadedSettings = await StorageService.getSettings();
+      setSettings(loadedSettings);
+    } catch {
+      /* ignore */
+    }
+  };
+
   useEffect(() => {
     animateEntry();
     setupAudio();
@@ -73,108 +169,12 @@ export const ModernTextToSpeechScreen: React.FC = () => {
     stopWaveformAnimation,
   ]);
 
-  const setupAudio = async () => {
-    try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
-        shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: false,
-      });
-    } catch {
-      /* ignore */
-    }
-  };
-
   // Reload settings when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
       loadSettings();
     }, []),
   );
-
-  const animateEntry = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        tension: 20,
-        friction: 7,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const startWaveformAnimation = () => {
-    waveformAnims.forEach((anim, index) => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 300 + Math.random() * 200,
-            useNativeDriver: true,
-            delay: index * 50,
-          }),
-          Animated.timing(anim, {
-            toValue: 0.3,
-            duration: 300 + Math.random() * 200,
-            useNativeDriver: true,
-          }),
-        ]),
-      ).start();
-    });
-  };
-
-  const stopWaveformAnimation = () => {
-    waveformAnims.forEach((anim) => {
-      anim.stopAnimation();
-      Animated.timing(anim, {
-        toValue: 0.3,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    });
-  };
-
-  const startPulseAnimation = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.05,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-  };
-
-  const stopPulseAnimation = () => {
-    pulseAnim.stopAnimation();
-    Animated.timing(pulseAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const loadSettings = async () => {
-    try {
-      const loadedSettings = await StorageService.getSettings();
-      setSettings(loadedSettings);
-    } catch {
-      /* ignore */
-    }
-  };
 
   const showStatus = (message: string, duration: number = 3000) => {
     setStatusMessage(message);
