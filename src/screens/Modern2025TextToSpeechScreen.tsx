@@ -13,7 +13,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-audio';
+import * as Audio from 'expo-audio';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import * as Sharing from 'expo-sharing';
@@ -202,7 +202,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
       setIsPlaying(true);
       showStatus(t('textToSpeech.status.playing'));
 
-      newSound.setOnPlaybackStatusUpdate(async (status) => {
+      newSound.setOnPlaybackStatusUpdate(async (status: any) => {
         if (status.isLoaded) {
           if (status.didJustFinish) {
             setIsPlaying(false);
@@ -282,7 +282,7 @@ export const Modern2025TextToSpeechScreen: React.FC = () => {
           setSound(newSound);
           setIsPlaying(true);
 
-          newSound.setOnPlaybackStatusUpdate(async (status) => {
+          newSound.setOnPlaybackStatusUpdate(async (status: any) => {
             if (status.isLoaded) {
               if (status.didJustFinish) {
                 setIsPlaying(false);

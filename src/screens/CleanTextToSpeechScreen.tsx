@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-audio';
+import * as Audio from 'expo-audio';
 import * as Clipboard from 'expo-clipboard';
 import { MinimalCard } from '../components/MinimalCard';
 import { SimpleButton } from '../components/SimpleButton';
@@ -143,7 +143,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
       setIsPlaying(true);
       showStatus(t('textToSpeech.status.playing'));
 
-      newSound.setOnPlaybackStatusUpdate((status) => {
+      newSound.setOnPlaybackStatusUpdate((status: any) => {
         if (status.isLoaded && status.didJustFinish) {
           setIsPlaying(false);
           showStatus(t('textToSpeech.status.complete'));

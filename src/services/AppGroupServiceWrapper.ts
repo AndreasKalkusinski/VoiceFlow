@@ -3,8 +3,16 @@ import { Platform, NativeModules } from 'react-native';
 // Safe wrapper that doesn't throw when module is not available
 class AppGroupServiceWrapper {
   private service: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
+  private moduleChecked = false;
 
   constructor() {
+    // Delay the check to avoid immediate module access
+  }
+
+  private initializeIfNeeded() {
+    if (this.moduleChecked) return;
+    this.moduleChecked = true;
+
     // Only try to load the service if the native module exists
     if (Platform.OS === 'ios' && NativeModules.AppGroupModule) {
       try {
@@ -20,16 +28,19 @@ class AppGroupServiceWrapper {
   }
 
   isAvailable(): boolean {
+    this.initializeIfNeeded();
     return this.service !== null && this.service.isAvailable();
   }
 
   async test(): Promise<string | null> {
+    this.initializeIfNeeded();
     if (!this.service) return null;
     return this.service.test();
   }
 
   async checkForSharedContent(): Promise<any> {
     // eslint-disable-line @typescript-eslint/no-explicit-any
+    this.initializeIfNeeded();
     if (!this.service) {
       return { hasAudio: false, hasText: false };
     }

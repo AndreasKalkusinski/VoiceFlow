@@ -11,7 +11,7 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { Audio } from 'expo-audio';
+import * as Audio from 'expo-audio';
 import * as Clipboard from 'expo-clipboard';
 import { LogView } from '../components/LogView';
 import { StorageService } from '../services/storage';
