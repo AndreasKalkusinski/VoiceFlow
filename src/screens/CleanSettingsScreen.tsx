@@ -113,7 +113,6 @@ export const CleanSettingsScreen: React.FC = () => {
     }
   };
 
-
   const saveSettings = async () => {
     setIsSaving(true);
     try {

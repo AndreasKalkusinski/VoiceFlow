@@ -257,7 +257,6 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     }
   }, [isProcessing, processingRotateAnim, processingScaleAnim]);
 
-
   const loadSettings = async () => {
     try {
       const loadedSettings = await StorageService.getSettings();

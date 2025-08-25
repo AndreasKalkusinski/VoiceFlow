@@ -277,7 +277,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
     ]);
   };
 
-
   const handleLanguageChange = async (languageCode: string) => {
     try {
       setSelectedLanguage(languageCode);
