@@ -255,7 +255,7 @@ export class GoogleTTSProvider extends BaseTTSProvider {
       });
 
       return audioUri;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google TTS Error:', error.response?.data || error.message);
       throw new Error('Failed to synthesize speech with Google Cloud TTS');
     }
@@ -268,7 +268,7 @@ export class GoogleTTSProvider extends BaseTTSProvider {
     return 'NEUTRAL';
   }
 
-  async validateConfig(config: any): Promise<boolean> {
+  async validateConfig(config: unknown): Promise<boolean> {
     if (!config.apiKey) return false;
 
     try {

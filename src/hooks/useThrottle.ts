@@ -13,7 +13,10 @@ import { useCallback, useRef } from 'react';
  *   console.log('Scrolling');
  * }, 200);
  */
-export function useThrottle<T extends (...args: any[]) => any>(callback: T, delay: number): T {
+export function useThrottle<T extends (...args: unknown[]) => unknown>(
+  callback: T,
+  delay: number,
+): T {
   const lastRun = useRef(Date.now());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 

@@ -1,39 +1,63 @@
 {
   "expo": {
-    "name": "VoiceFlow",
+    "name": "SpeakFlow AI",
     "slug": "voiceflow",
     "owner": "andreaskalkusinski",
-    "version": "2.1.2",
+    "version": "2.1.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "description": "Modern Speech-to-Text and Text-to-Speech app with OpenAI integration",
+    "description": "Modern Speech-to-Text and Text-to-Speech app with AI integration",
     "githubUrl": "https://github.com/andreaskalkusinski/VoiceFlow",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "de.jeantools.voiceflow",
       "buildNumber": "45",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "This app needs access to microphone for speech to text functionality."
+        "NSMicrophoneUsageDescription": "This app needs access to microphone for speech to text functionality.",
+        "CFBundleLocalizations": [
+          "en",
+          "de",
+          "es",
+          "en",
+          "de",
+          "es"
+        ]
       }
+    },
+    "locales": {
+      "de": "./assets/locales/de.json",
+      "en": "./assets/locales/en.json",
+      "es": "./assets/locales/es.json"
     },
     "android": {
       "package": "de.jeantools.voiceflow",
-      "versionCode": 45,
+      "versionCode": 44,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": ["android.permission.RECORD_AUDIO", "android.permission.MODIFY_AUDIO_SETTINGS"]
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-av"],
+    "plugins": [
+      "expo-av"
+    ],
     "extra": {
       "eas": {
         "projectId": "1a2d211f-749d-450b-b560-80433d745457"
       }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/1a2d211f-749d-450b-b560-80433d745457"
     }
   }
 }

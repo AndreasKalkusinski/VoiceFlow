@@ -76,7 +76,16 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
         });
       }, 3000);
     });
-  }, []);
+  }, [
+    fadeAnim,
+    onFinish,
+    rotateAnim,
+    scaleAnim,
+    startPulseAnimation,
+    startShimmerAnimation,
+    startWaveAnimations,
+    textOpacity,
+  ]);
 
   const startPulseAnimation = () => {
     Animated.loop(
@@ -218,7 +227,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
               {
                 left: `${(i % 5) * 25}%`,
                 top: `${Math.floor(i / 5) * 25}%`,
-                opacity: 0.1,
               },
             ]}
           />
@@ -275,7 +283,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
       {/* App name with shimmer effect */}
       <Animated.View style={[styles.textContainer, { opacity: textOpacity }]}>
-        <Text style={styles.appName}>VoiceFlow</Text>
+        <Text style={styles.appName}>SpeakFlow AI</Text>
         <Text style={styles.tagline}>AI Voice Assistant</Text>
 
         {/* Shimmer overlay */}
@@ -352,6 +360,7 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     backgroundColor: 'white',
+    opacity: 0.1,
   },
   wave: {
     position: 'absolute',

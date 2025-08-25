@@ -33,7 +33,7 @@ export const captureException = (
 ) => {
   if (!config.app.isProduction || !config.features.crashReporting) {
     // In development, just log to console
-    console.error('Error captured:', error, context);
+    // console.error('Error captured:', error, context);
     return;
   }
 
@@ -120,7 +120,7 @@ export const startSpan = (_name: string, _op: string) => {
 /**
  * Wrap async functions with error handling
  */
-export const wrapAsync = <T extends (...args: any[]) => Promise<any>>(
+export const wrapAsync = <T extends (...args: unknown[]) => Promise<any>>(
   fn: T,
   context?: string,
 ): T => {

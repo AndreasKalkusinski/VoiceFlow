@@ -61,7 +61,7 @@ export const ModernFAB: React.FC<ModernFABProps> = ({
     } else {
       pulseAnim.setValue(1);
     }
-  }, [isActive]);
+  }, [isActive, pulseAnim, scaleAnim]);
 
   const handlePressIn = () => {
     Animated.parallel([

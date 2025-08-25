@@ -92,7 +92,7 @@ export const TranscriptionProgress: React.FC<TranscriptionProgressProps> = ({
         useNativeDriver: true,
       }).start();
     }
-  }, [isVisible]);
+  }, [isVisible, dotAnim1, dotAnim2, dotAnim3, fadeAnim, progressAnim, pulseAnim]);
 
   const progressTranslate = progressAnim.interpolate({
     inputRange: [0, 1],

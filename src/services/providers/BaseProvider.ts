@@ -8,7 +8,7 @@ export abstract class BaseSTTProvider implements STTProvider {
 
   abstract transcribe(audioUri: string, options: STTOptions): Promise<string>;
 
-  async validateConfig(config: any): Promise<boolean> {
+  async validateConfig(config: unknown): Promise<boolean> {
     if (this.requiresApiKey && !config.apiKey) {
       return false;
     }
@@ -24,7 +24,7 @@ export abstract class BaseTTSProvider implements TTSProvider {
 
   abstract synthesize(text: string, options: TTSOptions): Promise<string>;
 
-  async validateConfig(config: any): Promise<boolean> {
+  async validateConfig(config: unknown): Promise<boolean> {
     if (this.requiresApiKey && !config.apiKey) {
       return false;
     }

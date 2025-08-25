@@ -15,7 +15,7 @@ export interface AppError {
   type: ErrorType;
   message: string;
   code?: string;
-  details?: any;
+  details?: unknown;
   timestamp: Date;
 }
 
@@ -25,10 +25,10 @@ export interface AppError {
 export class ApplicationError extends Error {
   public type: ErrorType;
   public code?: string;
-  public details?: any;
+  public details?: unknown;
   public timestamp: Date;
 
-  constructor(type: ErrorType, message: string, code?: string, details?: any) {
+  constructor(type: ErrorType, message: string, code?: string, details?: unknown) {
     super(message);
     this.name = 'ApplicationError';
     this.type = type;
@@ -51,7 +51,7 @@ export class ApplicationError extends Error {
 /**
  * Error handler for API responses
  */
-export function handleApiError(error: any): ApplicationError {
+export function handleApiError(error: unknown): ApplicationError {
   if (error.response) {
     // Server responded with error status
     const status = error.response.status;
@@ -115,7 +115,7 @@ export function handleApiError(error: any): ApplicationError {
 /**
  * Error handler for storage operations
  */
-export function handleStorageError(error: any): ApplicationError {
+export function handleStorageError(error: unknown): ApplicationError {
   return new ApplicationError(
     ErrorType.STORAGE,
     'Failed to access local storage. Please try again.',
@@ -139,7 +139,7 @@ export function handlePermissionError(permission: string): ApplicationError {
 /**
  * Generic error handler
  */
-export function handleError(error: any): ApplicationError {
+export function handleError(error: unknown): ApplicationError {
   if (error instanceof ApplicationError) {
     return error;
   }
@@ -186,7 +186,7 @@ export function getUserFriendlyMessage(error: ApplicationError): string {
  * Error logging service (can be extended to send to external service)
  */
 export class ErrorLogger {
-  static log(error: ApplicationError, context?: any): void {
+  static log(error: ApplicationError, context?: unknown): void {
     if (__DEV__) {
       console.error('Application Error:', {
         ...error.toJSON(),
@@ -198,7 +198,7 @@ export class ErrorLogger {
     // Sentry.captureException(error, { extra: context });
   }
 
-  static logWarning(message: string, details?: any): void {
+  static logWarning(message: string, details?: unknown): void {
     if (__DEV__) {
       console.warn('Warning:', message, details);
     }

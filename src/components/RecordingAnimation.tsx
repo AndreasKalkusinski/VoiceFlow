@@ -56,7 +56,7 @@ export const RecordingAnimation: React.FC<RecordingAnimationProps> = ({ isRecord
         anim.setValue(0);
       });
     }
-  }, [isRecording]);
+  }, [isRecording, pulseAnim, waveAnims]);
 
   if (!isRecording) {
     return null;

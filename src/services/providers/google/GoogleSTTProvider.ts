@@ -101,6 +101,16 @@ export class GoogleSTTProvider extends BaseSTTProvider {
 
   private baseURL = 'https://speech.googleapis.com/v1';
 
+  /**
+   * Load available models - Google doesn't provide a models endpoint for STT yet
+   * so we maintain a static list that we update periodically
+   */
+  async loadModels(_apiKey: string): Promise<STTModel[]> {
+    // Google Speech-to-Text doesn't have a public models endpoint
+    // Return the current known models
+    return this.models;
+  }
+
   async transcribe(audioUri: string, options: STTOptions): Promise<string> {
     if (!options.apiKey) {
       throw new Error('Google Cloud API key is required');
@@ -136,18 +146,18 @@ export class GoogleSTTProvider extends BaseSTTProvider {
 
       if (response.data.results && response.data.results.length > 0) {
         return response.data.results
-          .map((result: any) => result.alternatives[0].transcript)
+          .map((result: unknown) => result.alternatives[0].transcript)
           .join(' ');
       }
 
       return '';
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google STT Error:', error.response?.data || error.message);
       throw new Error('Failed to transcribe audio with Google Cloud Speech');
     }
   }
 
-  async validateConfig(config: any): Promise<boolean> {
+  async validateConfig(config: unknown): Promise<boolean> {
     if (!config.apiKey) return false;
 
     // Google doesn't have a simple validation endpoint

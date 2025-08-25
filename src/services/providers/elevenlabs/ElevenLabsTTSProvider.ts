@@ -125,13 +125,13 @@ export class ElevenLabsTTSProvider extends BaseTTSProvider {
       });
 
       return audioUri;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('ElevenLabs TTS Error:', error.response?.data || error.message);
       throw new Error('Failed to synthesize speech with ElevenLabs');
     }
   }
 
-  async validateConfig(config: any): Promise<boolean> {
+  async validateConfig(config: unknown): Promise<boolean> {
     if (!config.apiKey) return false;
 
     try {

@@ -53,13 +53,13 @@ export class OpenAITTSProvider extends BaseTTSProvider {
       // Filter for TTS models
       const ttsModels = response.data.data
         .filter(
-          (model: any) =>
+          (model: unknown) =>
             model.id.includes('tts') ||
             model.id === 'gpt-4o-mini-tts' ||
             model.id === 'tts-1' ||
             model.id === 'tts-1-hd',
         )
-        .map((model: any) => ({
+        .map((model: unknown) => ({
           id: model.id,
           name: this.formatModelName(model.id),
           description: this.getModelDescription(model.id),
@@ -169,7 +169,7 @@ export class OpenAITTSProvider extends BaseTTSProvider {
       });
 
       return audioUri;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('OpenAI TTS Error:', error.response?.data || error.message);
       throw new Error('Failed to synthesize speech with OpenAI');
     }

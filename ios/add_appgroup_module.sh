@@ -1,0 +1,27 @@
+#!/bin/bash
+
+echo "======================================="
+echo "AppGroupModule Xcode Integration Fix"
+echo "======================================="
+echo ""
+echo "PROBLEM: AppGroupModule is not available in the React Native app"
+echo ""
+echo "FILES TO ADD TO XCODE PROJECT:"
+echo "1. /Users/andreaskalkusinski/repo/VoiceFlow/ios/SpeakFlowAI/AppGroupModule.swift"
+echo "2. /Users/andreaskalkusinski/repo/VoiceFlow/ios/SpeakFlowAI/AppGroupModule.m"
+echo ""
+echo "INSTRUCTIONS:"
+echo "1. Open Xcode: open /Users/andreaskalkusinski/repo/VoiceFlow/ios/SpeakFlowAI.xcworkspace"
+echo "2. In the Project Navigator (left sidebar), right-click on 'SpeakFlowAI' folder"
+echo "3. Select 'Add Files to SpeakFlowAI...'"
+echo "4. Navigate to /Users/andreaskalkusinski/repo/VoiceFlow/ios/SpeakFlowAI/"
+echo "5. Select both:"
+echo "   - AppGroupModule.swift"
+echo "   - AppGroupModule.m"
+echo "6. Make sure 'SpeakFlowAI' target is checked"
+echo "7. Click 'Add'"
+echo "8. Build and run the app again"
+echo ""
+echo "Opening Xcode now..."
+
+open /Users/andreaskalkusinski/repo/VoiceFlow/ios/SpeakFlowAI.xcworkspace

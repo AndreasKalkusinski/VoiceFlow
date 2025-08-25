@@ -47,7 +47,7 @@ export const ModernSettingsScreen: React.FC = () => {
         clearInterval(modelRefreshInterval.current);
       }
     };
-  }, []);
+  }, [animateEntry, loadSettings]);
 
   // Auto-save when settings change
   useEffect(() => {
@@ -58,7 +58,7 @@ export const ModernSettingsScreen: React.FC = () => {
     }, 1000);
 
     return () => clearTimeout(saveTimer);
-  }, [settings]);
+  }, [settings, saveSettingsSilently]);
 
   // Fetch models when screen is focused and API key is available
   useFocusEffect(
@@ -75,7 +75,7 @@ export const ModernSettingsScreen: React.FC = () => {
           clearInterval(modelRefreshInterval.current);
         }
       };
-    }, [settings?.openaiApiKey]),
+    }, [settings?.openaiApiKey, fetchAvailableModels]),
   );
 
   const animateEntry = () => {
@@ -254,7 +254,11 @@ export const ModernSettingsScreen: React.FC = () => {
 
               {/* Language Selection */}
               <Text
-                style={[styles.subsectionTitle, { color: colors.textSecondary, marginTop: 20 }]}
+                style={[
+                  styles.subsectionTitle,
+                  styles.subsectionTitleWithMarginTop,
+                  { color: colors.textSecondary },
+                ]}
               >
                 {t('settings.language')}
               </Text>
@@ -404,5 +408,8 @@ const styles = StyleSheet.create({
   languageButton: {
     flex: 1,
     marginHorizontal: spacing.xs / 2,
+  },
+  subsectionTitleWithMarginTop: {
+    marginTop: 20,
   },
 });
