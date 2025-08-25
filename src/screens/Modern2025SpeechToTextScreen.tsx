@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -76,6 +76,39 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const buttonBottomAnim = useRef(new Animated.Value(140)).current;
   const processingRotateAnim = useRef(new Animated.Value(0)).current;
   const processingScaleAnim = useRef(new Animated.Value(1)).current;
+
+  const animateEntry = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: designTokens.animation.normal,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
+  const animatePulse = useCallback(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, [pulseAnim]);
 
   useEffect(() => {
     setupAudio();
@@ -224,38 +257,6 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     }
   }, [isProcessing, processingRotateAnim, processingScaleAnim]);
 
-  const animateEntry = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: designTokens.animation.normal,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        friction: 8,
-        tension: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const animatePulse = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.05,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-  };
 
   const loadSettings = async () => {
     try {

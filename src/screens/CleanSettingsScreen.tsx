@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -53,6 +53,14 @@ export const CleanSettingsScreen: React.FC = () => {
     };
   }, []);
 
+  const saveSettingsSilently = useCallback(async () => {
+    try {
+      await StorageService.saveSettings(settings);
+    } catch {
+      /* ignore */
+    }
+  }, [settings]);
+
   useEffect(() => {
     if (autoSave && settings.openaiApiKey) {
       if (saveTimeout.current) {
@@ -105,13 +113,6 @@ export const CleanSettingsScreen: React.FC = () => {
     }
   };
 
-  const saveSettingsSilently = async () => {
-    try {
-      await StorageService.saveSettings(settings);
-    } catch {
-      /* ignore */
-    }
-  };
 
   const saveSettings = async () => {
     setIsSaving(true);

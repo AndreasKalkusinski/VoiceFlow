@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   Linking,
   Image,
 } from 'react-native';
-import AppIconImage from '../../assets/icon.png';
+const AppIconImage = require('../../assets/icon.png');
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -90,6 +90,15 @@ export const Modern2025SettingsScreen: React.FC = () => {
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
+
+  // Define saveSettingsSilently before using it
+  const saveSettingsSilently = useCallback(async () => {
+    try {
+      await StorageService.saveSettings(settings);
+    } catch {
+      /* ignore */
+    }
+  }, [settings]);
 
   // Auto-save settings whenever they change
   useEffect(() => {
@@ -268,13 +277,6 @@ export const Modern2025SettingsScreen: React.FC = () => {
     ]);
   };
 
-  const saveSettingsSilently = async () => {
-    try {
-      await StorageService.saveSettings(settings);
-    } catch {
-      /* ignore */
-    }
-  };
 
   const handleLanguageChange = async (languageCode: string) => {
     try {
