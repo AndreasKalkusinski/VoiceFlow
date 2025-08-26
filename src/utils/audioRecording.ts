@@ -1,6 +1,7 @@
-import { Audio } from 'expo-av';
+import LegacyAudioService from '../services/LegacyAudioService';
+const Audio = LegacyAudioService.Audio;
 
-// Helper functions for audio recording that work with the new expo-audio API
+// Helper functions for audio recording
 
 export async function requestRecordingPermissions() {
   const { status } = await Audio.requestPermissionsAsync();

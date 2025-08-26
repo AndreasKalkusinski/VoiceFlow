@@ -10,7 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Audio } from 'expo-av';
+import LegacyAudioService from '../services/LegacyAudioService';
+const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import { RecordingAnimation } from '../components/RecordingAnimation';
 import { LogView } from '../components/LogView';

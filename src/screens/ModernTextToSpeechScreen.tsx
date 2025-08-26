@@ -12,7 +12,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio, AVPlaybackStatus } from 'expo-av';
+import LegacyAudioService from '../services/LegacyAudioService';
+import { AVPlaybackStatus } from 'expo-av';
+const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import * as Sharing from 'expo-sharing';

@@ -11,7 +11,8 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { Audio } from 'expo-av';
+import LegacyAudioService from '../services/LegacyAudioService';
+const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import { LogView } from '../components/LogView';
 import { StorageService } from '../services/storage';
