@@ -64,12 +64,6 @@ jobs:
             }
           done
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
       - name: Test build
         run: npx expo export --platform ios
 
