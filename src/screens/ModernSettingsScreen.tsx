@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Animated, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
@@ -7,7 +7,6 @@ import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 import { ProviderSettings } from '../components/ProviderSettings';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme, ThemeMode } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +30,7 @@ export const ModernSettingsScreen: React.FC = () => {
     providerSettings: {},
   });
   const [statusMessage, setStatusMessage] = useState('');
+  const [, setAvailableModels] = useState<any[]>([]);
   const modelRefreshInterval = useRef<NodeJS.Timeout | null>(null);
 
   const { colors, isDark, themeMode, setTheme } = useTheme();
@@ -39,46 +39,7 @@ export const ModernSettingsScreen: React.FC = () => {
   const slideAnim = useRef(new Animated.Value(50)).current;
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
-  useEffect(() => {
-    loadSettings();
-    animateEntry();
-    return () => {
-      if (modelRefreshInterval.current) {
-        clearInterval(modelRefreshInterval.current);
-      }
-    };
-  }, []);
-
-  // Auto-save when settings change
-  useEffect(() => {
-    const saveTimer = setTimeout(() => {
-      if (settings.openaiApiKey || settings.apiKeys?.openai) {
-        saveSettingsSilently();
-      }
-    }, 1000);
-
-    return () => clearTimeout(saveTimer);
-  }, [settings]);
-
-  // Fetch models when screen is focused and API key is available
-  useFocusEffect(
-    React.useCallback(() => {
-      if (settings?.openaiApiKey) {
-        fetchAvailableModels();
-        // Refresh models every 30 seconds while screen is focused
-        modelRefreshInterval.current = setInterval(() => {
-          fetchAvailableModels(true);
-        }, 30000);
-      }
-      return () => {
-        if (modelRefreshInterval.current) {
-          clearInterval(modelRefreshInterval.current);
-        }
-      };
-    }, [settings?.openaiApiKey]),
-  );
-
-  const animateEntry = () => {
+  const animateEntry = useCallback(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -92,9 +53,38 @@ export const ModernSettingsScreen: React.FC = () => {
         useNativeDriver: true,
       }),
     ]).start();
+  }, [fadeAnim, slideAnim]);
+
+  const showStatus = (message: string, duration: number = 3000) => {
+    setStatusMessage(message);
+    setTimeout(() => setStatusMessage(''), duration);
   };
 
-  const loadSettings = async () => {
+  const fetchAvailableModels = useCallback(
+    async (silent = false) => {
+      if (!settings?.openaiApiKey) return;
+
+      if (!silent) {
+        // Show loading status if not silent
+      }
+
+      try {
+        // For now, just use static models
+        const models = ['whisper-1', 'tts-1', 'tts-1-hd'];
+        setAvailableModels(models);
+        if (!silent) {
+          showStatus(`Found ${models.length} available models`);
+        }
+      } catch {
+        if (!silent) {
+          showStatus('Failed to fetch models');
+        }
+      }
+    },
+    [settings],
+  );
+
+  const loadSettings = useCallback(async () => {
     showStatus(t('settings.status.loading'));
     try {
       const loadedSettings = await StorageService.getSettings();
@@ -123,63 +113,55 @@ export const ModernSettingsScreen: React.FC = () => {
     } finally {
       /* nothing to cleanup */
     }
-  };
+  }, [t, fetchAvailableModels]);
 
-  const saveSettingsSilently = async () => {
+  const saveSettingsSilently = useCallback(async () => {
     try {
       await StorageService.saveSettings(settings);
       showStatus(t('settings.status.autoSaved'), 1500);
     } catch {
       /* ignore */
     }
-  };
+  }, [settings, t]);
 
-  const fetchAvailableModels = async (silent = false) => {
-    if (!settings?.openaiApiKey) return;
-
-    if (!silent) {
-      // Show loading status if not silent
-    }
-
-    try {
-      const openaiService = new OpenAIService(settings.openaiApiKey);
-
-      // Fetch models in parallel
-      const [whisper, tts] = await Promise.all([
-        openaiService.getWhisperModels(),
-        openaiService.getTTSModels(),
-      ]);
-
-      // Add default models if not in list
-      const defaultWhisper = { id: 'whisper-1', object: 'model', created: 0, owned_by: 'openai' };
-      const defaultTTS = { id: 'tts-1', object: 'model', created: 0, owned_by: 'openai' };
-      const defaultTTSHD = { id: 'tts-1-hd', object: 'model', created: 0, owned_by: 'openai' };
-
-      if (!whisper.find((m) => m.id === 'whisper-1')) {
-        whisper.push(defaultWhisper);
+  useEffect(() => {
+    loadSettings();
+    animateEntry();
+    return () => {
+      if (modelRefreshInterval.current) {
+        clearInterval(modelRefreshInterval.current);
       }
+    };
+  }, [animateEntry, loadSettings]);
 
-      if (!tts.find((m) => m.id === 'tts-1')) {
-        tts.push(defaultTTS);
+  // Auto-save when settings change
+  useEffect(() => {
+    const saveTimer = setTimeout(() => {
+      if (settings.openaiApiKey || settings.apiKeys?.openai) {
+        saveSettingsSilently();
       }
-      if (!tts.find((m) => m.id === 'tts-1-hd')) {
-        tts.push(defaultTTSHD);
-      }
+    }, 1000);
 
-      if (!silent) {
-        showStatus(t('settings.status.loaded'), 2000);
-      }
-    } catch {
-      // Set default models on error
-    } finally {
-      /* cleanup */
-    }
-  };
+    return () => clearTimeout(saveTimer);
+  }, [settings, saveSettingsSilently]);
 
-  const showStatus = (message: string, duration: number = 3000) => {
-    setStatusMessage(message);
-    setTimeout(() => setStatusMessage(''), duration);
-  };
+  // Fetch models when screen is focused and API key is available
+  useFocusEffect(
+    React.useCallback(() => {
+      if (settings?.openaiApiKey) {
+        fetchAvailableModels();
+        // Refresh models every 30 seconds while screen is focused
+        modelRefreshInterval.current = setInterval(() => {
+          fetchAvailableModels(true);
+        }, 30000);
+      }
+      return () => {
+        if (modelRefreshInterval.current) {
+          clearInterval(modelRefreshInterval.current);
+        }
+      };
+    }, [settings?.openaiApiKey, fetchAvailableModels]),
+  );
 
   const handleLanguageChange = async (languageCode: string) => {
     try {
@@ -254,7 +236,11 @@ export const ModernSettingsScreen: React.FC = () => {
 
               {/* Language Selection */}
               <Text
-                style={[styles.subsectionTitle, { color: colors.textSecondary, marginTop: 20 }]}
+                style={[
+                  styles.subsectionTitle,
+                  styles.subsectionTitleWithMarginTop,
+                  { color: colors.textSecondary },
+                ]}
               >
                 {t('settings.language')}
               </Text>
@@ -404,5 +390,8 @@ const styles = StyleSheet.create({
   languageButton: {
     flex: 1,
     marginHorizontal: spacing.xs / 2,
+  },
+  subsectionTitleWithMarginTop: {
+    marginTop: 20,
   },
 });

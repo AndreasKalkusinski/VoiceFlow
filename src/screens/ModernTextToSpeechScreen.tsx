@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-av';
+import LegacyAudioService, { Sound, AVPlaybackStatus } from '../services/LegacyAudioService';
+const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import * as Sharing from 'expo-sharing';
@@ -21,8 +22,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
+import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { wp, hp, spacing, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
@@ -33,7 +34,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [sound, setSound] = useState<Sound | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [playbackPosition, setPlaybackPosition] = useState(0);
   const [playbackDuration, setPlaybackDuration] = useState(0);
@@ -47,48 +48,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   const waveformAnims = useRef([...Array(15)].map(() => new Animated.Value(0.3))).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    animateEntry();
-    setupAudio();
-    return () => {
-      if (sound) {
-        sound.unloadAsync();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying) {
-      startWaveformAnimation();
-      startPulseAnimation();
-    } else {
-      stopWaveformAnimation();
-      stopPulseAnimation();
-    }
-  }, [isPlaying]);
-
-  const setupAudio = async () => {
-    try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
-        shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: false,
-      });
-    } catch {
-      /* ignore */
-    }
-  };
-
-  // Reload settings when screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      loadSettings();
-    }, []),
-  );
-
-  const animateEntry = () => {
+  const animateEntry = useCallback(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -102,9 +62,9 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  };
+  }, [fadeAnim, slideAnim]);
 
-  const startWaveformAnimation = () => {
+  const startWaveformAnimation = useCallback(() => {
     waveformAnims.forEach((anim, index) => {
       Animated.loop(
         Animated.sequence([
@@ -122,9 +82,9 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         ]),
       ).start();
     });
-  };
+  }, [waveformAnims]);
 
-  const stopWaveformAnimation = () => {
+  const stopWaveformAnimation = useCallback(() => {
     waveformAnims.forEach((anim) => {
       anim.stopAnimation();
       Animated.timing(anim, {
@@ -133,9 +93,9 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         useNativeDriver: true,
       }).start();
     });
-  };
+  }, [waveformAnims]);
 
-  const startPulseAnimation = () => {
+  const startPulseAnimation = useCallback(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
@@ -150,29 +110,72 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         }),
       ]),
     ).start();
-  };
+  }, [pulseAnim]);
 
-  const stopPulseAnimation = () => {
+  const stopPulseAnimation = useCallback(() => {
     pulseAnim.stopAnimation();
     Animated.timing(pulseAnim, {
       toValue: 1,
       duration: 300,
       useNativeDriver: true,
     }).start();
+  }, [pulseAnim]);
+
+  const setupAudio = async () => {
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+    } catch {
+      /* ignore */
+    }
   };
 
   const loadSettings = async () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-      console.log(
-        'TTS Settings loaded:',
-        loadedSettings?.openaiApiKey ? 'API key present' : 'No API key',
-      );
     } catch {
       /* ignore */
     }
   };
+
+  useEffect(() => {
+    animateEntry();
+    setupAudio();
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [animateEntry, sound]);
+
+  useEffect(() => {
+    if (isPlaying) {
+      startWaveformAnimation();
+      startPulseAnimation();
+    } else {
+      stopWaveformAnimation();
+      stopPulseAnimation();
+    }
+  }, [
+    isPlaying,
+    startPulseAnimation,
+    startWaveformAnimation,
+    stopPulseAnimation,
+    stopWaveformAnimation,
+  ]);
+
+  // Reload settings when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadSettings();
+    }, []),
+  );
 
   const showStatus = (message: string, duration: number = 3000) => {
     setStatusMessage(message);
@@ -214,12 +217,44 @@ export const ModernTextToSpeechScreen: React.FC = () => {
       showStatus(t('textToSpeech.status.generating'));
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-      const openaiService = new OpenAIService(currentSettings.openaiApiKey);
-      const audioUri = await openaiService.textToSpeech(
-        inputText,
-        currentSettings.ttsModel,
-        currentSettings.ttsVoice,
-      );
+      // Get the selected TTS provider
+      const providerId = currentSettings.ttsProvider || 'openai-tts';
+      const provider = ProviderRegistry.getTTSProvider(providerId);
+
+      if (!provider) {
+        throw new Error(`TTS provider ${providerId} not found`);
+      }
+
+      // Get the API key for the selected provider
+      const apiKey = providerId.includes('openai')
+        ? currentSettings.apiKeys?.openai || currentSettings.openaiApiKey
+        : providerId.includes('google')
+          ? currentSettings.apiKeys?.google
+          : providerId.includes('elevenlabs')
+            ? currentSettings.apiKeys?.elevenlabs
+            : '';
+
+      if (!apiKey) {
+        throw new Error('API key is missing');
+      }
+
+      // Get model and voice from providerSettings
+      const ttsModel =
+        currentSettings.providerSettings?.[providerId]?.model ||
+        currentSettings.ttsModel ||
+        'tts-1';
+      const ttsVoice =
+        currentSettings.providerSettings?.[providerId]?.voice ||
+        currentSettings.ttsVoice ||
+        'alloy';
+
+      // Synthesize using the selected provider
+      const audioUri = await provider.synthesize(inputText, {
+        apiKey,
+        model: ttsModel,
+        voice: ttsVoice,
+        speed: 1.0,
+      });
 
       showStatus(t('textToSpeech.status.loading'));
 
@@ -260,12 +295,12 @@ export const ModernTextToSpeechScreen: React.FC = () => {
     }
   };
 
-  const onPlaybackStatusUpdate = (status: any) => {
+  const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
     if (status.isLoaded) {
       setPlaybackPosition(status.positionMillis || 0);
       setPlaybackDuration(status.durationMillis || 0);
 
-      if (status.isPlaying) {
+      if ('isPlaying' in status && status.isPlaying) {
         setIsPlaying(true);
       } else {
         setIsPlaying(false);
@@ -537,11 +572,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
                       <View
                         style={[
                           styles.progressBar,
-                          {
-                            backgroundColor: isDark
-                              ? 'rgba(99, 102, 241, 0.1)'
-                              : 'rgba(139, 92, 246, 0.1)',
-                          },
+                          isDark ? styles.progressBarDark : styles.progressBarLight,
                         ]}
                       >
                         <Animated.View
@@ -854,6 +885,12 @@ const styles = StyleSheet.create({
     borderRadius: hp(0.5),
     overflow: 'visible',
     position: 'relative',
+  },
+  progressBarDark: {
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+  },
+  progressBarLight: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
   },
   progressFill: {
     height: '100%',

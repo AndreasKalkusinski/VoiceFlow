@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,8 @@ import {
   Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-av';
+import LegacyAudioService, { Recording } from '../services/LegacyAudioService';
+const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,9 +23,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ModernCard } from '../components/ModernCard';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
 import { useTheme } from '../hooks/useTheme';
+import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { useTranslation } from 'react-i18next';
 import { designTokens } from '../utils/design-system';
 import { vh } from '../utils/responsive-dimensions';
@@ -39,7 +40,7 @@ import { AIQuickActions } from '../components/AIQuickActions';
 
 export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recording, setRecording] = useState<Recording | null>(null);
   const [transcribedText, setTranscribedText] = useState('');
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -74,6 +75,41 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
   const slideAnim = useRef(new Animated.Value(30)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const buttonBottomAnim = useRef(new Animated.Value(140)).current;
+  const processingRotateAnim = useRef(new Animated.Value(0)).current;
+  const processingScaleAnim = useRef(new Animated.Value(1)).current;
+
+  const animateEntry = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: designTokens.animation.normal,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
+  const animatePulse = useCallback(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, [pulseAnim]);
 
   useEffect(() => {
     setupAudio();
@@ -106,7 +142,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
-  }, []);
+  }, [animateEntry, buttonBottomAnim]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -127,13 +163,33 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       setIsProcessing(true);
       showStatus(t('speechToText.status.transcribing'));
 
-      const openaiService = new OpenAIService(settings.apiKeys?.openai || settings.openaiApiKey);
+      // Get the selected STT provider
+      const providerId = settings.sttProvider || 'openai-stt';
+      const provider = ProviderRegistry.getSTTProvider(providerId);
+
+      if (!provider) {
+        throw new Error(`STT provider ${providerId} not found`);
+      }
+
+      // Get the API key for the selected provider
+      const apiKey = providerId.includes('openai')
+        ? settings.apiKeys?.openai || settings.openaiApiKey
+        : providerId.includes('google')
+          ? settings.apiKeys?.google
+          : providerId.includes('mistral')
+            ? settings.apiKeys?.mistral
+            : '';
+
+      if (!apiKey) {
+        throw new Error(`API key not configured for ${provider.name}`);
+      }
 
       // Transcribe the shared audio file
-      const text = await openaiService.transcribeAudio(
-        sharedAudioUri,
-        settings.providerSettings?.['openai-stt']?.model || settings.sttModel || 'whisper-1',
-      );
+      const text = await provider.transcribe(sharedAudioUri, {
+        apiKey,
+        model: settings.providerSettings?.[providerId]?.model || settings.sttModel || 'whisper-1',
+        // Don't specify language to enable auto-detection
+      });
 
       if (text) {
         setTranscribedText(text);
@@ -167,40 +223,40 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     } else {
       pulseAnim.setValue(1);
     }
-  }, [isRecording]);
+  }, [isRecording, animatePulse, pulseAnim]);
 
-  const animateEntry = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: designTokens.animation.normal,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        friction: 8,
-        tension: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const animatePulse = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.05,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
+  useEffect(() => {
+    if (isProcessing) {
+      // Start rotation animation for processing
+      Animated.loop(
+        Animated.timing(processingRotateAnim, {
           toValue: 1,
-          duration: 1000,
+          duration: 2000,
           useNativeDriver: true,
         }),
-      ]),
-    ).start();
-  };
+      ).start();
+
+      // Start scale pulse animation for processing
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(processingScaleAnim, {
+            toValue: 1.2,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(processingScaleAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    } else {
+      // Reset animations when not processing
+      processingRotateAnim.setValue(0);
+      processingScaleAnim.setValue(1);
+    }
+  }, [isProcessing, processingRotateAnim, processingScaleAnim]);
 
   const loadSettings = async () => {
     try {
@@ -307,8 +363,34 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
 
       if (uri && settings) {
         showStatus(t('speechToText.status.transcribing'));
-        const openaiService = new OpenAIService(settings.openaiApiKey);
-        const text = await openaiService.transcribeAudio(uri, settings.sttModel);
+
+        // Get the selected STT provider
+        const providerId = settings.sttProvider || 'openai-stt';
+        const provider = ProviderRegistry.getSTTProvider(providerId);
+
+        if (!provider) {
+          throw new Error(`STT provider ${providerId} not found`);
+        }
+
+        // Get the API key for the selected provider
+        const apiKey = providerId.includes('openai')
+          ? settings.apiKeys?.openai || settings.openaiApiKey
+          : providerId.includes('google')
+            ? settings.apiKeys?.google
+            : providerId.includes('mistral')
+              ? settings.apiKeys?.mistral
+              : '';
+
+        if (!apiKey) {
+          throw new Error(`API key not configured for ${provider.name}`);
+        }
+
+        // Transcribe using the selected provider
+        const text = await provider.transcribe(uri, {
+          apiKey,
+          model: settings.providerSettings?.[providerId]?.model || settings.sttModel || 'whisper-1',
+          // Don't specify language to enable auto-detection
+        });
 
         const fullText = transcribedText ? transcribedText + ' ' + text : text;
         setTranscribedText(fullText);
@@ -371,8 +453,12 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     }
   };
 
-  const wordCount = transcribedText.split(' ').filter((w) => w).length;
-  const charCount = transcribedText.length;
+  const wordCount =
+    transcribedText && typeof transcribedText === 'string'
+      ? transcribedText.split(' ').filter((w) => w).length
+      : 0;
+  const charCount =
+    transcribedText && typeof transcribedText === 'string' ? transcribedText.length : 0;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
@@ -460,12 +546,16 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
                 )}
 
                 {/* AI Quick Actions */}
-                {transcribedText && !isProcessing && !isRecording && (
-                  <AIQuickActions
-                    text={transcribedText}
-                    onResult={(result) => setTranscribedText(result)}
-                  />
-                )}
+                {transcribedText &&
+                  typeof transcribedText === 'string' &&
+                  transcribedText.trim() &&
+                  !isProcessing &&
+                  !isRecording && (
+                    <AIQuickActions
+                      text={transcribedText}
+                      onResult={(result) => setTranscribedText(result)}
+                    />
+                  )}
 
                 {/* Modern recording indicator */}
                 {isRecording && (
@@ -568,8 +658,18 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
           style={[
             styles.floatingRecordButtonInner,
             {
-              backgroundColor: isRecording ? colors.error : colors.primary,
-              shadowColor: isRecording ? colors.error : colors.primary,
+              backgroundColor: isRecording
+                ? colors.error
+                : isProcessing
+                  ? colors.accent
+                  : colors.primary,
+              shadowColor: isRecording
+                ? colors.error
+                : isProcessing
+                  ? colors.accent
+                  : colors.primary,
+              shadowOpacity: isProcessing ? 0.6 : 0.3,
+              shadowRadius: isProcessing ? 12 : 8,
             },
           ]}
         >
@@ -577,15 +677,25 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
             style={[
               styles.floatingButtonContent,
               {
-                transform: [{ scale: pulseAnim }],
+                transform: [
+                  { scale: isProcessing ? processingScaleAnim : pulseAnim },
+                  {
+                    rotate: processingRotateAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg'],
+                    }),
+                  },
+                ],
               },
             ]}
           >
-            <Ionicons
-              name={isProcessing ? 'hourglass-outline' : isRecording ? 'stop' : 'mic'}
-              size={28}
-              color="white"
-            />
+            {isProcessing ? (
+              <View style={styles.processingIconContainer}>
+                <Ionicons name="sync-outline" size={28} color="white" />
+              </View>
+            ) : (
+              <Ionicons name={isRecording ? 'stop' : 'mic'} size={28} color="white" />
+            )}
           </Animated.View>
 
           {/* Recording indicator dot */}
@@ -762,5 +872,9 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
+  },
+  processingIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

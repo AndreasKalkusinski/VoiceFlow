@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,8 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-av';
+import LegacyAudioService, { Recording } from '../services/LegacyAudioService';
+const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,8 +20,8 @@ import { GlassCard } from '../components/GlassCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 import { FloatingActionButton } from '../components/FloatingActionButton';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
+import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { wp, hp, spacing, fontSizes, componentHeights, adaptiveSpacing } from '../utils/responsive';
@@ -30,7 +31,7 @@ import { AIQuickActions } from '../components/AIQuickActions';
 
 export const ModernSpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recording, setRecording] = useState<Recording | null>(null);
   const [transcribedText, setTranscribedText] = useState('');
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -48,27 +49,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
       .map(() => new Animated.Value(0)),
   ).current;
 
-  useEffect(() => {
-    setupAudio();
-    animateEntry();
-  }, []);
-
-  // Reload settings when screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      loadSettings();
-    }, []),
-  );
-
-  useEffect(() => {
-    if (isRecording) {
-      animateWaves();
-    } else {
-      stopWaveAnimation();
-    }
-  }, [isRecording]);
-
-  const animateEntry = () => {
+  const animateEntry = useCallback(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -82,9 +63,9 @@ export const ModernSpeechToTextScreen: React.FC = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  };
+  }, [fadeAnim, slideAnim]);
 
-  const animateWaves = () => {
+  const animateWaves = useCallback(() => {
     waveAnims.forEach((anim, index) => {
       Animated.loop(
         Animated.sequence([
@@ -102,9 +83,9 @@ export const ModernSpeechToTextScreen: React.FC = () => {
         ]),
       ).start();
     });
-  };
+  }, [waveAnims]);
 
-  const stopWaveAnimation = () => {
+  const stopWaveAnimation = useCallback(() => {
     waveAnims.forEach((anim) => {
       anim.stopAnimation();
       Animated.timing(anim, {
@@ -113,16 +94,32 @@ export const ModernSpeechToTextScreen: React.FC = () => {
         useNativeDriver: true,
       }).start();
     });
-  };
+  }, [waveAnims]);
+
+  useEffect(() => {
+    setupAudio();
+    animateEntry();
+  }, [animateEntry]);
+
+  // Reload settings when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadSettings();
+    }, []),
+  );
+
+  useEffect(() => {
+    if (isRecording) {
+      animateWaves();
+    } else {
+      stopWaveAnimation();
+    }
+  }, [isRecording, animateWaves, stopWaveAnimation]);
 
   const loadSettings = async () => {
     try {
       const loadedSettings = await StorageService.getSettings();
       setSettings(loadedSettings);
-      console.log(
-        'Loaded settings:',
-        loadedSettings?.openaiApiKey ? 'API key present' : 'No API key',
-      );
     } catch {
       /* ignore */
     }
@@ -130,7 +127,6 @@ export const ModernSpeechToTextScreen: React.FC = () => {
 
   const setupAudio = async () => {
     try {
-      await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
@@ -205,8 +201,32 @@ export const ModernSpeechToTextScreen: React.FC = () => {
 
       if (uri && settings) {
         showStatus(t('speechToText.status.transcribing'));
-        const openaiService = new OpenAIService(settings.openaiApiKey);
-        const text = await openaiService.transcribeAudio(uri, settings.sttModel);
+
+        // Get the selected STT provider
+        const providerId = settings.sttProvider || 'openai-stt';
+        const provider = ProviderRegistry.getSTTProvider(providerId);
+
+        if (!provider) {
+          throw new Error(`STT provider ${providerId} not found`);
+        }
+
+        // Get the API key for the selected provider
+        const apiKey = providerId.includes('openai')
+          ? settings.apiKeys?.openai || settings.openaiApiKey
+          : providerId.includes('google')
+            ? settings.apiKeys?.google
+            : '';
+
+        if (!apiKey) {
+          throw new Error(`API key not configured for ${provider.name}`);
+        }
+
+        // Transcribe using the selected provider
+        const text = await provider.transcribe(uri, {
+          apiKey,
+          model: settings.providerSettings?.[providerId]?.model || settings.sttModel || 'whisper-1',
+          // Don't specify language to enable auto-detection
+        });
 
         if (transcribedText) {
           setTranscribedText(transcribedText + ' ' + text);
@@ -244,7 +264,7 @@ export const ModernSpeechToTextScreen: React.FC = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const wordCount = transcribedText.split(' ').filter((w) => w).length;
+  const wordCount = transcribedText ? transcribedText.split(' ').filter((w) => w).length : 0;
 
   return (
     <SafeAreaView style={styles.safeArea}>

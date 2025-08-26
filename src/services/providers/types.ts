@@ -58,7 +58,7 @@ export interface STTOptions {
   model?: string;
   language?: string;
   apiKey: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface TTSOptions {
@@ -68,7 +68,7 @@ export interface TTSOptions {
   speed?: number;
   pitch?: number;
   apiKey: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ProviderConfig {
@@ -78,4 +78,36 @@ export interface ProviderConfig {
   voice?: string;
   customEndpoint?: string;
   additionalSettings?: Record<string, any>;
+}
+
+// LLM Provider types
+export interface LLMMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+export interface LLMCompletionOptions {
+  messages: LLMMessage[];
+  temperature?: number;
+  maxTokens?: number;
+  stream?: boolean;
+}
+
+export interface LLMProvider {
+  id: string;
+  name: string;
+  description: string;
+  requiresApiKey: boolean;
+  models?: LLMModel[];
+  complete(options: LLMCompletionOptions): Promise<string>;
+  validateConfig?(config: any): Promise<boolean>;
+  loadModels?(apiKey: string, forceRefresh?: boolean): Promise<LLMModel[]>;
+}
+
+export interface LLMModel {
+  id: string;
+  name: string;
+  description?: string;
+  contextWindow?: number;
+  maxTokens?: number;
 }

@@ -1,6 +1,6 @@
 {
-  "name": "voiceflow",
-  "version": "2.1.2",
+  "name": "speakflow-ai",
+  "version": "2.1.4",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -42,6 +42,7 @@
     "axios": "^1.11.0",
     "buffer": "^6.0.3",
     "expo": "~53.0.0",
+    "expo-audio": "0.4.8",
     "expo-av": "~15.1.7",
     "expo-blur": "~14.1.5",
     "expo-clipboard": "~7.1.5",
@@ -53,6 +54,7 @@
     "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.10",
+    "expo-updates": "~0.28.17",
     "i18next": "^25.3.2",
     "lottie-react-native": "7.2.2",
     "promise": "^8.3.0",

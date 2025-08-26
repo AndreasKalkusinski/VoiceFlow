@@ -1,4 +1,4 @@
-# VoiceFlow 🎤🔊
+# SpeakFlow AI 🎤🔊
 
 ![CI/CD](https://github.com/AndreasKalkusinski/VoiceFlow/actions/workflows/ci.yml/badge.svg)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
@@ -12,7 +12,7 @@ A modern, open-source React Native app for Speech-to-Text and Text-to-Speech usi
 
 🌍 **[English](#english)** | 🇩🇪 **[Deutsch](#deutsch)**
 
-## 🌟 Why VoiceFlow?
+## 🌟 Why SpeakFlow AI?
 
 - 🆓 **100% Free & Open Source** - No hidden costs, no subscriptions
 - 🔒 **Privacy First** - Your data stays on your device

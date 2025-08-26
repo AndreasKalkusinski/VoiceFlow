@@ -67,7 +67,7 @@ export function withSuspense<P extends object>(
 ) {
   return (props: P) => (
     <Suspense fallback={<ScreenLoader />}>
-      <LazyComponent {...(props as any)} />
+      <LazyComponent {...props} />
     </Suspense>
   );
 }

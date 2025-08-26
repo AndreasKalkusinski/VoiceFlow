@@ -130,15 +130,30 @@ export class MistralProvider extends BaseLLMProvider {
       const data = await response.json();
 
       // Map Mistral API response to our model format
-      const dynamicModels =
+      const apiModels =
         data.data?.map((model: any) => ({
           id: model.id,
           name: this.formatModelName(model.id),
           description: this.getModelDescription(model.id),
           contextWindow: this.getContextWindow(model.id),
-        })) || this.models;
+        })) || [];
 
-      return dynamicModels;
+      // Remove duplicates by using a Map with model ID as key
+      const modelMap = new Map<string, LLMModel>();
+
+      // Add API models first (they're more up-to-date)
+      apiModels.forEach((model: LLMModel) => {
+        modelMap.set(model.id, model);
+      });
+
+      // Add default models if they don't exist in API response
+      this.models.forEach((model) => {
+        if (!modelMap.has(model.id)) {
+          modelMap.set(model.id, model);
+        }
+      });
+
+      return Array.from(modelMap.values());
     } catch (error) {
       console.error('Error loading Mistral models:', error);
       return this.models;

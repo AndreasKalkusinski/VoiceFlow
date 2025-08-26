@@ -76,7 +76,10 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
         {requiresApiKey && (
           <View style={styles.footer}>
             <View
-              style={[styles.apiKeyStatus, { backgroundColor: hasApiKey ? '#10B981' : '#EF4444' }]}
+              style={[
+                styles.apiKeyStatus,
+                hasApiKey ? styles.apiKeyStatusValid : styles.apiKeyStatusMissing,
+              ]}
             >
               <Text style={styles.apiKeyText}>{hasApiKey ? '✓ API Key' : '✗ No Key'}</Text>
             </View>
@@ -155,5 +158,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: fontSizes.tiny,
     fontWeight: '600',
+  },
+  apiKeyStatusValid: {
+    backgroundColor: '#10B981',
+  },
+  apiKeyStatusMissing: {
+    backgroundColor: '#EF4444',
   },
 });

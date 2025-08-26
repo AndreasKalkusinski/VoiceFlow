@@ -123,7 +123,7 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({
               </Text>
               <View style={styles.apiKeyContainer}>
                 <TextInput
-                  style={[styles.input, { color: colors.text, flex: 1 }]}
+                  style={[styles.input, { color: colors.text }]}
                   value={getApiKeyForProvider(currentProvider.id)}
                   onChangeText={(text) => handleApiKeyChange(currentProvider.id, text)}
                   placeholder={`Enter ${currentProvider.name} API Key`}
@@ -223,6 +223,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
+    flex: 1,
     borderWidth: 1,
     borderColor: 'rgba(99, 102, 241, 0.2)',
     borderRadius: spacing.sm,

@@ -10,13 +10,14 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-av';
+import LegacyAudioService, { Sound } from '../services/LegacyAudioService';
+const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import { MinimalCard } from '../components/MinimalCard';
 import { SimpleButton } from '../components/SimpleButton';
 import { StorageService } from '../services/storage';
-import { OpenAIService } from '../services/openai';
 import { Settings } from '../types';
+import { ProviderRegistry } from '../services/providers/ProviderRegistry';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
@@ -26,7 +27,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [sound, setSound] = useState<Sound | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
 
   const { colors } = useTheme();
@@ -39,7 +40,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
         sound.unloadAsync();
       }
     };
-  }, []);
+  }, [sound]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -91,12 +92,44 @@ export const CleanTextToSpeechScreen: React.FC = () => {
     showStatus(t('textToSpeech.status.generating'));
 
     try {
-      const openaiService = new OpenAIService(currentSettings.openaiApiKey);
-      const audioUri = await openaiService.textToSpeech(
-        inputText,
-        currentSettings.ttsModel,
-        currentSettings.ttsVoice,
-      );
+      // Get the selected TTS provider
+      const providerId = currentSettings.ttsProvider || 'openai-tts';
+      const provider = ProviderRegistry.getTTSProvider(providerId);
+
+      if (!provider) {
+        throw new Error(`TTS provider ${providerId} not found`);
+      }
+
+      // Get the API key for the selected provider
+      const apiKey = providerId.includes('openai')
+        ? currentSettings.apiKeys?.openai || currentSettings.openaiApiKey
+        : providerId.includes('google')
+          ? currentSettings.apiKeys?.google
+          : providerId.includes('elevenlabs')
+            ? currentSettings.apiKeys?.elevenlabs
+            : '';
+
+      if (!apiKey) {
+        throw new Error('API key is missing');
+      }
+
+      // Get model and voice from providerSettings
+      const ttsModel =
+        currentSettings.providerSettings?.[providerId]?.model ||
+        currentSettings.ttsModel ||
+        'tts-1';
+      const ttsVoice =
+        currentSettings.providerSettings?.[providerId]?.voice ||
+        currentSettings.ttsVoice ||
+        'alloy';
+
+      // Synthesize using the selected provider
+      const audioUri = await provider.synthesize(inputText, {
+        apiKey,
+        model: ttsModel,
+        voice: ttsVoice,
+        speed: 1.0,
+      });
 
       if (sound) {
         await sound.unloadAsync();
@@ -111,7 +144,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
       setIsPlaying(true);
       showStatus(t('textToSpeech.status.playing'));
 
-      newSound.setOnPlaybackStatusUpdate((status) => {
+      newSound.setOnPlaybackStatusUpdate((status: any) => {
         if (status.isLoaded && status.didJustFinish) {
           setIsPlaying(false);
           showStatus(t('textToSpeech.status.complete'));

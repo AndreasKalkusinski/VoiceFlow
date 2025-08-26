@@ -49,8 +49,8 @@ export class ModelService {
       // Cache expired, remove it
       await AsyncStorage.removeItem(key);
       return null;
-    } catch (error) {
-      console.error('Error reading cache:', error);
+    } catch {
+      // console.error('Error reading cache:', error);
       return null;
     }
   }
@@ -66,8 +66,8 @@ export class ModelService {
         ttl,
       };
       await AsyncStorage.setItem(key, JSON.stringify(cachedData));
-    } catch (error) {
-      console.error('Error writing to cache:', error);
+    } catch {
+      // console.error('Error writing to cache:', error);
     }
   }
 
@@ -86,8 +86,8 @@ export class ModelService {
       if (providerKeys.length > 0) {
         await AsyncStorage.multiRemove(providerKeys);
       }
-    } catch (error) {
-      console.error('Error clearing provider cache:', error);
+    } catch {
+      // console.error('Error clearing provider cache:', error);
     }
   }
 
@@ -104,8 +104,8 @@ export class ModelService {
       if (cacheKeys.length > 0) {
         await AsyncStorage.multiRemove(cacheKeys);
       }
-    } catch (error) {
-      console.error('Error clearing all cache:', error);
+    } catch {
+      // console.error('Error clearing all cache:', error);
     }
   }
 
@@ -165,8 +165,8 @@ export class ModelService {
       // Cache the results
       await this.setCachedData(cacheKey, whisperModels);
       return whisperModels;
-    } catch (error: any) {
-      console.error('Failed to fetch OpenAI models:', error.response?.data || error.message);
+    } catch {
+      // console.error('Failed to fetch OpenAI models:', error.response?.data || error.message);
       throw new Error('Failed to fetch OpenAI models');
     }
   }
@@ -207,8 +207,8 @@ export class ModelService {
       // Cache the results
       await this.setCachedData(cacheKey, voices);
       return voices;
-    } catch (error: any) {
-      console.error('Failed to fetch Google voices:', error.response?.data || error.message);
+    } catch {
+      // console.error('Failed to fetch Google voices:', error.response?.data || error.message);
       throw new Error('Failed to fetch Google Cloud voices');
     }
   }
@@ -246,10 +246,17 @@ export class ModelService {
       // Cache the results
       await this.setCachedData(cacheKey, voices);
       return voices;
-    } catch (error: any) {
-      console.error('Failed to fetch ElevenLabs voices:', error.response?.data || error.message);
+    } catch {
+      // console.error('Failed to fetch ElevenLabs voices:', error.response?.data || error.message);
       throw new Error('Failed to fetch ElevenLabs voices');
     }
+  }
+
+  /**
+   * Get supported languages for Whisper models
+   */
+  private getSupportedLanguages(): string[] {
+    return ['en', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'zh', 'ja', 'ko'];
   }
 
   /**
@@ -260,8 +267,20 @@ export class ModelService {
       {
         id: 'whisper-1',
         name: 'Whisper v1',
-        description: 'Latest Whisper model with excellent accuracy',
-        languages: ['en', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'zh', 'ja', 'ko'],
+        description: 'Latest Whisper model with improved accuracy',
+        languages: this.getSupportedLanguages(),
+      },
+      {
+        id: 'whisper-large-v3',
+        name: 'Whisper Large v3',
+        description: 'Most accurate Whisper model, slower processing',
+        languages: this.getSupportedLanguages(),
+      },
+      {
+        id: 'whisper-large-v2',
+        name: 'Whisper Large v2',
+        description: 'Previous large model version',
+        languages: this.getSupportedLanguages(),
       },
     ];
   }

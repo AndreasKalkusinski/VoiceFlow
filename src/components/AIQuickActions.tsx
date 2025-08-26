@@ -19,9 +19,11 @@ import { designTokens } from '../utils/design-system';
 import * as Haptics from 'expo-haptics';
 import * as Clipboard from 'expo-clipboard';
 import Modal from 'react-native-modal';
-import { Audio } from 'expo-av';
+import LegacyAudioService, { Recording } from '../services/LegacyAudioService';
+const Audio = LegacyAudioService.Audio;
 import { StorageService } from '../services/storage';
 import { LLMProviderRegistry } from '../services/providers/LLMProviderRegistry';
+import { Settings } from '../types/settings';
 
 interface AIAction {
   id: string;
@@ -43,9 +45,9 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
   const [processedResult, setProcessedResult] = useState<string>('');
   const [showMagicQuill, setShowMagicQuill] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<Settings | null>(null);
   const [isRecordingPrompt, setIsRecordingPrompt] = useState(false);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recording, setRecording] = useState<Recording | null>(null);
 
   React.useEffect(() => {
     loadSettings();
@@ -136,7 +138,9 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
           ? settings.apiKeys?.anthropic
           : settings.llmProvider.includes('google')
             ? settings.apiKeys?.google
-            : null;
+            : settings.llmProvider.includes('mistral')
+              ? settings.apiKeys?.mistral
+              : null;
 
       if (!apiKey) {
         Alert.alert(t('alerts.configRequired'), t('errors.noApiKey'));
@@ -154,7 +158,7 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
           {
             role: 'system',
             content:
-              'You are a helpful assistant that processes text according to specific instructions. Be concise and clear.',
+              'You are a helpful assistant that processes text according to specific instructions. Return ONLY the processed result without any explanation, introduction, or the original text. Be concise and clear.',
           },
           {
             role: 'user',
@@ -166,9 +170,10 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
       setProcessedResult(result);
       onResult?.(result);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('AI processing error:', error);
-      Alert.alert(t('alerts.error'), t('ai.processingError'));
+      const errorMessage = error instanceof Error ? error.message : t('ai.processingError');
+      Alert.alert(t('alerts.error'), errorMessage);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setProcessingAction(null);
@@ -320,11 +325,9 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
             key={action.id}
             style={[
               styles.actionBadge,
-              {
-                backgroundColor: isDark ? colors.surface : 'white',
-                borderColor: colors.border,
-                opacity: processingAction && processingAction !== action.id ? 0.5 : 1,
-              },
+              isDark ? styles.actionBadgeDark : styles.actionBadgeLight,
+              { borderColor: colors.border },
+              processingAction && processingAction !== action.id && styles.actionBadgeDisabled,
             ]}
             onPress={() => handleQuickAction(action)}
             disabled={!!processingAction}
@@ -448,7 +451,9 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
               {processingAction === 'magic' ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
-                <Text style={[styles.modalButtonText, { color: 'white' }]}>{t('ai.process')}</Text>
+                <Text style={[styles.modalButtonText, styles.modalButtonTextWhite]}>
+                  {t('ai.process')}
+                </Text>
               )}
             </TouchableOpacity>
           </View>
@@ -652,5 +657,17 @@ const styles = StyleSheet.create({
   modalButtonText: {
     ...designTokens.typography.bodyMedium,
     fontWeight: '600',
+  },
+  actionBadgeDark: {
+    backgroundColor: '#1F2937', // colors.surface for dark mode
+  },
+  actionBadgeLight: {
+    backgroundColor: 'white',
+  },
+  actionBadgeDisabled: {
+    opacity: 0.5,
+  },
+  modalButtonTextWhite: {
+    color: 'white',
   },
 });

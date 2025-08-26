@@ -200,7 +200,8 @@ export const ModelDropdown: React.FC<ModelDropdownProps> = ({
                       style={[
                         styles.optionText,
                         { color: colors.text },
-                        item.id === value && { color: colors.primary, fontWeight: '600' },
+                        item.id === value && styles.selectedOptionText,
+                        item.id === value && { color: colors.primary },
                       ]}
                     >
                       {item.name}
@@ -343,5 +344,8 @@ const styles = StyleSheet.create({
   checkmark: {
     fontSize: fontSizes.large,
     fontWeight: '700',
+  },
+  selectedOptionText: {
+    fontWeight: '600',
   },
 });
