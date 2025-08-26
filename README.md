@@ -2,13 +2,13 @@
 
 ![CI/CD](https://github.com/AndreasKalkusinski/VoiceFlow/actions/workflows/ci.yml/badge.svg)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![React Native](https://img.shields.io/badge/React%20Native-0.79-blue.svg)](https://reactnative.dev/)
+[![React Native](https://img.shields.io/badge/React%20Native-0.76-blue.svg)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo-53-000.svg)](https://expo.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/AndreasKalkusinski/VoiceFlow/ci.yml)](https://github.com/AndreasKalkusinski/VoiceFlow/actions)
 
-A modern, open-source React Native app for Speech-to-Text and Text-to-Speech using OpenAI's Whisper and TTS APIs.
+A modern, open-source React Native app for Speech-to-Text and Text-to-Speech with support for multiple AI providers.
 
 🌍 **[English](#english)** | 🇩🇪 **[Deutsch](#deutsch)**
 
@@ -17,99 +17,262 @@ A modern, open-source React Native app for Speech-to-Text and Text-to-Speech usi
 - 🆓 **100% Free & Open Source** - No hidden costs, no subscriptions
 - 🔒 **Privacy First** - Your data stays on your device
 - 🎨 **Beautiful UI** - Three modern themes with dark mode support
-- 🌍 **Multi-language** - Supports English, German, Spanish
+- 🌍 **Multi-language** - Supports English, German, Spanish, and auto-detection
 - ⚡ **Fast & Reliable** - Built with performance in mind
-- 🧩 **Extensible** - Easy to add new providers and features
+- 🧩 **Multiple Providers** - OpenAI, Google, ElevenLabs, Mistral AI
+- 📱 **Share Extension** - Share audio files directly from other apps (iOS)
+- 🎯 **Smart Features** - Language auto-detection, provider recommendations
 
 ---
 
 ## English
 
-### Features
+### ✨ Features
 
-### 🎤 Speech-to-Text
+#### 🎤 Speech-to-Text
 
-- Sprachaufnahme mit visueller Animation
-- Transkription über OpenAI Whisper
-- Text bearbeiten und ergänzen
-- Text in Zwischenablage kopieren
+- Voice recording with visual animations
+- Multiple STT providers:
+  - **OpenAI Whisper** - High accuracy, 25+ languages
+  - **Google Cloud STT** - Real-time transcription
+  - **Mistral AI** - Privacy-focused European provider
+- Automatic language detection
+- Edit and enhance transcribed text
+- Copy text to clipboard
+- Transcription history
 
-### 🔊 Text-to-Speech
+#### 🔊 Text-to-Speech
 
-- Text eingeben oder aus Zwischenablage einfügen
-- Sprachausgabe mit verschiedenen Stimmen
-- Wiedergabe-Kontrollen (Play/Pause/Stop)
+- Natural-sounding voices from multiple providers:
+  - **OpenAI TTS** - Neural voices with emotions
+  - **Google Cloud TTS** - 400+ voices in 50+ languages
+  - **ElevenLabs** - Ultra-realistic AI voices
+  - **Mistral AI** - Privacy-focused TTS
+- Playback controls (Play/Pause/Stop)
+- Voice selection and speed adjustment
+- Save audio files
 
-### ⚙️ Settings
+#### 🤖 AI Text Processing
 
-- OpenAI API Key Konfiguration
-- API Key Validierung
-- Modell-Auswahl für STT und TTS
-- Stimmenauswahl für TTS
+- Integrated LLM providers for text enhancement:
+  - **OpenAI GPT** - GPT-4 and GPT-3.5
+  - **Google Gemini** - Advanced reasoning
+  - **Mistral AI** - Open-weight models
+- Text correction and formatting
+- Translation between languages
+- Summarization and expansion
 
-## Installation
+#### 📱 iOS Share Extension
 
-1. **Abhängigkeiten installieren:**
+- Share audio files from any app
+- Automatic transcription of shared audio
+- Works with Voice Memos, WhatsApp, and more
+- Seamless integration with the main app
+
+#### ⚙️ Settings & Configuration
+
+- Easy provider management
+- API key validation
+- Model selection for each service
+- Voice and language preferences
+- Three beautiful themes:
+  - **Classic** - Original design
+  - **Modern** - Contemporary look
+  - **2025** - Cutting-edge UI
+
+### 🚀 Installation
+
+#### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Expo CLI
+- iOS: Xcode 15+ (for native builds)
+- Android: Android Studio (for native builds)
+
+#### Quick Start
+
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/AndreasKalkusinski/VoiceFlow.git
+cd VoiceFlow
+```
+
+2. **Install dependencies:**
 
 ```bash
 npm install
 ```
 
-2. **App starten:**
+3. **Start the development server:**
 
 ```bash
 npx expo start
 ```
 
-3. **App auf Gerät/Simulator ausführen:**
+4. **Run on device/simulator:**
 
-- iOS: Drücke `i` im Terminal
-- Android: Drücke `a` im Terminal
-- Expo Go App: Scanne den QR-Code
+- iOS Simulator: Press `i`
+- Android Emulator: Press `a`
+- Physical device: Scan QR code with Expo Go app
 
-## Konfiguration
+#### Building for Production
 
-1. Öffne die App und gehe zu **Settings**
-2. Gib deinen OpenAI API Key ein
-3. Klicke auf **Validate API Key** um zu prüfen ob er funktioniert
-4. Speichere die Einstellungen
+**iOS:**
 
-## OpenAI API Key
+```bash
+npx expo run:ios --configuration Release
+```
 
-Du benötigst einen OpenAI API Key. Diesen erhältst du unter:
-https://platform.openai.com/api-keys
+**Android:**
 
-## Verwendete Technologien
+```bash
+npx expo run:android --variant release
+```
 
-- React Native mit Expo
-- TypeScript
-- OpenAI Whisper API (Speech-to-Text)
-- OpenAI TTS API (Text-to-Speech)
-- AsyncStorage für lokale Datenspeicherung
-- React Navigation für die Navigation
+### 🔧 Configuration
 
-## Hinweise
+1. Open the app and navigate to **Settings**
+2. Select your preferred providers
+3. Enter API keys for each service
+4. Validate keys with the built-in validator
+5. Choose models and voices
+6. Save your configuration
 
-- Die App benötigt Mikrofonberechtigungen für Speech-to-Text
-- Eine aktive Internetverbindung ist für die API-Aufrufe erforderlich
-- Der API Key wird lokal auf dem Gerät gespeichert
+### 🔑 API Keys
 
-## 🤝 Contributing
+Get your API keys from:
+
+- **OpenAI**: https://platform.openai.com/api-keys
+- **Google Cloud**: https://console.cloud.google.com/apis/credentials
+- **ElevenLabs**: https://elevenlabs.io/api
+- **Mistral AI**: https://console.mistral.ai/api-keys
+
+### 📚 Technology Stack
+
+- **Framework**: React Native with Expo SDK 53
+- **Language**: TypeScript 5.8
+- **Navigation**: React Navigation 7
+- **State Management**: React Hooks & Context
+- **Storage**: AsyncStorage & SecureStore
+- **Audio**: expo-av
+- **Animations**: React Native Reanimated 3
+- **Testing**: Jest & React Native Testing Library
+- **CI/CD**: GitHub Actions
+
+### 🏗️ Project Structure
+
+```
+VoiceFlow/
+├── src/
+│   ├── screens/          # Main app screens
+│   ├── components/       # Reusable UI components
+│   ├── services/         # API and business logic
+│   │   └── providers/    # AI provider implementations
+│   ├── hooks/           # Custom React hooks
+│   ├── utils/           # Helper functions
+│   ├── types/           # TypeScript definitions
+│   └── i18n/           # Translations
+├── ios/
+│   └── ShareExtension/  # iOS Share Extension
+└── assets/             # Images, fonts, etc.
+```
+
+### 🤝 Contributing
 
 We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Quick Start for Contributors
 
 ```bash
 # Fork and clone the repo
 git clone https://github.com/yourusername/VoiceFlow.git
 
-# Install dependencies
-npm install
+# Create a feature branch
+git checkout -b feature/amazing-feature
 
-# Start development
-npm start
+# Make your changes and commit
+git commit -m 'Add amazing feature'
+
+# Push and create a PR
+git push origin feature/amazing-feature
 ```
+
+### 📊 Project Status
+
+- ✅ Core features complete
+- ✅ Multiple provider support
+- ✅ iOS Share Extension
+- ✅ Production ready
+- 🚧 Android Share Extension (coming soon)
+- 🚧 Offline mode (planned)
+
+---
+
+## Deutsch
+
+### ✨ Funktionen
+
+#### 🎤 Sprache-zu-Text
+
+- Sprachaufnahme mit visuellen Animationen
+- Mehrere STT-Anbieter:
+  - **OpenAI Whisper** - Hohe Genauigkeit, 25+ Sprachen
+  - **Google Cloud STT** - Echtzeit-Transkription
+  - **Mistral AI** - Datenschutz-fokussierter europäischer Anbieter
+- Automatische Spracherkennung
+- Transkribierter Text bearbeiten und verbessern
+- Text in Zwischenablage kopieren
+- Transkriptionsverlauf
+
+#### 🔊 Text-zu-Sprache
+
+- Natürlich klingende Stimmen von mehreren Anbietern:
+  - **OpenAI TTS** - Neuronale Stimmen mit Emotionen
+  - **Google Cloud TTS** - 400+ Stimmen in 50+ Sprachen
+  - **ElevenLabs** - Ultrarrealistische KI-Stimmen
+  - **Mistral AI** - Datenschutz-fokussierte TTS
+- Wiedergabe-Steuerung (Play/Pause/Stop)
+- Stimmauswahl und Geschwindigkeitsanpassung
+- Audiodateien speichern
+
+#### 🤖 KI-Textverarbeitung
+
+- Integrierte LLM-Anbieter zur Textverbesserung:
+  - **OpenAI GPT** - GPT-4 und GPT-3.5
+  - **Google Gemini** - Fortgeschrittenes Reasoning
+  - **Mistral AI** - Open-Weight-Modelle
+- Textkorrektur und Formatierung
+- Übersetzung zwischen Sprachen
+- Zusammenfassung und Erweiterung
+
+#### 📱 iOS Share Extension
+
+- Audiodateien aus jeder App teilen
+- Automatische Transkription geteilter Audios
+- Funktioniert mit Sprachmemos, WhatsApp und mehr
+- Nahtlose Integration mit der Haupt-App
+
+### 🚀 Installation
+
+Siehe englische Anleitung oben.
+
+### 🔑 API-Schlüssel
+
+API-Schlüssel erhalten Sie bei:
+
+- **OpenAI**: https://platform.openai.com/api-keys
+- **Google Cloud**: https://console.cloud.google.com/apis/credentials
+- **ElevenLabs**: https://elevenlabs.io/api
+- **Mistral AI**: https://console.mistral.ai/api-keys
+
+### ⚠️ Wichtige Hinweise
+
+- Die App benötigt Mikrofonberechtigungen für Sprache-zu-Text
+- Eine aktive Internetverbindung ist für API-Aufrufe erforderlich
+- API-Schlüssel werden sicher lokal auf dem Gerät gespeichert
+- Die Share Extension ist derzeit nur für iOS verfügbar
+
+---
 
 ## 📜 License
 
@@ -121,35 +284,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Terms of Service](TERMS.md)
 - [Security Policy](SECURITY.md)
 
-## 📊 Project Status
-
-- ✅ Core features complete
-- ✅ Production ready
-- ✅ Fully tested
-- 🚧 Continuous improvements
-
 ## 🙏 Acknowledgments
 
-- OpenAI for the amazing Whisper and TTS APIs
+- OpenAI, Google, ElevenLabs, and Mistral AI for their APIs
 - The React Native and Expo communities
-- All our contributors
-
----
-
-## Deutsch
-
-### Entwicklung
-
-Die App ist modular aufgebaut:
-
-- `/src/screens/` - Die drei Hauptbildschirme
-- `/src/components/` - Wiederverwendbare Komponenten
-- `/src/services/` - API und Storage Services
-- `/src/types/` - TypeScript Type Definitionen
+- All our amazing contributors
 
 ## ⭐ Support the Project
 
-If you like VoiceFlow, please:
+If you like SpeakFlow AI, please:
 
 - ⭐ Star this repository
 - 🐛 Report bugs
@@ -159,10 +302,9 @@ If you like VoiceFlow, please:
 
 ## 📬 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/VoiceFlow/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/VoiceFlow/discussions)
-- **Email**: support@voiceflow.app
+- **Issues**: [GitHub Issues](https://github.com/AndreasKalkusinski/VoiceFlow/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/AndreasKalkusinski/VoiceFlow/discussions)
 
 ---
 
-Made with ❤️ by the VoiceFlow community
+Made with ❤️ by the SpeakFlow AI community
