@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,11 +14,11 @@
 		1BD964372E55F69200E37812 /* AppGroupModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BD964352E55F69200E37812 /* AppGroupModule.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		453CDDC7E48D476CB4FED7A5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E247DF451DC44FC0827734E9 /* InfoPlist.strings */; };
-		4D6D68B4D2D6C33D914E671B /* libPods-SpeakFlowAI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A9037C835E7D60D828059A4F /* libPods-SpeakFlowAI.a */; };
 		6E13EBE0F28D4011A4075A05 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30EA5428C0E440EB9E3EB1C3 /* InfoPlist.strings */; };
 		6EB8A0A44C4F5C99DA3414FB /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 231291D20C2FB30CB70FC8BF /* ExpoModulesProvider.swift */; };
 		92A8D261CCCF3B7BBC056DF8 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 308C1E0514C788AD2765F002 /* PrivacyInfo.xcprivacy */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		D5E3E061977E243DEC1881A2 /* libPods-SpeakFlowAI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2E560956E50C43C29354DC /* libPods-SpeakFlowAI.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -57,19 +57,19 @@
 		308C1E0514C788AD2765F002 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = SpeakFlowAI/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		30EA5428C0E440EB9E3EB1C3 /* InfoPlist.strings */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		413D6F4BBE7A46ECAA46DF29 /* InfoPlist.strings */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		41FB4959C2DDCDFC6265004D /* Pods-SpeakFlowAI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpeakFlowAI.release.xcconfig"; path = "Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI.release.xcconfig"; sourceTree = "<group>"; };
-		6326B3768461DB0562134471 /* Pods-SpeakFlowAI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpeakFlowAI.debug.xcconfig"; path = "Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI.debug.xcconfig"; sourceTree = "<group>"; };
-		A9037C835E7D60D828059A4F /* libPods-SpeakFlowAI.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SpeakFlowAI.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F4007E7188A66BCE81062C4 /* Pods-SpeakFlowAI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpeakFlowAI.release.xcconfig"; path = "Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI.release.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = SpeakFlowAI/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		DFB8F12B867957A1DF01558E /* Pods-SpeakFlowAI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpeakFlowAI.debug.xcconfig"; path = "Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI.debug.xcconfig"; sourceTree = "<group>"; };
 		E247DF451DC44FC0827734E9 /* InfoPlist.strings */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EA2E560956E50C43C29354DC /* libPods-SpeakFlowAI.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SpeakFlowAI.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = SpeakFlowAI/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* SpeakFlowAI-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "SpeakFlowAI-Bridging-Header.h"; path = "SpeakFlowAI/SpeakFlowAI-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1B590AF02E55CE4E00724394 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		1B590AF02E55CE4E00724394 /* Exceptions for "ShareExtension" folder in "ShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -79,7 +79,18 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		1B590AE32E55CE4E00724394 /* ShareExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (1B590AF02E55CE4E00724394 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ShareExtension; sourceTree = "<group>"; };
+		1B590AE32E55CE4E00724394 /* ShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1B590AF02E55CE4E00724394 /* Exceptions for "ShareExtension" folder in "ShareExtension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = ShareExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D6D68B4D2D6C33D914E671B /* libPods-SpeakFlowAI.a in Frameworks */,
+				D5E3E061977E243DEC1881A2 /* libPods-SpeakFlowAI.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,7 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				A9037C835E7D60D828059A4F /* libPods-SpeakFlowAI.a */,
+				EA2E560956E50C43C29354DC /* libPods-SpeakFlowAI.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -135,8 +146,8 @@
 		70563BCD06583E73F9725A15 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				6326B3768461DB0562134471 /* Pods-SpeakFlowAI.debug.xcconfig */,
-				41FB4959C2DDCDFC6265004D /* Pods-SpeakFlowAI.release.xcconfig */,
+				DFB8F12B867957A1DF01558E /* Pods-SpeakFlowAI.debug.xcconfig */,
+				4F4007E7188A66BCE81062C4 /* Pods-SpeakFlowAI.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -226,15 +237,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "SpeakFlowAI" */;
 			buildPhases = (
-				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
+				4DDA2F98B951CC5C2B03870F /* [CP] Check Pods Manifest.lock */,
 				DE7CC4E909CE3413483C0EDA /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				B44063BFC7280AA74AB5B3C1 /* [CP] Embed Pods Frameworks */,
 				1B590AED2E55CE4E00724394 /* Embed Foundation Extensions */,
+				31E1668E64AA432741ED8536 /* [CP] Embed Pods Frameworks */,
+				5E864BEDE7D0592DA9F4A255 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -344,7 +355,25 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n# Source .xcode.env.updates if it exists to allow\n# SKIP_BUNDLING to be unset if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.updates\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.updates\"\nfi\n# Source local changes to allow overrides\n# if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n\n";
 		};
-		08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */ = {
+		31E1668E64AA432741ED8536 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4DDA2F98B951CC5C2B03870F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -366,7 +395,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
+		5E864BEDE7D0592DA9F4A255 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -454,24 +483,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B44063BFC7280AA74AB5B3C1 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SpeakFlowAI/Pods-SpeakFlowAI-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		DE7CC4E909CE3413483C0EDA /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -525,7 +536,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6326B3768461DB0562134471 /* Pods-SpeakFlowAI.debug.xcconfig */;
+			baseConfigurationReference = DFB8F12B867957A1DF01558E /* Pods-SpeakFlowAI.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -568,7 +579,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 41FB4959C2DDCDFC6265004D /* Pods-SpeakFlowAI.release.xcconfig */;
+			baseConfigurationReference = 4F4007E7188A66BCE81062C4 /* Pods-SpeakFlowAI.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -747,7 +758,10 @@
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -802,7 +816,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
