@@ -22,49 +22,44 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Try different strategies to work around npm registry issues
-          for i in 1 2 3 4 5; do
-            echo "Attempt $i to install dependencies..."
+          # Use exponential backoff for retries
+          delays=(30 60 120 240 300)
+
+          for i in 0 1 2 3 4; do
+            attempt=$((i+1))
+            echo "Attempt $attempt to install dependencies..."
             
-            # Try with different registry settings
-            if [ $i -eq 2 ]; then
-              echo "Using npm with different timeout settings..."
-              npm config set fetch-timeout 600000
-              npm config set fetch-retry-mintimeout 20000
-              npm config set fetch-retry-maxtimeout 120000
+            # Clear npm cache on retries
+            if [ $i -gt 0 ]; then
+              echo "Clearing npm cache..."
+              npm cache clean --force
             fi
             
-            if [ $i -eq 3 ]; then
-              echo "Trying with Cloudflare npm proxy..."
-              npm config set registry https://npmjs.cf
-            fi
-            
-            if [ $i -eq 4 ]; then
-              echo "Trying with npm default registry..."
-              npm config delete registry
-              npm config set registry https://registry.npmjs.org
-            fi
-            
-            # Attempt installation
-            if npm ci --legacy-peer-deps; then
+            # Try installation with rate limiting
+            if npm ci --legacy-peer-deps --maxsockets 2; then
               echo "Installation successful!"
               # Verify critical packages are installed
+              echo "Verifying ESLint installation..."
               npx eslint --version && echo "✓ ESLint verified" || exit 1
+              echo "Verifying TypeScript installation..."
               npx tsc --version && echo "✓ TypeScript verified" || exit 1
-              break
+              exit 0
             else
-              if [ $i -lt 5 ]; then
-                echo "Attempt $i failed, cleaning cache and retrying in 20 seconds..."
-                npm cache clean --force
-                sleep 20
+              if [ $i -lt 4 ]; then
+                delay=${delays[$i]}
+                echo "Attempt $attempt failed. Waiting $delay seconds before retry..."
+                sleep $delay
               else
-                echo "All attempts failed with npm, trying with yarn as fallback..."
-                # Last resort: try yarn
-                npm install -g yarn
-                yarn install --frozen-lockfile && {
-                  npx eslint --version && echo "✓ ESLint verified" || exit 1
-                  npx tsc --version && echo "✓ TypeScript verified" || exit 1
-                } || exit 1
+                echo "All npm attempts failed. Trying alternative approach..."
+                # Try with npm install instead of ci
+                npm install --legacy-peer-deps --maxsockets 2 && {
+                  npx eslint --version && echo "✓ ESLint verified"
+                  npx tsc --version && echo "✓ TypeScript verified"
+                  exit 0
+                } || {
+                  echo "Final attempt failed. Installation could not be completed."
+                  exit 1
+                }
               fi
             fi
           done
@@ -99,49 +94,44 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Try different strategies to work around npm registry issues
-          for i in 1 2 3 4 5; do
-            echo "Attempt $i to install dependencies..."
+          # Use exponential backoff for retries
+          delays=(30 60 120 240 300)
+
+          for i in 0 1 2 3 4; do
+            attempt=$((i+1))
+            echo "Attempt $attempt to install dependencies..."
             
-            # Try with different registry settings
-            if [ $i -eq 2 ]; then
-              echo "Using npm with different timeout settings..."
-              npm config set fetch-timeout 600000
-              npm config set fetch-retry-mintimeout 20000
-              npm config set fetch-retry-maxtimeout 120000
+            # Clear npm cache on retries
+            if [ $i -gt 0 ]; then
+              echo "Clearing npm cache..."
+              npm cache clean --force
             fi
             
-            if [ $i -eq 3 ]; then
-              echo "Trying with Cloudflare npm proxy..."
-              npm config set registry https://npmjs.cf
-            fi
-            
-            if [ $i -eq 4 ]; then
-              echo "Trying with npm default registry..."
-              npm config delete registry
-              npm config set registry https://registry.npmjs.org
-            fi
-            
-            # Attempt installation
-            if npm ci --legacy-peer-deps; then
+            # Try installation with rate limiting
+            if npm ci --legacy-peer-deps --maxsockets 2; then
               echo "Installation successful!"
               # Verify critical packages are installed
+              echo "Verifying ESLint installation..."
               npx eslint --version && echo "✓ ESLint verified" || exit 1
+              echo "Verifying TypeScript installation..."
               npx tsc --version && echo "✓ TypeScript verified" || exit 1
-              break
+              exit 0
             else
-              if [ $i -lt 5 ]; then
-                echo "Attempt $i failed, cleaning cache and retrying in 20 seconds..."
-                npm cache clean --force
-                sleep 20
+              if [ $i -lt 4 ]; then
+                delay=${delays[$i]}
+                echo "Attempt $attempt failed. Waiting $delay seconds before retry..."
+                sleep $delay
               else
-                echo "All attempts failed with npm, trying with yarn as fallback..."
-                # Last resort: try yarn
-                npm install -g yarn
-                yarn install --frozen-lockfile && {
-                  npx eslint --version && echo "✓ ESLint verified" || exit 1
-                  npx tsc --version && echo "✓ TypeScript verified" || exit 1
-                } || exit 1
+                echo "All npm attempts failed. Trying alternative approach..."
+                # Try with npm install instead of ci
+                npm install --legacy-peer-deps --maxsockets 2 && {
+                  npx eslint --version && echo "✓ ESLint verified"
+                  npx tsc --version && echo "✓ TypeScript verified"
+                  exit 0
+                } || {
+                  echo "Final attempt failed. Installation could not be completed."
+                  exit 1
+                }
               fi
             fi
           done
@@ -213,49 +203,44 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Try different strategies to work around npm registry issues
-          for i in 1 2 3 4 5; do
-            echo "Attempt $i to install dependencies..."
+          # Use exponential backoff for retries
+          delays=(30 60 120 240 300)
+
+          for i in 0 1 2 3 4; do
+            attempt=$((i+1))
+            echo "Attempt $attempt to install dependencies..."
             
-            # Try with different registry settings
-            if [ $i -eq 2 ]; then
-              echo "Using npm with different timeout settings..."
-              npm config set fetch-timeout 600000
-              npm config set fetch-retry-mintimeout 20000
-              npm config set fetch-retry-maxtimeout 120000
+            # Clear npm cache on retries
+            if [ $i -gt 0 ]; then
+              echo "Clearing npm cache..."
+              npm cache clean --force
             fi
             
-            if [ $i -eq 3 ]; then
-              echo "Trying with Cloudflare npm proxy..."
-              npm config set registry https://npmjs.cf
-            fi
-            
-            if [ $i -eq 4 ]; then
-              echo "Trying with npm default registry..."
-              npm config delete registry
-              npm config set registry https://registry.npmjs.org
-            fi
-            
-            # Attempt installation
-            if npm ci --legacy-peer-deps; then
+            # Try installation with rate limiting
+            if npm ci --legacy-peer-deps --maxsockets 2; then
               echo "Installation successful!"
               # Verify critical packages are installed
+              echo "Verifying ESLint installation..."
               npx eslint --version && echo "✓ ESLint verified" || exit 1
+              echo "Verifying TypeScript installation..."
               npx tsc --version && echo "✓ TypeScript verified" || exit 1
-              break
+              exit 0
             else
-              if [ $i -lt 5 ]; then
-                echo "Attempt $i failed, cleaning cache and retrying in 20 seconds..."
-                npm cache clean --force
-                sleep 20
+              if [ $i -lt 4 ]; then
+                delay=${delays[$i]}
+                echo "Attempt $attempt failed. Waiting $delay seconds before retry..."
+                sleep $delay
               else
-                echo "All attempts failed with npm, trying with yarn as fallback..."
-                # Last resort: try yarn
-                npm install -g yarn
-                yarn install --frozen-lockfile && {
-                  npx eslint --version && echo "✓ ESLint verified" || exit 1
-                  npx tsc --version && echo "✓ TypeScript verified" || exit 1
-                } || exit 1
+                echo "All npm attempts failed. Trying alternative approach..."
+                # Try with npm install instead of ci
+                npm install --legacy-peer-deps --maxsockets 2 && {
+                  npx eslint --version && echo "✓ ESLint verified"
+                  npx tsc --version && echo "✓ TypeScript verified"
+                  exit 0
+                } || {
+                  echo "Final attempt failed. Installation could not be completed."
+                  exit 1
+                }
               fi
             fi
           done
