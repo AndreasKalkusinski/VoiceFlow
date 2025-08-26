@@ -7,6 +7,7 @@ import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
 import { Linking } from 'react-native';
+import Constants from 'expo-constants';
 import './src/i18n';
 // import { runAppGroupTestOnStartup } from './src/utils/testAppGroup'; // Removed unused import
 
@@ -41,18 +42,24 @@ function ThemedApp() {
       if (!navigationRef.current) return;
 
       try {
-        // Use stub service in Expo Go, real service in dev builds
-        const isExpoDev = __DEV__ && !window.location;
-        const AppGroupService = isExpoDev
-          ? (await import('./src/services/AppGroupServiceStub')).default
-          : (await import('./src/services/AppGroupServiceWrapper')).default;
+        // Check if we're in Expo Go using Constants
+        const isExpoGo = Constants.executionEnvironment === 'storeClient';
+
+        if (isExpoGo) {
+          // eslint-disable-next-line no-console
+          console.log('[App] Running in Expo Go - skipping native module features');
+          return;
+        }
+
+        // Only import the wrapper service if not in Expo Go
+        const { default: AppGroupService } = await import('./src/services/AppGroupServiceWrapper');
 
         // eslint-disable-next-line no-console
         console.log('[App] AppGroupService available:', AppGroupService.isAvailable());
 
         if (!AppGroupService.isAvailable()) {
           // eslint-disable-next-line no-console
-          console.log('[App] AppGroup not available - running in Expo Go or native module missing');
+          console.log('[App] AppGroup not available - native module missing');
           return;
         }
 
@@ -85,7 +92,7 @@ function ThemedApp() {
       } catch (error) {
         // Silently fail if module is not available
         // eslint-disable-next-line no-console
-        console.log('[App] AppGroupService error:', error);
+        console.log('[App] AppGroupService error (expected in Expo Go):', error);
       }
     };
 
