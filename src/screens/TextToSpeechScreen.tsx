@@ -11,7 +11,7 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import LegacyAudioService from '../services/LegacyAudioService';
+import LegacyAudioService, { Sound, AVPlaybackStatus } from '../services/LegacyAudioService';
 const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import { LogView } from '../components/LogView';
@@ -25,7 +25,7 @@ export const TextToSpeechScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [sound, setSound] = useState<Sound | null>(null);
 
   useEffect(() => {
     loadSettings();
@@ -138,7 +138,7 @@ export const TextToSpeechScreen: React.FC = () => {
           setIsPlaying(true);
           addLog('Playing audio', 'info');
 
-          sound.setOnPlaybackStatusUpdate((status) => {
+          sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
             if (status.isLoaded && status.didJustFinish) {
               setIsPlaying(false);
               setLogs([]);

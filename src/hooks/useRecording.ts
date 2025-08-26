@@ -33,7 +33,7 @@ export function useRecording(): RecordingHook {
       // Setup audio mode for recording
       await setAudioModeAsync({
         allowsRecording: true,
-        playsInSilentModeIOS: true,
+        playsInSilentMode: true,
       });
 
       // Start recording

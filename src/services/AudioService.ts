@@ -23,15 +23,15 @@ export class AudioService {
 
   static async setupRecordingMode(): Promise<void> {
     await setAudioModeAsync({
-      allowsRecordingIOS: true,
-      playsInSilentModeIOS: true,
+      allowsRecording: true,
+      playsInSilentMode: true,
     });
   }
 
   static async setupPlaybackMode(): Promise<void> {
     await setAudioModeAsync({
-      allowsRecordingIOS: false,
-      playsInSilentModeIOS: true,
+      allowsRecording: false,
+      playsInSilentMode: true,
     });
   }
 

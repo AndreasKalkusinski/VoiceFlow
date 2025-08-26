@@ -27,7 +27,7 @@ export function usePlayback(): PlaybackHook {
         // Setup audio mode for playback
         await setAudioModeAsync({
           allowsRecording: false,
-          playsInSilentModeIOS: true,
+          playsInSilentMode: true,
         });
 
         // Set the URI and play

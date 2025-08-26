@@ -1,4 +1,4 @@
-import LegacyAudioService from '../services/LegacyAudioService';
+import LegacyAudioService, { Recording } from '../services/LegacyAudioService';
 const Audio = LegacyAudioService.Audio;
 
 // Helper functions for audio recording
@@ -26,7 +26,7 @@ export async function startRecording() {
   return recording;
 }
 
-export async function stopRecording(recording: Audio.Recording) {
+export async function stopRecording(recording: Recording) {
   await recording.stopAndUnloadAsync();
   const uri = recording.getURI();
   return uri;
