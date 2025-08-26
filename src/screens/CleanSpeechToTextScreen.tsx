@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Audio from 'expo-audio';
+import { Audio } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import { MinimalCard } from '../components/MinimalCard';
 import { SimpleButton } from '../components/SimpleButton';
@@ -97,7 +97,9 @@ export const CleanSpeechToTextScreen: React.FC = () => {
         playsInSilentModeIOS: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync(Audio.RecordingPresets.HIGH_QUALITY);
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
+      );
 
       setRecording(recording);
       setIsRecording(true);

@@ -1,4 +1,4 @@
-import * as Audio from 'expo-audio';
+import { Audio } from 'expo-av';
 
 // Helper functions for audio recording that work with the new expo-audio API
 
@@ -22,9 +22,9 @@ export async function startRecording() {
     playsInSilentModeIOS: true,
   });
 
-  const recording = new Audio.Recording();
-  await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-  await recording.startAsync();
+  const { recording } = await Audio.Recording.createAsync(
+    Audio.RecordingOptionsPresets.HIGH_QUALITY,
+  );
 
   return recording;
 }

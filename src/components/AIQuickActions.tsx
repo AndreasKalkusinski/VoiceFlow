@@ -19,7 +19,7 @@ import { designTokens } from '../utils/design-system';
 import * as Haptics from 'expo-haptics';
 import * as Clipboard from 'expo-clipboard';
 import Modal from 'react-native-modal';
-import * as Audio from 'expo-audio';
+import { Audio } from 'expo-av';
 import { StorageService } from '../services/storage';
 import { LLMProviderRegistry } from '../services/providers/LLMProviderRegistry';
 import { Settings } from '../types/settings';
@@ -219,7 +219,9 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
       });
 
       // Start recording
-      const { recording } = await Audio.Recording.createAsync(Audio.RecordingPresets.HIGH_QUALITY);
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
+      );
 
       setRecording(recording);
       setIsRecordingPrompt(true);

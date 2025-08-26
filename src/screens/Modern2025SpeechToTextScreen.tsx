@@ -14,7 +14,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Audio from 'expo-audio';
+import { Audio } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -290,7 +290,7 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
     try {
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
-        allowsRecording: true,
+        allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
     } catch {
@@ -323,11 +323,13 @@ export const Modern2025SpeechToTextScreen: React.FC = () => {
       }
 
       await Audio.setAudioModeAsync({
-        allowsRecording: true,
+        allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync(Audio.RecordingPresets.HIGH_QUALITY);
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
+      );
 
       setRecording(recording);
       setIsRecording(true);
