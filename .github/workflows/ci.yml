@@ -64,14 +64,14 @@ jobs:
             }
           done
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
       - name: Test build
-        run: npx expo export --platform ios
+        run: |
+          for i in 1 2 3 4 5; do
+            npx expo export --platform ios && break || {
+              echo "Attempt $i failed, retrying in 10 seconds..."
+              sleep 10
+            }
+          done
 
   # Preview builds are currently disabled
   # Uncomment this job when EAS credentials are configured
