@@ -6,7 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
-import { Linking } from 'react-native';
+import { Linking, AppState } from 'react-native';
 import Constants from 'expo-constants';
 import './src/i18n';
 // import { runAppGroupTestOnStartup } from './src/utils/testAppGroup'; // Removed unused import
@@ -99,18 +99,18 @@ function ThemedApp() {
     // Check on mount
     checkSharedData();
 
-    // Setup listener for app state changes
+    // Setup listener for app state changes (only if not in Expo Go)
+    const isExpoGo = Constants.executionEnvironment === 'storeClient';
     let subscription: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    (async () => {
+    if (!isExpoGo) {
       // Check when app becomes active (from background)
-      const { AppState } = await import('react-native');
       subscription = AppState.addEventListener('change', (nextAppState: string) => {
         if (nextAppState === 'active') {
           checkSharedData();
         }
       });
-    })();
+    }
 
     return () => {
       subscription?.remove();
