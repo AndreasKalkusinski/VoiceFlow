@@ -17,52 +17,37 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: |
-          # Use exponential backoff for retries
-          delays=(30 60 120 240 300)
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-          for i in 0 1 2 3 4; do
-            attempt=$((i+1))
-            echo "Attempt $attempt to install dependencies..."
-            
-            # Clear npm cache on retries
-            if [ $i -gt 0 ]; then
-              echo "Clearing npm cache..."
-              npm cache clean --force
-            fi
-            
-            # Try installation with rate limiting
-            if npm ci --legacy-peer-deps --maxsockets 2; then
-              echo "Installation successful!"
-              # Verify critical packages are installed
-              echo "Verifying ESLint installation..."
-              npx eslint --version && echo "✓ ESLint verified" || exit 1
-              echo "Verifying TypeScript installation..."
-              npx tsc --version && echo "✓ TypeScript verified" || exit 1
-              exit 0
-            else
-              if [ $i -lt 4 ]; then
-                delay=${delays[$i]}
-                echo "Attempt $attempt failed. Waiting $delay seconds before retry..."
-                sleep $delay
-              else
-                echo "All npm attempts failed. Trying alternative approach..."
-                # Try with npm install instead of ci
-                npm install --legacy-peer-deps --maxsockets 2 && {
-                  npx eslint --version && echo "✓ ESLint verified"
-                  npx tsc --version && echo "✓ TypeScript verified"
-                  exit 0
-                } || {
-                  echo "Final attempt failed. Installation could not be completed."
-                  exit 1
-                }
-              fi
-            fi
-          done
+      - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: |
+          echo "Cache miss - installing dependencies..."
+          # Use Chinese npm mirror to avoid 403 errors
+          npm config set registry https://registry.npmmirror.com
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+      - name: Restore from cache if needed
+        if: steps.cache-npm.outputs.cache-hit == 'true'
+        run: echo "Using cached dependencies"
+
+      - name: Verify installations
+        run: |
+          echo "Verifying ESLint installation..."
+          npx eslint --version || { echo "ESLint not found!"; exit 1; }
+          echo "Verifying TypeScript installation..."
+          npx tsc --version || { echo "TypeScript not found!"; exit 1; }
 
       - name: Run linter
         run: npm run lint
@@ -89,52 +74,37 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: |
-          # Use exponential backoff for retries
-          delays=(30 60 120 240 300)
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-          for i in 0 1 2 3 4; do
-            attempt=$((i+1))
-            echo "Attempt $attempt to install dependencies..."
-            
-            # Clear npm cache on retries
-            if [ $i -gt 0 ]; then
-              echo "Clearing npm cache..."
-              npm cache clean --force
-            fi
-            
-            # Try installation with rate limiting
-            if npm ci --legacy-peer-deps --maxsockets 2; then
-              echo "Installation successful!"
-              # Verify critical packages are installed
-              echo "Verifying ESLint installation..."
-              npx eslint --version && echo "✓ ESLint verified" || exit 1
-              echo "Verifying TypeScript installation..."
-              npx tsc --version && echo "✓ TypeScript verified" || exit 1
-              exit 0
-            else
-              if [ $i -lt 4 ]; then
-                delay=${delays[$i]}
-                echo "Attempt $attempt failed. Waiting $delay seconds before retry..."
-                sleep $delay
-              else
-                echo "All npm attempts failed. Trying alternative approach..."
-                # Try with npm install instead of ci
-                npm install --legacy-peer-deps --maxsockets 2 && {
-                  npx eslint --version && echo "✓ ESLint verified"
-                  npx tsc --version && echo "✓ TypeScript verified"
-                  exit 0
-                } || {
-                  echo "Final attempt failed. Installation could not be completed."
-                  exit 1
-                }
-              fi
-            fi
-          done
+      - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: |
+          echo "Cache miss - installing dependencies..."
+          # Use Chinese npm mirror to avoid 403 errors
+          npm config set registry https://registry.npmmirror.com
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+      - name: Restore from cache if needed
+        if: steps.cache-npm.outputs.cache-hit == 'true'
+        run: echo "Using cached dependencies"
+
+      - name: Verify installations
+        run: |
+          echo "Verifying ESLint installation..."
+          npx eslint --version || { echo "ESLint not found!"; exit 1; }
+          echo "Verifying TypeScript installation..."
+          npx tsc --version || { echo "TypeScript not found!"; exit 1; }
 
       - name: Test build
         run: |
@@ -198,52 +168,37 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: |
-          # Use exponential backoff for retries
-          delays=(30 60 120 240 300)
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-          for i in 0 1 2 3 4; do
-            attempt=$((i+1))
-            echo "Attempt $attempt to install dependencies..."
-            
-            # Clear npm cache on retries
-            if [ $i -gt 0 ]; then
-              echo "Clearing npm cache..."
-              npm cache clean --force
-            fi
-            
-            # Try installation with rate limiting
-            if npm ci --legacy-peer-deps --maxsockets 2; then
-              echo "Installation successful!"
-              # Verify critical packages are installed
-              echo "Verifying ESLint installation..."
-              npx eslint --version && echo "✓ ESLint verified" || exit 1
-              echo "Verifying TypeScript installation..."
-              npx tsc --version && echo "✓ TypeScript verified" || exit 1
-              exit 0
-            else
-              if [ $i -lt 4 ]; then
-                delay=${delays[$i]}
-                echo "Attempt $attempt failed. Waiting $delay seconds before retry..."
-                sleep $delay
-              else
-                echo "All npm attempts failed. Trying alternative approach..."
-                # Try with npm install instead of ci
-                npm install --legacy-peer-deps --maxsockets 2 && {
-                  npx eslint --version && echo "✓ ESLint verified"
-                  npx tsc --version && echo "✓ TypeScript verified"
-                  exit 0
-                } || {
-                  echo "Final attempt failed. Installation could not be completed."
-                  exit 1
-                }
-              fi
-            fi
-          done
+      - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: |
+          echo "Cache miss - installing dependencies..."
+          # Use Chinese npm mirror to avoid 403 errors
+          npm config set registry https://registry.npmmirror.com
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+      - name: Restore from cache if needed
+        if: steps.cache-npm.outputs.cache-hit == 'true'
+        run: echo "Using cached dependencies"
+
+      - name: Verify installations
+        run: |
+          echo "Verifying ESLint installation..."
+          npx eslint --version || { echo "ESLint not found!"; exit 1; }
+          echo "Verifying TypeScript installation..."
+          npx tsc --version || { echo "TypeScript not found!"; exit 1; }
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
