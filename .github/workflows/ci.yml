@@ -22,10 +22,23 @@ jobs:
       - name: Install dependencies
         run: |
           for i in 1 2 3 4 5; do
-            npm ci --legacy-peer-deps && break || {
-              echo "Attempt $i failed, retrying in 10 seconds..."
-              sleep 10
-            }
+            echo "Attempt $i to install dependencies..."
+            if npm ci --legacy-peer-deps; then
+              echo "Installation successful!"
+              # Verify critical packages are installed
+              npx eslint --version && echo "✓ ESLint verified" || exit 1
+              npx tsc --version && echo "✓ TypeScript verified" || exit 1
+              break
+            else
+              if [ $i -lt 5 ]; then
+                echo "Attempt $i failed, cleaning cache and retrying in 15 seconds..."
+                npm cache clean --force
+                sleep 15
+              else
+                echo "All attempts failed"
+                exit 1
+              fi
+            fi
           done
 
       - name: Run linter
@@ -58,10 +71,23 @@ jobs:
       - name: Install dependencies
         run: |
           for i in 1 2 3 4 5; do
-            npm ci --legacy-peer-deps && break || {
-              echo "Attempt $i failed, retrying in 10 seconds..."
-              sleep 10
-            }
+            echo "Attempt $i to install dependencies..."
+            if npm ci --legacy-peer-deps; then
+              echo "Installation successful!"
+              # Verify critical packages are installed
+              npx eslint --version && echo "✓ ESLint verified" || exit 1
+              npx tsc --version && echo "✓ TypeScript verified" || exit 1
+              break
+            else
+              if [ $i -lt 5 ]; then
+                echo "Attempt $i failed, cleaning cache and retrying in 15 seconds..."
+                npm cache clean --force
+                sleep 15
+              else
+                echo "All attempts failed"
+                exit 1
+              fi
+            fi
           done
 
       - name: Test build
@@ -131,10 +157,23 @@ jobs:
       - name: Install dependencies
         run: |
           for i in 1 2 3 4 5; do
-            npm ci --legacy-peer-deps && break || {
-              echo "Attempt $i failed, retrying in 10 seconds..."
-              sleep 10
-            }
+            echo "Attempt $i to install dependencies..."
+            if npm ci --legacy-peer-deps; then
+              echo "Installation successful!"
+              # Verify critical packages are installed
+              npx eslint --version && echo "✓ ESLint verified" || exit 1
+              npx tsc --version && echo "✓ TypeScript verified" || exit 1
+              break
+            else
+              if [ $i -lt 5 ]; then
+                echo "Attempt $i failed, cleaning cache and retrying in 15 seconds..."
+                npm cache clean --force
+                sleep 15
+              else
+                echo "All attempts failed"
+                exit 1
+              fi
+            fi
           done
 
       - name: Setup EAS
