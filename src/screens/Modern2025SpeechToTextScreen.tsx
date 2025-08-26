@@ -14,7 +14,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LegacyAudioService from '../services/LegacyAudioService';
+import LegacyAudioService, { Recording } from '../services/LegacyAudioService';
 const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
@@ -40,7 +40,7 @@ import { AIQuickActions } from '../components/AIQuickActions';
 
 export const Modern2025SpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recording, setRecording] = useState<Recording | null>(null);
   const [transcribedText, setTranscribedText] = useState('');
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);

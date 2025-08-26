@@ -19,7 +19,7 @@ import { designTokens } from '../utils/design-system';
 import * as Haptics from 'expo-haptics';
 import * as Clipboard from 'expo-clipboard';
 import Modal from 'react-native-modal';
-import LegacyAudioService from '../services/LegacyAudioService';
+import LegacyAudioService, { Recording } from '../services/LegacyAudioService';
 const Audio = LegacyAudioService.Audio;
 import { StorageService } from '../services/storage';
 import { LLMProviderRegistry } from '../services/providers/LLMProviderRegistry';
@@ -47,7 +47,7 @@ export const AIQuickActions: React.FC<AIQuickActionsProps> = ({ text, onResult }
   const [customPrompt, setCustomPrompt] = useState('');
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isRecordingPrompt, setIsRecordingPrompt] = useState(false);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recording, setRecording] = useState<Recording | null>(null);
 
   React.useEffect(() => {
     loadSettings();

@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LegacyAudioService from '../services/LegacyAudioService';
+import LegacyAudioService, { Sound } from '../services/LegacyAudioService';
 const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import { MinimalCard } from '../components/MinimalCard';
@@ -27,7 +27,7 @@ export const CleanTextToSpeechScreen: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [sound, setSound] = useState<Sound | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
 
   const { colors } = useTheme();

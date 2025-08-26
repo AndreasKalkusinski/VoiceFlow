@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import LegacyAudioService from '../services/LegacyAudioService';
+import LegacyAudioService, { Recording } from '../services/LegacyAudioService';
 const Audio = LegacyAudioService.Audio;
 import * as Clipboard from 'expo-clipboard';
 import { RecordingAnimation } from '../components/RecordingAnimation';
@@ -21,7 +21,7 @@ import { LogMessage, Settings } from '../types';
 
 export const SpeechToTextScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recording, setRecording] = useState<Recording | null>(null);
   const [transcribedText, setTranscribedText] = useState('');
   const [logs, setLogs] = useState<LogMessage[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
