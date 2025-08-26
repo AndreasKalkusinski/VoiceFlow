@@ -22,11 +22,19 @@ jobs:
       - name: Install dependencies
         run: |
           for i in 1 2 3 4 5; do
+            echo "Attempt $i to install dependencies..."
             npm ci --legacy-peer-deps && break || {
-              echo "Attempt $i failed, retrying in 10 seconds..."
-              sleep 10
+              if [ $i -lt 5 ]; then
+                echo "Attempt $i failed, retrying in 10 seconds..."
+                sleep 10
+              else
+                echo "All attempts failed"
+                exit 1
+              fi
             }
           done
+          # Verify eslint is installed
+          npx eslint --version || (echo "ESLint not found after install" && exit 1)
 
       - name: Run linter
         run: npm run lint
@@ -58,11 +66,19 @@ jobs:
       - name: Install dependencies
         run: |
           for i in 1 2 3 4 5; do
+            echo "Attempt $i to install dependencies..."
             npm ci --legacy-peer-deps && break || {
-              echo "Attempt $i failed, retrying in 10 seconds..."
-              sleep 10
+              if [ $i -lt 5 ]; then
+                echo "Attempt $i failed, retrying in 10 seconds..."
+                sleep 10
+              else
+                echo "All attempts failed"
+                exit 1
+              fi
             }
           done
+          # Verify eslint is installed
+          npx eslint --version || (echo "ESLint not found after install" && exit 1)
 
       - name: Test build
         run: |
@@ -131,11 +147,19 @@ jobs:
       - name: Install dependencies
         run: |
           for i in 1 2 3 4 5; do
+            echo "Attempt $i to install dependencies..."
             npm ci --legacy-peer-deps && break || {
-              echo "Attempt $i failed, retrying in 10 seconds..."
-              sleep 10
+              if [ $i -lt 5 ]; then
+                echo "Attempt $i failed, retrying in 10 seconds..."
+                sleep 10
+              else
+                echo "All attempts failed"
+                exit 1
+              fi
             }
           done
+          # Verify eslint is installed
+          npx eslint --version || (echo "ESLint not found after install" && exit 1)
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
