@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-av';
+import { Audio, AVPlaybackStatus } from 'expo-av';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import * as Sharing from 'expo-sharing';
@@ -123,7 +123,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
   const setupAudio = async () => {
     try {
       await Audio.setAudioModeAsync({
-        allowsRecording: false,
+        allowsRecordingIOS: false,
         playsInSilentModeIOS: true,
         staysActiveInBackground: true,
         shouldDuckAndroid: true,
@@ -263,7 +263,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
 
       // Setup audio mode for playback
       await Audio.setAudioModeAsync({
-        allowsRecording: false,
+        allowsRecordingIOS: false,
         playsInSilentModeIOS: true,
         staysActiveInBackground: true,
         shouldDuckAndroid: true,
@@ -330,7 +330,7 @@ export const ModernTextToSpeechScreen: React.FC = () => {
         } else {
           // Ensure audio mode is set for playback
           await Audio.setAudioModeAsync({
-            allowsRecording: false,
+            allowsRecordingIOS: false,
             playsInSilentModeIOS: true,
             staysActiveInBackground: true,
             shouldDuckAndroid: true,

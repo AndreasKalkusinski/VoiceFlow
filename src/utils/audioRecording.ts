@@ -3,12 +3,8 @@ import { Audio } from 'expo-av';
 // Helper functions for audio recording that work with the new expo-audio API
 
 export async function requestRecordingPermissions() {
-  const [permissionResponse, requestPermission] = await Audio.getPermissionsAsync();
-  if (permissionResponse.status !== 'granted') {
-    const result = await requestPermission();
-    return result.status === 'granted';
-  }
-  return true;
+  const { status } = await Audio.requestPermissionsAsync();
+  return status === 'granted';
 }
 
 export async function startRecording() {
